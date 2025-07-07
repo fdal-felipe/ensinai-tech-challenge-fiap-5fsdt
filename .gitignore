@@ -1,0 +1,20 @@
+# Arquivo de variáveis de ambiente - NUNCA ENVIE ESTE ARQUIVO!
+.env
+
+# Dependências do Node.js
+node_modules
+
+# Pasta com os dados do volume do Docker
+pgdata
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Arquivos de sistema operacional
+.DS_Store
+Thumbs.db
+
+# Arquivos do editor/IDE
+.vscode/

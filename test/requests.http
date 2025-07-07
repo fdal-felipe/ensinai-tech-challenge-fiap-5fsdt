@@ -1,0 +1,14 @@
+@baseUrl = http://localhost:3000
+
+### Criar uma nova postagem
+POST {{baseUrl}}/posts
+Content-Type: application/json
+
+{
+  "title": "Postagem com variável",
+  "content": "Usando variáveis para deixar o arquivo mais limpo.",
+  "author_id": 1
+}
+
+### Testar a rota principal
+GET {{baseUrl}}/
