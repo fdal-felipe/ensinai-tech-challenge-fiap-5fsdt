@@ -66,8 +66,6 @@ exports.updatePost = async (req, res) => {
     }
 };
 
-// ... (depois da função updatePost)
-
 // Função para deletar uma postagem
 exports.deletePost = async (req, res) => {
     const { id } = req.params;
@@ -80,6 +78,25 @@ exports.deletePost = async (req, res) => {
         res.status(204).send();
     } catch (error) {
         console.error('Erro ao deletar post:', error);
+        res.status(500).json({ error: 'Erro interno do servidor.' });
+    }
+};
+
+// Função para buscar posts por palavra-chave
+exports.searchPosts = async (req, res) => {
+    const { q } = req.query;
+    if (!q) {
+        return res.status(400).json({ error: 'O parâmetro de busca "q" é obrigatório.' });
+    }
+    try {
+        const sql = `
+            SELECT * FROM posts 
+            WHERE to_tsvector('portuguese', title || ' ' || content) @@ to_tsquery('portuguese', $1)
+        `;
+        const { rows } = await db.query(sql, [q]);
+        res.status(200).json(rows);
+    } catch (error) {
+        console.error('Erro ao buscar posts:', error);
         res.status(500).json({ error: 'Erro interno do servidor.' });
     }
 };

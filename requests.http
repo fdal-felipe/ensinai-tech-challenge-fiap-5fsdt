@@ -30,3 +30,6 @@ Content-Type: application/json
 
 ### Deletar uma postagem
 DELETE {{baseUrl}}/posts/1
+
+### Buscar posts por palavra-chave
+GET {{baseUrl}}/posts/search?q=insi
