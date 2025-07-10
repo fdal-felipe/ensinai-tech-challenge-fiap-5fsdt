@@ -13,7 +13,7 @@ describe('Testes dos Endpoints de Posts (CRUD Completo)', () => {
         
         const userData = await db.query(
             "INSERT INTO users (name, email, password_hash, role) VALUES ($1, $2, $3, $4) RETURNING id",
-            ['Usuário de Teste', 'teste@teste.com', 'senha_hash', 'docente']
+            ['Usuário de Teste', 'teste@teste.com', 'senha_hash', 'professor']
         );
         testUserId = userData.rows[0].id;
     });
