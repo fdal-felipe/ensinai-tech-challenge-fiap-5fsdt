@@ -1,35 +1,33 @@
 const request = require('supertest');
-const app = require('../src/app'); // Importamos o app, não o server!
+const app = require('../src/app');
 const db = require('../src/db');
 
-// Descreve o conjunto de testes para os endpoints de posts
-describe('Endpoints de Posts', () => {
+describe('Testes dos Endpoints de Posts (CRUD Completo)', () => {
 
-    // Limpa o banco de dados antes de todos os testes
+    let testUserId;
+    let postId;
+
     beforeAll(async () => {
         await db.query('DELETE FROM posts');
+        await db.query('DELETE FROM users');
+        
+        const userData = await db.query(
+            "INSERT INTO users (name, email, password_hash, role) VALUES ($1, $2, $3, $4) RETURNING id",
+            ['Usuário de Teste', 'teste@teste.com', 'senha_hash', 'docente']
+        );
+        testUserId = userData.rows[0].id;
     });
-    
-    // Garante que a conexão com o banco seja fechada após os testes
+
     afterAll(async () => {
         await db.pool.end();
     });
 
-    it('GET /posts - deve retornar uma lista vazia de posts inicialmente', async () => {
-        const response = await request(app).get('/posts');
-        
-        expect(response.statusCode).toBe(200);
-        expect(response.body).toBeInstanceOf(Array);
-        expect(response.body.length).toBe(0);
-    });
-
-    it('POST /posts - deve criar um novo post', async () => {
+    it('POST /posts - deve criar um novo post e retornar 201', async () => {
         const novoPost = {
-            title: 'Post de Teste',
+            title: 'Post para Teste Completo',
             content: 'Conteúdo do post de teste.',
-            author_id: 1 // Assumindo que o usuário 1 existe para o teste
+            author_id: testUserId
         };
-
         const response = await request(app)
             .post('/posts')
             .send(novoPost);
@@ -37,13 +35,37 @@ describe('Endpoints de Posts', () => {
         expect(response.statusCode).toBe(201);
         expect(response.body.title).toBe(novoPost.title);
         expect(response.body).toHaveProperty('id');
+        postId = response.body.id;
     });
     
-    it('GET /posts - deve retornar uma lista com um post após a criação', async () => {
-        const response = await request(app).get('/posts');
-        
+    it('GET /posts/:id - deve retornar o post específico recém-criado', async () => {
+        const response = await request(app).get(`/posts/${postId}`);
         expect(response.statusCode).toBe(200);
-        expect(response.body.length).toBe(1);
-        expect(response.body[0].title).toBe('Post de Teste');
+        expect(response.body.id).toBe(postId);
+        expect(response.body.title).toBe('Post para Teste Completo');
+    });
+
+    it('PUT /posts/:id - deve atualizar o post criado e retornar 200', async () => {
+        const postAtualizado = {
+            title: 'Título do Post Atualizado',
+            content: 'Conteúdo do post foi atualizado.',
+            author_id: testUserId
+        };
+        const response = await request(app)
+            .put(`/posts/${postId}`)
+            .send(postAtualizado);
+
+        expect(response.statusCode).toBe(200);
+        expect(response.body.title).toBe('Título do Post Atualizado');
+    });
+
+    it('DELETE /posts/:id - deve deletar o post e retornar 204', async () => {
+        const response = await request(app).delete(`/posts/${postId}`);
+        expect(response.statusCode).toBe(204);
+    });
+
+    it('GET /posts/:id - deve retornar 404 para um post que foi deletado', async () => {
+        const response = await request(app).get(`/posts/${postId}`);
+        expect(response.statusCode).toBe(404);
     });
 });
