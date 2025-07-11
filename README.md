@@ -1,6 +1,6 @@
-# Educa Blog - OutSystems
+# Ensinai Blog Educacional - OutSystems
 
-Projeto desenvolvido como parte do **Tech Challenge - Fase 01** do curso Fullstack, com foco na criação de uma aplicação de blogging educacional para professores e alunos da rede pública.
+Projeto desenvolvido como parte do **Tech Challenge** do curso Fullstack, com foco na criação de uma aplicação de blogging educacional para professores e alunos da rede pública.
 
 ## 🎯 Objetivo
 
@@ -14,8 +14,7 @@ Criar uma aplicação simples e funcional utilizando a plataforma **OutSystems**
 ## 🛠️ Tecnologias Utilizadas
 
 - [OutSystems](https://www.outsystems.com/)
-- [Draw.io](https://draw.io/) ou [Lucidchart](https://www.lucidchart.com/) para fluxograma
-- [Miro](https://miro.com/) para documentação visual (opcional)
+- [Draw.io](https://draw.io/)
 
 ---
 
@@ -40,14 +39,13 @@ Criar uma aplicação simples e funcional utilizando a plataforma **OutSystems**
 - Dificuldades enfrentadas pelo grupo durante o desenvolvimento
 - Passo a passo básico para uso do sistema
 
-> A documentação completa está disponível na pasta `documentacao`.
+> A documentação completa está disponível na pasta `outsystems`.
 
 ---
 
 ## 🎥 Apresentação em Vídeo
 
-A apresentação gravada está disponível em:  
-📺 *[link do vídeo no YouTube ou Google Drive aqui]*
+A apresentação gravada está disponível na pasta `outsystems`.
 
 ---
 

@@ -1,4 +1,4 @@
-const app = require('./app'); // Importa o app do novo arquivo
+const app = require('./app');
 
 const port = 3000;
 

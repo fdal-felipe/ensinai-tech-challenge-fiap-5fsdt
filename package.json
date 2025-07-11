@@ -1,7 +1,7 @@
 {
   "name": "ensinai-tech-challenge-fiap-5fsdt",
   "version": "1.0.0",
-  "description": "Projeto desenvolvido como parte do **Tech Challenge - Fase 01** do curso Fullstack, com foco na criação de uma aplicação de blogging educacional para professores e alunos da rede pública.",
+  "description": "Projeto desenvolvido como parte do **Tech Challenge** do curso Fullstack, com foco na criação de uma aplicação de blogging educacional para professores e alunos da rede pública.",
   "main": "index.js",
   "scripts": {
     "test": "jest",

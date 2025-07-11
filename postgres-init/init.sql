@@ -1,4 +1,5 @@
--- Usar um ENUM para o papel do usuário é uma boa prática para garantir a integridade dos dados.
+-- ENUM para definir os papéis dos usuários.
+-- 'professor' e 'aluno' são os papéis possíveis na plataforma.
 CREATE TYPE user_role AS ENUM ('professor', 'aluno');
 
 -- Tabela para armazenar os usuários da plataforma.
@@ -17,12 +18,9 @@ CREATE TABLE posts (
     id SERIAL PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     content TEXT NOT NULL,
-    -- Chave estrangeira que referencia o autor da postagem.
     author_id INTEGER NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-
-    -- Define o relacionamento: se um usuário for deletado, suas postagens também serão.
     CONSTRAINT fk_author
         FOREIGN KEY(author_id)
         REFERENCES users(id)
@@ -35,5 +33,4 @@ CREATE TABLE posts (
 CREATE INDEX idx_posts_author_id ON posts(author_id);
 
 -- Cria um índice GIN para Full-Text Search no título e conteúdo.
--- Isso tornará a funcionalidade de busca (GET /posts/search) extremamente rápida.
 CREATE INDEX idx_posts_search ON posts USING gin(to_tsvector('portuguese', title || ' ' || content));
