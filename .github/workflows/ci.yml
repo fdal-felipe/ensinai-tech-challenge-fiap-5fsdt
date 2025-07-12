@@ -1,6 +1,6 @@
 # .github/workflows/ci.yml
 
-name: CI de Testes da API
+name: CI/CD Pipeline
 
 on:
   push:
@@ -53,3 +53,10 @@ jobs:
           DB_HOST: localhost
           DB_PORT: 5432
         run: npm test
+  deploy:
+    needs: build
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Disparar Deploy Hook no Render
+        run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
