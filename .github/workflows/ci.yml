@@ -41,9 +41,12 @@ jobs:
 
       - name: Inicializar o banco de dados
         env:
-          PGPASSWORD: ${{ secrets.DB_PASSWORD }}
-        run: |
-          psql -h localhost -U ${{ secrets.DB_USER }} -d ${{ secrets.DB_DATABASE }} -p 5432 -f postgres-init/init.sql
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_DATABASE: ${{ secrets.DB_DATABASE }}
+          DB_HOST: localhost
+          DB_PORT: 5432
+        run: node src/db/migrate.js
 
       - name: Rodar os testes
         env:
