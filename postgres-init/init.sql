@@ -1,20 +1,26 @@
 -- 1. Ativa a extensão que remove acentos
 CREATE EXTENSION IF NOT EXISTS unaccent;
 
--- 2. Cria uma nova configuração de busca de texto para português sem acentos
-CREATE TEXT SEARCH CONFIGURATION pt_unaccent (COPY = portuguese);
+-- 2. Cria a configuração de busca de texto de forma segura
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_ts_config WHERE cfgname = 'pt_unaccent') THEN
+        CREATE TEXT SEARCH CONFIGURATION pt_unaccent (COPY = portuguese);
+        ALTER TEXT SEARCH CONFIGURATION pt_unaccent
+            ALTER MAPPING FOR hword, hword_part, word
+            WITH unaccent, portuguese_stem;
+    END IF;
+END$$;
 
--- Alteração da configuração para usar o dicionário unaccent
-ALTER TEXT SEARCH CONFIGURATION pt_unaccent
-    ALTER MAPPING FOR hword, hword_part, word
-    WITH unaccent, portuguese_stem;
+-- 3. Cria o tipo ENUM de forma segura
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'user_role') THEN
+        CREATE TYPE user_role AS ENUM ('professor', 'aluno');
+    END IF;
+END$$;
 
--- 3. Esquema do banco (tabelas, tipos, etc.)
-
--- Cria o tipo ENUM para os papéis dos usuários
-CREATE TYPE user_role AS ENUM ('professor', 'aluno');
-
--- Cria a tabela de usuários
+-- 4. Cria as tabelas e índices
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
@@ -25,7 +31,6 @@ CREATE TABLE IF NOT EXISTS users (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Cria a tabela de posts
 CREATE TABLE IF NOT EXISTS posts (
     id SERIAL PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
@@ -39,9 +44,6 @@ CREATE TABLE IF NOT EXISTS posts (
         ON DELETE CASCADE
 );
 
--- --- ÍNDICES PARA OTIMIZAÇÃO ---
-
 CREATE INDEX IF NOT EXISTS idx_posts_author_id ON posts(author_id);
 
--- Atualiza o índice de busca para usar a configuração 'pt_unaccent'
 CREATE INDEX IF NOT EXISTS idx_posts_search ON posts USING gin(to_tsvector('pt_unaccent', title || ' ' || content));

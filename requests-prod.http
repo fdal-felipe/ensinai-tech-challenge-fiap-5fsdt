@@ -14,7 +14,7 @@ Content-Type: application/json
 GET {{baseUrl}}/posts
 
 ### Obter uma postagem específica (sucesso)
-GET {{baseUrl}}/posts/1
+GET {{baseUrl}}/posts/6
 
 ### Obter uma postagem específica (erro 404)
 GET {{baseUrl}}/posts/9999
@@ -24,12 +24,12 @@ PUT {{baseUrl}}/posts/6
 Content-Type: application/json
 
 {
-  "title": "Este Título Foi Atualizado",
-  "content": "O conteúdo também foi modificado através do endpoint PUT."
+  "title": "Este Título Foi Atualizado novamente",
+  "content": "O conteúdo também foi modificado através do endpoint PUT novamente."
 }
 
 ### Deletar uma postagem
 DELETE {{baseUrl}}/posts/1
 
 ### Buscar posts por palavra-chave
-GET {{baseUrl}}/posts/search?q=tulo
+GET {{baseUrl}}/posts/search?q=título
