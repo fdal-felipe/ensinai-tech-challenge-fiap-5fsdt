@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const postsController = require("../controllers/postsController");
+const { body, validationResult } = require('express-validator');
 
 /**
  * @openapi
@@ -162,7 +163,15 @@ const postsController = require("../controllers/postsController");
 
 // Rotas
 router.get("/", postsController.getAllPosts);
-router.post("/", postsController.createPost);
+router.post(
+  "/",
+  [
+    body('title').notEmpty(),
+    body('content').notEmpty(),
+    body('author_id').isInt()
+  ],
+  postsController.createPost
+);
 router.get("/search", postsController.searchPosts);
 router.get("/:id", postsController.getPostById);
 router.put("/:id", postsController.updatePost);

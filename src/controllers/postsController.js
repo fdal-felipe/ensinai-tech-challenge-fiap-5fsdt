@@ -91,7 +91,7 @@ exports.searchPosts = async (req, res) => {
     try {
         const sql = `
             SELECT * FROM posts 
-            WHERE to_tsvector('portuguese', title || ' ' || content) @@ to_tsquery('portuguese', $1)
+            WHERE to_tsvector('portuguese', title || ' ' || content) @@ plainto_tsquery('portuguese', $1)
         `;
         const { rows } = await db.query(sql, [q]);
         res.status(200).json(rows);

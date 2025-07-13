@@ -5,17 +5,17 @@ const path = require('path');
 async function runMigrations() {
   console.log('Verificando a necessidade de executar migrações...');
   try {
-    await db.query("SELECT 'public.users'::regclass");
-    console.log('Tabelas já existem. Nenhuma migração necessária.');
-  } catch (error) {
-    if (error.message.includes('does not exist')) {
+    const result = await db.query("SELECT to_regclass('public.users') as exists");
+    if (!result.rows[0].exists) {
       console.log('Tabelas não encontradas, executando script de inicialização...');
       const initSql = fs.readFileSync(path.join(__dirname, '../../postgres-init/init.sql')).toString();
       await db.query(initSql);
       console.log('Banco de dados inicializado com sucesso.');
     } else {
-      throw error;
+      console.log('Tabelas já existem. Nenhuma migração necessária.');
     }
+  } catch (error) {
+    throw error;
   }
 }
 
