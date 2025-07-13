@@ -40,10 +40,23 @@ jobs:
         run: npm install
 
       - name: Inicializar o banco de dados
+        env:
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_DATABASE: ${{ secrets.DB_DATABASE }}
+          DB_HOST: localhost
+          DB_PORT: 5432
         run: node src/db/migrate.js
 
       - name: Rodar os testes
+        env:
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_DATABASE: ${{ secrets.DB_DATABASE }}
+          DB_HOST: localhost
+          DB_PORT: 5432
         run: npm test
+        
   deploy:
     needs: build
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
