@@ -1,8 +1,21 @@
--- ENUM para definir os papéis dos usuários.
+-- 1. Ativa a extensão que remove acentos
+CREATE EXTENSION IF NOT EXISTS unaccent;
+
+-- 2. Cria uma nova configuração de busca de texto para português sem acentos
+CREATE TEXT SEARCH CONFIGURATION pt_unaccent (COPY = portuguese);
+
+-- Alteração da configuração para usar o dicionário unaccent
+ALTER TEXT SEARCH CONFIGURATION pt_unaccent
+    ALTER MAPPING FOR hword, hword_part, word
+    WITH unaccent, portuguese_stem;
+
+-- 3. Esquema do banco (tabelas, tipos, etc.)
+
+-- Cria o tipo ENUM para os papéis dos usuários
 CREATE TYPE user_role AS ENUM ('professor', 'aluno');
 
--- Tabela para armazenar os usuários da plataforma.
-CREATE TABLE users (
+-- Cria a tabela de usuários
+CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
@@ -12,8 +25,8 @@ CREATE TABLE users (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Tabela para armazenar as postagens do blog.
-CREATE TABLE posts (
+-- Cria a tabela de posts
+CREATE TABLE IF NOT EXISTS posts (
     id SERIAL PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     content TEXT NOT NULL,
@@ -26,10 +39,9 @@ CREATE TABLE posts (
         ON DELETE CASCADE
 );
 
--- --- ÍNDICES PARA OTIMIZAÇÃO DE BUSCAS ---
+-- --- ÍNDICES PARA OTIMIZAÇÃO ---
 
--- Cria um índice na chave estrangeira para acelerar joins e buscas por autor.
-CREATE INDEX idx_posts_author_id ON posts(author_id);
+CREATE INDEX IF NOT EXISTS idx_posts_author_id ON posts(author_id);
 
--- Cria um índice GIN para Full-Text Search no título e conteúdo.
-CREATE INDEX idx_posts_search ON posts USING gin(to_tsvector('portuguese', title || ' ' || content));
+-- Atualiza o índice de busca para usar a configuração 'pt_unaccent'
+CREATE INDEX IF NOT EXISTS idx_posts_search ON posts USING gin(to_tsvector('pt_unaccent', title || ' ' || content));

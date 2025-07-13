@@ -88,12 +88,16 @@ exports.searchPosts = async (req, res) => {
     if (!q) {
         return res.status(400).json({ error: 'O parâmetro de busca "q" é obrigatório.' });
     }
+
     try {
+        const searchTerm = q.split(' ').filter(word => word).map(word => word + ':*').join(' & ');
         const sql = `
-            SELECT * FROM posts 
-            WHERE to_tsvector('portuguese', title || ' ' || content) @@ plainto_tsquery('portuguese', $1)
+            SELECT p.*, u.name as author_name 
+            FROM posts p
+            JOIN users u ON p.author_id = u.id 
+            WHERE to_tsvector('pt_unaccent', p.title || ' ' || p.content) @@ to_tsquery('pt_unaccent', $1)
         `;
-        const { rows } = await db.query(sql, [q]);
+        const { rows } = await db.query(sql, [searchTerm]);
         res.status(200).json(rows);
     } catch (error) {
         console.error('Erro ao buscar posts:', error);
