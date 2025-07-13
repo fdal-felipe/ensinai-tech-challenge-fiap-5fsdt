@@ -1,9 +1,8 @@
 -- ENUM para definir os papéis dos usuários.
--- 'professor' e 'aluno' são os papéis possíveis na plataforma.
-CREATE TYPE IF NOT EXISTS user_role AS ENUM ('professor', 'aluno');
+CREATE TYPE user_role AS ENUM ('professor', 'aluno');
 
 -- Tabela para armazenar os usuários da plataforma.
-CREATE TABLE IF NOT EXISTS users (
+CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
@@ -14,7 +13,7 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 -- Tabela para armazenar as postagens do blog.
-CREATE TABLE IF NOT EXISTS posts (
+CREATE TABLE posts (
     id SERIAL PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     content TEXT NOT NULL,
@@ -30,7 +29,7 @@ CREATE TABLE IF NOT EXISTS posts (
 -- --- ÍNDICES PARA OTIMIZAÇÃO DE BUSCAS ---
 
 -- Cria um índice na chave estrangeira para acelerar joins e buscas por autor.
-CREATE INDEX IF NOT EXISTS idx_posts_author_id ON posts(author_id);
+CREATE INDEX idx_posts_author_id ON posts(author_id);
 
 -- Cria um índice GIN para Full-Text Search no título e conteúdo.
-CREATE INDEX IF NOT EXISTS idx_posts_search ON posts USING gin(to_tsvector('portuguese', title || ' ' || content));
+CREATE INDEX idx_posts_search ON posts USING gin(to_tsvector('portuguese', title || ' ' || content));
