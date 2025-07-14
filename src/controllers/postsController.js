@@ -94,8 +94,8 @@ exports.searchPosts = async (req, res) => {
             SELECT p.*, u.name as author_name
             FROM posts p
             JOIN users u ON p.author_id = u.id
-            WHERE unaccent(p.title || ' ' || p.content) % unaccent($1)
-            ORDER BY similarity(unaccent(p.title || ' ' || p.content), unaccent($1)) DESC
+            WHERE f_unaccent(p.title || ' ' || p.content) % f_unaccent($1)
+            ORDER BY similarity(f_unaccent(p.title || ' ' || p.content), f_unaccent($1)) DESC
         `;
         
         const { rows } = await db.query(sql, [q]);

@@ -1,17 +1,12 @@
--- 1. Ativa as extensões necessárias (unaccent para acentos, pg_trgm para fuzzy search)
+-- 1. Ativa as extensões necessárias
 CREATE EXTENSION IF NOT EXISTS unaccent;
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
 
--- 2. Cria a configuração de busca de texto
-DO $$
-BEGIN
-    IF NOT EXISTS (SELECT 1 FROM pg_ts_config WHERE cfgname = 'pt_unaccent') THEN
-        CREATE TEXT SEARCH CONFIGURATION pt_unaccent (COPY = portuguese);
-        ALTER TEXT SEARCH CONFIGURATION pt_unaccent
-            ALTER MAPPING FOR hword, hword_part, word
-            WITH unaccent, portuguese_stem;
-    END IF;
-END$$;
+-- 2. Cria uma função "wrapper" imutável para a unaccent
+CREATE OR REPLACE FUNCTION f_unaccent(text)
+RETURNS text AS $$
+SELECT unaccent('unaccent', $1)
+$$ LANGUAGE sql IMMUTABLE;
 
 -- 3. Cria o tipo ENUM
 DO $$
@@ -47,5 +42,6 @@ CREATE TABLE IF NOT EXISTS posts (
 
 -- 5. Cria os índices
 CREATE INDEX IF NOT EXISTS idx_posts_author_id ON posts(author_id);
+
 DROP INDEX IF EXISTS idx_posts_search;
-CREATE INDEX idx_posts_search ON posts USING gin ((unaccent(title) || ' ' || unaccent(content)) gin_trgm_ops);
+CREATE INDEX idx_posts_search ON posts USING gin (f_unaccent(title || ' ' || content) gin_trgm_ops);
