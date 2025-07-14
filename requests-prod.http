@@ -32,4 +32,4 @@ Content-Type: application/json
 DELETE {{baseUrl}}/posts/1
 
 ### Buscar posts por palavra-chave
-GET {{baseUrl}}/posts/search?q=tít
+GET {{baseUrl}}/posts/search?q=Postgem de exemplo
