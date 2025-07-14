@@ -90,15 +90,17 @@ exports.searchPosts = async (req, res) => {
     }
 
     try {
-        const searchTerm = q.split(' ').filter(word => word).map(word => word + ':*').join(' & ');
         const sql = `
-            SELECT p.*, u.name as author_name 
+            SELECT p.*, u.name as author_name
             FROM posts p
-            JOIN users u ON p.author_id = u.id 
-            WHERE to_tsvector('pt_unaccent', p.title || ' ' || p.content) @@ to_tsquery('pt_unaccent', $1)
+            JOIN users u ON p.author_id = u.id
+            WHERE unaccent(p.title || ' ' || p.content) % unaccent($1)
+            ORDER BY similarity(unaccent(p.title || ' ' || p.content), unaccent($1)) DESC
         `;
-        const { rows } = await db.query(sql, [searchTerm]);
+        
+        const { rows } = await db.query(sql, [q]);
         res.status(200).json(rows);
+
     } catch (error) {
         console.error('Erro ao buscar posts:', error);
         res.status(500).json({ error: 'Erro interno do servidor.' });
