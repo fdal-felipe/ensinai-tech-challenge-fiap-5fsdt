@@ -29,7 +29,7 @@ Content-Type: application/json
 }
 
 ### Deletar uma postagem
-DELETE {{baseUrl}}/posts/1
+DELETE {{baseUrl}}/posts/6
 
 ### Buscar posts por palavra-chave
-GET {{baseUrl}}/posts/search?q=Postgem de exemplo
+GET {{baseUrl}}/posts/search?q=Forla de bhaskara
