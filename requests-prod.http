@@ -32,4 +32,4 @@ Content-Type: application/json
 DELETE {{baseUrl}}/posts/6
 
 ### Buscar posts por palavra-chave
-GET {{baseUrl}}/posts/search?q=Forla de bhaskara
+GET {{baseUrl}}/posts/search?q=Plantas 
