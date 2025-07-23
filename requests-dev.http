@@ -29,27 +29,28 @@ Content-Type: application/json
 }
 
 ### Deletar uma postagem
-DELETE {{baseUrl}}/posts/
+DELETE {{baseUrl}}/posts/1
 
 ### Buscar posts por palavra-chave
 GET {{baseUrl}}/posts/search?q=insi
 
 ### Obter usuarios cadastrados
-GET {{baseUrl}}/users/1
+GET {{baseUrl}}/users/
 
 ###criar um novo usuário
 POST {{baseUrl}}/users/
 Content-Type: application/json
 
 {
-  "name": "Camila",
-  "email": "camila@teste.com",
-  "password_hash": "523",
-  "role":"professor"
+  "name": "Felipe Seiji",
+  "email": "felipe@teste.com",
+  "password_hash": "345",
+  "role":"professor",
+  "status":"ativo"
 }
 
 ### Atualizar uma postagem
-PUT {{baseUrl}}/users/1
+PUT {{baseUrl}}/users/
 Content-Type: application/json
 {
  "name": "Felipe Seiji",
@@ -58,4 +59,7 @@ Content-Type: application/json
   "role": "professor",
 }
 ### Deletar uma postagem
-DELETE {{baseUrl}}/users/2
+DELETE {{baseUrl}}/users/
+
+### Testar a rota principal
+GET {{baseUrl}}/professor/posts

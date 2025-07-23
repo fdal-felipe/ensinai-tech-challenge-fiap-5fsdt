@@ -14,6 +14,8 @@ app.use(express.json());
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 app.use('/posts', postsRoutes);
+app.use('/professor/posts', postsRoutes);
+app.use('/alunos/posts', postsRoutes);
 app.use('/users', usersRoutes);
 
 

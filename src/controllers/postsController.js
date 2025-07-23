@@ -2,8 +2,8 @@ const db = require('../db');
 
 // Função para criar uma nova postagem
 exports.createPost = async (req, res) => {
-    const { title, content, author_id } = req.body;
-    if (!title || !content || !author_id) {
+    const { title, content, author_id} = req.body;
+    if (!title || !content || !author_id ) {
         return res.status(400).json({ error: 'Título, conteúdo e ID do autor são obrigatórios.' });
     }
     try {
@@ -21,6 +21,17 @@ exports.createPost = async (req, res) => {
 exports.getAllPosts = async (req, res) => {
     try {
         const sql = 'SELECT * FROM posts ORDER BY created_at DESC';
+        const { rows } = await db.query(sql);
+        res.status(200).json(rows);
+    } catch (error) {
+        console.error('Erro ao listar posts:', error);
+        res.status(500).json({ error: 'Erro interno do servidor.' });
+    }
+};
+// Função para obter todas as postagens
+exports.getAllPostsProfessor = async (req, res) => {
+    try {
+        const sql = 'SELECT * FROM posts WHERE status = ativo  ORDER BY created_at DESC';
         const { rows } = await db.query(sql);
         res.status(200).json(rows);
     } catch (error) {
@@ -48,13 +59,13 @@ exports.getPostById = async (req, res) => {
 // Função para atualizar uma postagem
 exports.updatePost = async (req, res) => {
     const { id } = req.params;
-    const { title, content } = req.body;
-    if (!title || !content) {
+    const { title, content,status } = req.body;
+    if (!title || !content || !status) {
         return res.status(400).json({ error: 'Título e conteúdo são obrigatórios.' });
     }
     try {
-        const sql = 'UPDATE posts SET title = $1, content = $2, updated_at = NOW() WHERE id = $3 RETURNING *';
-        const values = [title, content, id];
+        const sql = 'UPDATE posts SET title = $1, content = $2, status = $3 updated_at = NOW() WHERE id = $3 RETURNING *';
+        const values = [title, content, id, !status];
         const { rows } = await db.query(sql, values);
         if (rows.length === 0) {
             return res.status(404).json({ error: 'Postagem não encontrada.' });
