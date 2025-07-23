@@ -29,7 +29,33 @@ Content-Type: application/json
 }
 
 ### Deletar uma postagem
-DELETE {{baseUrl}}/posts/1
+DELETE {{baseUrl}}/posts/
 
 ### Buscar posts por palavra-chave
 GET {{baseUrl}}/posts/search?q=insi
+
+### Obter usuarios cadastrados
+GET {{baseUrl}}/users/1
+
+###criar um novo usuário
+POST {{baseUrl}}/users/
+Content-Type: application/json
+
+{
+  "name": "Camila",
+  "email": "camila@teste.com",
+  "password_hash": "523",
+  "role":"professor"
+}
+
+### Atualizar uma postagem
+PUT {{baseUrl}}/users/1
+Content-Type: application/json
+{
+ "name": "Felipe Seiji",
+  "email": "seijimatie@gmail.com",
+  "password_hash": "123",
+  "role": "professor",
+}
+### Deletar uma postagem
+DELETE {{baseUrl}}/users/2

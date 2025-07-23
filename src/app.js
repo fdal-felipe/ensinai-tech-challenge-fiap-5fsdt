@@ -1,5 +1,6 @@
 const express = require('express');
 const postsRoutes = require('./routes/posts');
+const usersRoutes = require('./routes/users');
 
 const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
@@ -13,5 +14,7 @@ app.use(express.json());
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 app.use('/posts', postsRoutes);
+app.use('/users', usersRoutes);
+
 
 module.exports = app;

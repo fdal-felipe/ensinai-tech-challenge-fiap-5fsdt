@@ -1,5 +1,4 @@
 require('dotenv').config();
-
 const app = require('./app');
 const runMigrations = require('./db/migrate');
 
