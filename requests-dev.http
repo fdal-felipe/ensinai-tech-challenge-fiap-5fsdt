@@ -42,24 +42,24 @@ POST {{baseUrl}}/users/
 Content-Type: application/json
 
 {
-  "name": "Felipe Seiji",
-  "email": "felipe@teste.com",
-  "password_hash": "345",
-  "role":"professor",
-  "status":"ativo"
-}
+  "name": "Camila",
+  "email": "camila@teste.com",
+  "password_hash": "1121",
+  "role":"professor"
+  }
 
-### Atualizar uma postagem
-PUT {{baseUrl}}/users/
+### Atualizar usuário
+PUT {{baseUrl}}/users/1
 Content-Type: application/json
-{
- "name": "Felipe Seiji",
-  "email": "seijimatie@gmail.com",
-  "password_hash": "123",
-  "role": "professor",
-}
-### Deletar uma postagem
-DELETE {{baseUrl}}/users/
 
-### Testar a rota principal
+{
+  "name": "Camila",
+  "email": "cacazinha@gmail.com",
+  "password_hash": "2806",
+  "role": "professor"
+}
+### Deletar um usuário
+DELETE {{baseUrl}}/users/1
+
+### Testar a rota principal - professores
 GET {{baseUrl}}/professor/posts

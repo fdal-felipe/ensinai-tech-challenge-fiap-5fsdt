@@ -1,5 +1,5 @@
 const db = require('../db');
-// Função para obter todas as postagens
+// Função para obter todos os usuário
 exports.getAllUsers = async (req, res) => {
     try {
         const sql = 'SELECT * FROM users ORDER BY created_at DESC';
@@ -11,7 +11,7 @@ exports.getAllUsers = async (req, res) => {
     }
 };
 
-// Função para criar uma nova postagem
+// Função para criar um novo usuário
 exports.createUser = async (req, res) => {
     const { name, email, password_hash,role } = req.body;
     if (!name || !email || !password_hash || !role) {
@@ -29,7 +29,7 @@ exports.createUser = async (req, res) => {
 };
 
 
-// Função para obter uma postagem por ID
+// Função para obter um usuário por ID
 exports.getUsersById = async (req, res) => {
     const { id } = req.params;
     try {
@@ -45,24 +45,24 @@ exports.getUsersById = async (req, res) => {
     }
 };
 
-// Função para atualizar uma postagem
+// Função para atualizar usuário
 exports.updateUsers = async (req, res) => {
     const { id } = req.params;
-    const { name, email, password_hash,role } = req.body;
-    if (!name || !content || !password_hash || !role) {
-        return res.status(400).json({ error: 'Nome , email, password e funcao são obrigatórios.' });
+    const { name, email, password_hash, role } = req.body;
+    if (!name || !email || !password_hash || !role) {
+        return res.status(400).json({ error: 'Nome, email, password e função são obrigatórios.' });
     }
     try {
-        const sql = 'UPDATE users SET title = $1, content = $2, updated_at = NOW() WHERE id = $3 RETURNING *';
-        const values = [title, content, id];
+        const sql = 'UPDATE users SET name = $1, email = $2, password_hash = $3, role = $4, updated_at = NOW() WHERE id = $5 RETURNING *';
+        const values = [name, email, password_hash, role, id];
         const { rows } = await db.query(sql, values);
         if (rows.length === 0) {
-            return res.status(404).json({ error: 'Usuario não encontrada.' });
+            return res.status(404).json({ error: 'Usuário não encontrado.' });
         }
         res.status(200).json(rows[0]);
     } catch (error) {
         console.error('Erro ao atualizar user:', error);
-        res.status(500).json({ error: 'Erro interno do servidor ao atualizar usuario.' });
+        res.status(500).json({ error: 'Erro interno do servidor ao atualizar usuário.' });
     }
 };
 

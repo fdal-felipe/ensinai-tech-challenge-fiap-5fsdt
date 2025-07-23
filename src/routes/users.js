@@ -16,7 +16,7 @@ router.post(
 //router.get("/search", usersController.searchPosts);
 router.get("/:id", usersController.getUsersById);
 router.put("/:id", usersController.updateUsers);
-router.delete("/:id", usersController.deletePost);
+router.delete("/:id", usersController.deleteUsers);
 
 
 module.exports = router;
