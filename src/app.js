@@ -1,6 +1,7 @@
 const express = require('express');
 const postsRoutes = require('./routes/posts');
 const usersRoutes = require('./routes/users');
+const alunoPostsRoutes = require('./routes/alunoPosts.js')
 
 const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
@@ -13,9 +14,9 @@ app.use(express.json());
 // Rotas
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
-app.use('/posts', postsRoutes);
+//app.use('/posts', postsRoutes);
 app.use('/professor/posts', postsRoutes);
-app.use('/alunos/posts', postsRoutes);
+app.use('/aluno/posts', alunoPostsRoutes);
 app.use('/users', usersRoutes);
 
 

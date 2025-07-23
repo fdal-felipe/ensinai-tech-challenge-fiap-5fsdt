@@ -1,38 +1,38 @@
 @baseUrl = http://localhost:3000
 
 ### Criar uma nova postagem
-POST {{baseUrl}}/posts
+POST {{baseUrl}}/professor/posts
 Content-Type: application/json
-
 {
-  "title": "2 Postagem com variável",
+  "title": "3 novo posts",
   "content": "Usando variáveis para deixar o arquivo mais limpo.",
   "author_id": 1
 }
 
 ### Testar a rota principal
-GET {{baseUrl}}/posts
+GET {{baseUrl}}/professor/posts
 
 ### Obter uma postagem específica (sucesso)
-GET {{baseUrl}}/posts/1
+GET {{baseUrl}}/professor/posts/1
 
 ### Obter uma postagem específica (erro 404)
-GET {{baseUrl}}/posts/9999
+GET {{baseUrl}}/professor/posts/9999
 
 ### Atualizar uma postagem
-PUT {{baseUrl}}/posts/1
+PUT {{baseUrl}}/professor/posts/1
 Content-Type: application/json
 
 {
   "title": "Este Título Foi Atualizado",
-  "content": "O conteúdo também foi modificado através do endpoint PUT."
+  "content": "O conteúdo também foi modificado através do endpoint PUT.",
+  "status":"inativo"
 }
 
 ### Deletar uma postagem
-DELETE {{baseUrl}}/posts/1
+DELETE {{baseUrl}}/professor/posts/1
 
 ### Buscar posts por palavra-chave
-GET {{baseUrl}}/posts/search?q=insi
+GET {{baseUrl}}/professor/posts/search?q=insi
 
 ### Obter usuarios cadastrados
 GET {{baseUrl}}/users/
@@ -42,8 +42,8 @@ POST {{baseUrl}}/users/
 Content-Type: application/json
 
 {
-  "name": "Camila",
-  "email": "camila@teste.com",
+  "name": "Felipe Seiji",
+  "email": "Felipe@teste.com",
   "password_hash": "1121",
   "role":"professor"
   }
@@ -61,5 +61,11 @@ Content-Type: application/json
 ### Deletar um usuário
 DELETE {{baseUrl}}/users/1
 
-### Testar a rota principal - professores
-GET {{baseUrl}}/professor/posts
+### Testar a rota principal - alunos
+GET {{baseUrl}}/aluno/posts
+
+### Obter uma postagem específica - aluno
+GET {{baseUrl}}/aluno/posts/1
+
+### Buscar posts por palavra-chave
+GET {{baseUrl}}/professor/posts/search?q=insi

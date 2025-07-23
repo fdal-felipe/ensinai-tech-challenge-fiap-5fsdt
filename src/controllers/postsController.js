@@ -58,24 +58,35 @@ exports.getPostById = async (req, res) => {
 
 // Função para atualizar uma postagem
 exports.updatePost = async (req, res) => {
-    const { id } = req.params;
-    const { title, content,status } = req.body;
-    if (!title || !content || !status) {
-        return res.status(400).json({ error: 'Título e conteúdo são obrigatórios.' });
+  const { id } = req.params;
+  const { title, content, status } = req.body;
+
+  if (!title || !content || !status) {
+    return res.status(400).json({ error: 'Título, conteúdo e status são obrigatórios.' });
+  }
+
+  try {
+    const sql = `
+      UPDATE posts
+      SET title = $1, content = $2, status = $3, updated_at = NOW()
+      WHERE id = $4
+      RETURNING *;
+    `;
+    const values = [title, content, status, id];
+
+    const { rows } = await db.query(sql, values);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Postagem não encontrada.' });
     }
-    try {
-        const sql = 'UPDATE posts SET title = $1, content = $2, status = $3 updated_at = NOW() WHERE id = $3 RETURNING *';
-        const values = [title, content, id, !status];
-        const { rows } = await db.query(sql, values);
-        if (rows.length === 0) {
-            return res.status(404).json({ error: 'Postagem não encontrada.' });
-        }
-        res.status(200).json(rows[0]);
-    } catch (error) {
-        console.error('Erro ao atualizar post:', error);
-        res.status(500).json({ error: 'Erro interno do servidor ao atualizar postagem.' });
-    }
+
+    res.status(200).json(rows[0]);
+  } catch (error) {
+    console.error('Erro ao atualizar post:', error);
+    res.status(500).json({ error: 'Erro interno do servidor ao atualizar postagem.' });
+  }
 };
+
 
 // Função para deletar uma postagem
 exports.deletePost = async (req, res) => {

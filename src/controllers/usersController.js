@@ -67,7 +67,7 @@ exports.updateUsers = async (req, res) => {
 };
 
 // Função para deletar uma postagem
-exports.deletePost = async (req, res) => {
+exports.deleteUsers = async (req, res) => {
     const { id } = req.params;
     try {
         const sql = 'DELETE FROM users WHERE id = $1';
