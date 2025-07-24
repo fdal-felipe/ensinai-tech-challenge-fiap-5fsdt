@@ -3,6 +3,7 @@
 ### Criar uma nova postagem
 POST {{baseUrl}}/professor/posts
 Content-Type: application/json
+
 {
   "title": "3 novo posts",
   "content": "Usando variáveis para deixar o arquivo mais limpo.",
@@ -23,7 +24,7 @@ PUT {{baseUrl}}/professor/posts/1
 Content-Type: application/json
 
 {
-  "title": "Este Título Foi Atualizado",
+  "title": "Este Título Foi ajustado",
   "content": "O conteúdo também foi modificado através do endpoint PUT.",
   "status":"inativo"
 }
@@ -32,7 +33,7 @@ Content-Type: application/json
 DELETE {{baseUrl}}/professor/posts/1
 
 ### Buscar posts por palavra-chave
-GET {{baseUrl}}/professor/posts/search?q=insi
+GET {{baseUrl}}/professor/posts/search?q=3
 
 ### Obter usuarios cadastrados
 GET {{baseUrl}}/users/

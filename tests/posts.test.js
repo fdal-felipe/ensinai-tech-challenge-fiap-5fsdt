@@ -39,7 +39,7 @@ describe('Testes dos Endpoints de Posts (CRUD Completo)', () => {
     });
     
     it('GET /posts/:id - deve retornar o post específico recém-criado', async () => {
-        const response = await request(app).get(`/posts/${postId}`);
+        const response = await request(app).get(`professor/posts/${postId}`);
         expect(response.statusCode).toBe(200);
         expect(response.body.id).toBe(postId);
         expect(response.body.title).toBe('Post para Teste Completo');
@@ -60,12 +60,12 @@ describe('Testes dos Endpoints de Posts (CRUD Completo)', () => {
     });
 
     it('DELETE /posts/:id - deve deletar o post e retornar 204', async () => {
-        const response = await request(app).delete(`/posts/${postId}`);
+        const response = await request(app).delete(`professor/posts/${postId}`);
         expect(response.statusCode).toBe(204);
     });
 
     it('GET /posts/:id - deve retornar 404 para um post que foi deletado', async () => {
-        const response = await request(app).get(`/posts/${postId}`);
+        const response = await request(app).get(`professor/posts/${postId}`);
         expect(response.statusCode).toBe(404);
     });
 });
