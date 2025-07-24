@@ -40,7 +40,7 @@ exports.searchPosts = async (req, res) => {
             SELECT p.*, u.name as author_name
             FROM posts p
             JOIN users u ON p.author_id = u.id
-            WHERE similarity(f_unaccent(p.title || ' ' || p.content), f_unaccent($1)) > 0.01
+            WHERE similarity(f_unaccent(p.title || ' ' || p.content), f_unaccent($1)) > 0.1 AND status = 'ativo'
             ORDER BY similarity(f_unaccent(p.title || ' ' || p.content), f_unaccent($1)) DESC
         `;
         

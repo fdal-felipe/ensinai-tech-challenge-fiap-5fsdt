@@ -1,26 +1,24 @@
 @baseUrl = http://localhost:3000
 
-### Criar uma nova postagem
+# ROTA PROFESSORES
+###
+GET {{baseUrl}}/professor/posts
+###
 POST {{baseUrl}}/professor/posts
 Content-Type: application/json
 
 {
-  "title": "3 novo posts",
+  "title": "novo posts",
   "content": "Usando variáveis para deixar o arquivo mais limpo.",
-  "author_id": 1
+  "author_id": 6
 }
 
-### Testar a rota principal
-GET {{baseUrl}}/professor/posts
-
-### Obter uma postagem específica (sucesso)
-GET {{baseUrl}}/professor/posts/1
-
-### Obter uma postagem específica (erro 404)
+###
+GET {{baseUrl}}/professor/posts/87
+###
 GET {{baseUrl}}/professor/posts/9999
-
-### Atualizar uma postagem
-PUT {{baseUrl}}/professor/posts/1
+###
+PUT {{baseUrl}}/professor/posts/87
 Content-Type: application/json
 
 {
@@ -29,28 +27,28 @@ Content-Type: application/json
   "status":"inativo"
 }
 
-### Deletar uma postagem
-DELETE {{baseUrl}}/professor/posts/1
+###
+DELETE {{baseUrl}}/professor/posts/88
+###
+GET {{baseUrl}}/professor/posts/search?q=ajustado
 
-### Buscar posts por palavra-chave
-GET {{baseUrl}}/professor/posts/search?q=3
 
-### Obter usuarios cadastrados
+# ROTA USERS
+###
 GET {{baseUrl}}/users/
-
-###criar um novo usuário
+###
 POST {{baseUrl}}/users/
 Content-Type: application/json
 
 {
-  "name": "Felipe Seiji",
-  "email": "Felipe@teste.com",
-  "password_hash": "1121",
+  "name": "Filipe Seiji",
+  "email": "ipe@teste.com",
+  "password_hash": "6565",
   "role":"professor"
   }
 
-### Atualizar usuário
-PUT {{baseUrl}}/users/1
+###
+PUT {{baseUrl}}/users/4
 Content-Type: application/json
 
 {
@@ -59,14 +57,15 @@ Content-Type: application/json
   "password_hash": "2806",
   "role": "professor"
 }
-### Deletar um usuário
-DELETE {{baseUrl}}/users/1
 
-### Testar a rota principal - alunos
+###
+DELETE {{baseUrl}}/users/4
+
+
+# ROTA ALUNOS
+###
 GET {{baseUrl}}/aluno/posts
-
-### Obter uma postagem específica - aluno
-GET {{baseUrl}}/aluno/posts/1
-
-### Buscar posts por palavra-chave
-GET {{baseUrl}}/professor/posts/search?q=insi
+###
+GET {{baseUrl}}/aluno/posts/87
+###
+GET {{baseUrl}}/aluno/posts/search?q=ajustado

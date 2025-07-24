@@ -81,28 +81,3 @@ exports.deleteUsers = async (req, res) => {
         res.status(500).json({ error: 'Erro interno do servidor.' });
     }
 };
-
-/* Função para buscar posts por palavra-chave
-exports.searchPosts = async (req, res) => {
-    const { q } = req.query;
-    if (!q) {
-        return res.status(400).json({ error: 'O parâmetro de busca "q" é obrigatório.' });
-    }
-
-    try {
-        const sql = `
-            SELECT p.*, u.name as author_name
-            FROM posts p
-            JOIN users u ON p.author_id = u.id
-            WHERE similarity(f_unaccent(p.title || ' ' || p.content), f_unaccent($1)) > 0.01
-            ORDER BY similarity(f_unaccent(p.title || ' ' || p.content), f_unaccent($1)) DESC
-        `;
-        
-        const { rows } = await db.query(sql, [q]);
-        res.status(200).json(rows);
-
-    } catch (error) {
-        console.error('Erro ao buscar posts:', error);
-        res.status(500).json({ error: 'Erro interno do servidor.' });
-    }
-};*/

@@ -13,10 +13,8 @@ router.post(
   ],
   usersController.createUser
 );
-//router.get("/search", usersController.searchPosts);
 router.get("/:id", usersController.getUsersById);
 router.put("/:id", usersController.updateUsers);
 router.delete("/:id", usersController.deleteUsers);
-
 
 module.exports = router;
