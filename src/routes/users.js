@@ -8,11 +8,6 @@ const usersController = require("../controllers/usersController");
  * schemas:
  * User:
  * type: object
- * required:
- * - name
- * - email
- * - password_hash
- * - role
  * properties:
  * id:
  * type: integer
@@ -23,6 +18,7 @@ const usersController = require("../controllers/usersController");
  * format: email
  * password_hash:
  * type: string
+ * description: "Atenção: Apenas para criação/atualização. Nunca será retornado."
  * role:
  * type: string
  * enum: [professor, aluno]
@@ -59,6 +55,9 @@ const usersController = require("../controllers/usersController");
  * required: true
  * schema:
  * type: integer
+ * responses:
+ * "200":
+ * description: Detalhes do usuário.
  * put:
  * summary: Atualiza um usuário
  * tags: [Users]
@@ -74,6 +73,9 @@ const usersController = require("../controllers/usersController");
  * application/json:
  * schema:
  * $ref: '#/components/schemas/User'
+ * responses:
+ * "200":
+ * description: Usuário atualizado com sucesso.
  * delete:
  * summary: Deleta um usuário
  * tags: [Users]
@@ -83,6 +85,9 @@ const usersController = require("../controllers/usersController");
  * required: true
  * schema:
  * type: integer
+ * responses:
+ * "204":
+ * description: Usuário deletado com sucesso.
  */
 
 router.get("/", usersController.getAllUsers);

@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const postsController = require("../controllers/postsController");
-const { body } = require('express-validator');
 
 /**
  * @openapi
@@ -9,10 +8,6 @@ const { body } = require('express-validator');
  * schemas:
  * Post:
  * type: object
- * required:
- * - title
- * - content
- * - author_id
  * properties:
  * id:
  * type: integer
@@ -26,18 +21,22 @@ const { body } = require('express-validator');
  * author_id:
  * type: integer
  * description: O ID do autor.
+ * author_name:
+ * type: string
+ * description: O nome do autor do post.
  * status:
  * type: string
  * description: O status do post (ex: 'ativo', 'inativo').
  * created_at:
  * type: string
  * format: date-time
+ * description: A data de criação.
+ * updated_at:
+ * type: string
+ * format: date-time
+ * description: A data da última atualização.
  * PostUpdate:
  * type: object
- * required:
- * - title
- * - content
- * - status
  * properties:
  * title:
  * type: string
@@ -56,6 +55,12 @@ const { body } = require('express-validator');
  * responses:
  * "200":
  * description: Lista de todos os posts.
+ * content:
+ * application/json:
+ * schema:
+ * type: array
+ * items:
+ * $ref: '#/components/schemas/Post'
  * post:
  * summary: Cria um novo post
  * tags: [Professor]
@@ -68,6 +73,19 @@ const { body } = require('express-validator');
  * responses:
  * "201":
  * description: Post criado com sucesso.
+ * /professor/posts/search:
+ * get:
+ * summary: Busca posts por palavra-chave (para professores)
+ * tags: [Professor]
+ * parameters:
+ * - in: query
+ * name: q
+ * required: true
+ * schema:
+ * type: string
+ * responses:
+ * "200":
+ * description: Lista de posts encontrados.
  * /professor/posts/{id}:
  * get:
  * summary: Obtém um post específico pelo ID
@@ -78,6 +96,9 @@ const { body } = require('express-validator');
  * required: true
  * schema:
  * type: integer
+ * responses:
+ * "200":
+ * description: Detalhes do post.
  * put:
  * summary: Atualiza um post existente
  * tags: [Professor]
@@ -112,6 +133,7 @@ const { body } = require('express-validator');
 
 router.get("/", postsController.getAllPosts);
 router.post("/", postsController.createPost);
+router.get("/search", postsController.searchPosts);
 router.get("/:id", postsController.getPostById);
 router.put("/:id", postsController.updatePost);
 router.delete("/:id", postsController.deletePost);
