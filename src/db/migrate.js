@@ -6,7 +6,7 @@ async function runMigrations() {
     console.log("Verificando a necessidade de executar migrações...");
     try {
         const checkQuery = `
-      SELECT
+        SELECT
         -- Extensões
         (SELECT 1 FROM pg_extension WHERE extname = 'unaccent') as unaccent_exists,
         (SELECT 1 FROM pg_extension WHERE extname = 'pg_trgm') as trgm_exists,

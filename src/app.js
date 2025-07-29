@@ -14,10 +14,8 @@ app.use(express.json());
 // Rotas
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
-//app.use('/posts', postsRoutes);
 app.use('/professor/posts', postsRoutes);
 app.use('/aluno/posts', alunoPostsRoutes);
 app.use('/users', usersRoutes);
-
 
 module.exports = app;

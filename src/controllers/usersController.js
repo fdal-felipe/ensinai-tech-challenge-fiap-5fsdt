@@ -1,4 +1,5 @@
 const db = require('../db');
+
 // Função para obter todos os usuário
 exports.getAllUsers = async (req, res) => {
     try {
@@ -27,7 +28,6 @@ exports.createUser = async (req, res) => {
         res.status(500).json({ error: 'Erro interno do servidor ao criar usuário.' });
     }
 };
-
 
 // Função para obter um usuário por ID
 exports.getUsersById = async (req, res) => {

@@ -101,6 +101,9 @@ DB_HOST=localhost
 DB_PORT=5432
 ```
 
+### 5. Iniciar do Docker
+-   Abra o seu Docker Desktop para iniciar os motores do Docker.
+
 ### 4. Subir os Contêineres com Docker Compose
 ```bash
 docker-compose up --build

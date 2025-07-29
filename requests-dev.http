@@ -8,9 +8,9 @@ POST {{baseUrl}}/professor/posts
 Content-Type: application/json
 
 {
-  "title": "novo posts",
-  "content": "Usando variáveis para deixar o arquivo mais limpo.",
-  "author_id": 6
+  "title": "O Corpo Humano: Sistemas e Órgãos",
+  "content": "Uma visão geral sobre os principais sistemas do corpo humano: digestório, respiratório, circulatório e nervoso. Como eles trabalham em conjunto?",
+  "author_id": 13
 }
 
 ###
@@ -68,4 +68,4 @@ GET {{baseUrl}}/aluno/posts
 ###
 GET {{baseUrl}}/aluno/posts/87
 ###
-GET {{baseUrl}}/aluno/posts/search?q=ajustado
+GET {{baseUrl}}/aluno/posts/search?q=fotossíntese
