@@ -1,6 +1,5 @@
 const db = require('../db');
 
-// Função para obter todas as postagens
 exports.getAllPosts = async (req, res) => {
     try {
         const sql = "SELECT * FROM posts WHERE status = 'ativo' ORDER BY created_at DESC";
