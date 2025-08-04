@@ -1,6 +1,5 @@
 const db = require('../db');
 
-// Função para criar uma nova postagem
 exports.createPost = async (req, res) => {
     const { title, content, author_id} = req.body;
     if (!title || !content || !author_id ) {
@@ -17,7 +16,6 @@ exports.createPost = async (req, res) => {
     }
 };
 
-// Função para obter todas as postagens
 exports.getAllPosts = async (req, res) => {
     try {
         const sql = 'SELECT * FROM posts ORDER BY created_at DESC';
@@ -28,19 +26,7 @@ exports.getAllPosts = async (req, res) => {
         res.status(500).json({ error: 'Erro interno do servidor.' });
     }
 };
-// Função para obter todas as postagens
-exports.getAllPostsProfessor = async (req, res) => {
-    try {
-        const sql = 'SELECT * FROM posts WHERE status = ativo  ORDER BY created_at DESC';
-        const { rows } = await db.query(sql);
-        res.status(200).json(rows);
-    } catch (error) {
-        console.error('Erro ao listar posts:', error);
-        res.status(500).json({ error: 'Erro interno do servidor.' });
-    }
-};
 
-// Função para obter uma postagem por ID
 exports.getPostById = async (req, res) => {
     const { id } = req.params;
     try {
@@ -56,7 +42,6 @@ exports.getPostById = async (req, res) => {
     }
 };
 
-// Função para atualizar uma postagem
 exports.updatePost = async (req, res) => {
     const { id } = req.params;
     const { title, content, status } = req.body;
@@ -73,9 +58,7 @@ exports.updatePost = async (req, res) => {
         RETURNING *;
         `;
         const values = [title, content, status, id];
-
         const { rows } = await db.query(sql, values);
-
         if (rows.length === 0) {
         return res.status(404).json({ error: 'Postagem não encontrada.' });
         }
@@ -87,8 +70,6 @@ exports.updatePost = async (req, res) => {
     }
 };
 
-
-// Função para deletar uma postagem
 exports.deletePost = async (req, res) => {
     const { id } = req.params;
     try {
@@ -104,7 +85,6 @@ exports.deletePost = async (req, res) => {
     }
 };
 
-// Função para buscar posts por palavra-chave
 exports.searchPosts = async (req, res) => {
     const { q } = req.query;
     if (!q) {

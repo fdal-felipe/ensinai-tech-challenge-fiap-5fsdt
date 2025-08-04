@@ -52,6 +52,7 @@ jobs:
           DB_DATABASE: ${{ secrets.DB_DATABASE }}
           DB_HOST: localhost
           DB_PORT: 5432
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
         run: npm test
         
   deploy:

@@ -1,5 +1,5 @@
 const express = require('express');
-const postsRoutes = require('./routes/posts');
+const professorPostsRoutes = require('./routes/professorPosts.js');
 const usersRoutes = require('./routes/users');
 const alunoPostsRoutes = require('./routes/alunoPosts');
 const authRoutes = require('./routes/auth');
@@ -17,7 +17,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 app.use('/auth', authRoutes);
 app.use('/aluno/posts', alunoPostsRoutes);
 
-app.use('/professor/posts', authenticate, authorizeProfessor, postsRoutes);
+app.use('/professor/posts', authenticate, authorizeProfessor, professorPostsRoutes);
 app.use('/users', authenticate, authorizeProfessor, usersRoutes);
 
 module.exports = app;

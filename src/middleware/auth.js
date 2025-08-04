@@ -9,7 +9,7 @@ exports.authenticate = (req, res, next) => {
     }
 
     try {
-        const decoded = jwt.verify(token, 'SUA_CHAVE_SECRETA_SUPER_SEGURA');
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.user = decoded;
         next();
     } catch (error) {

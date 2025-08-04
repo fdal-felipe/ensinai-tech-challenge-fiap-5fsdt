@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const postsController = require("../controllers/postsController");
+const professorPostsController = require("../controllers/professorPostsController");
 
 /**
  * @openapi
@@ -57,7 +57,7 @@ const postsController = require("../controllers/postsController");
  *               items:
  *                 $ref: '#/components/schemas/Post'
  */
-router.get("/", postsController.getAllPosts);
+router.get("/", professorPostsController.getAllPosts);
 
 /**
  * @openapi
@@ -75,7 +75,7 @@ router.get("/", postsController.getAllPosts);
  *       "201":
  *         description: Post criado com sucesso.
  */
-router.post("/", postsController.createPost);
+router.post("/", professorPostsController.createPost);
 
 /**
  * @openapi
@@ -93,7 +93,7 @@ router.post("/", postsController.createPost);
  *       "200":
  *         description: Lista de posts encontrados.
  */
-router.get("/search", postsController.searchPosts);
+router.get("/search", professorPostsController.searchPosts);
 
 /**
  * @openapi
@@ -115,7 +115,7 @@ router.get("/search", postsController.searchPosts);
  *             schema:
  *               $ref: '#/components/schemas/Post'
  */
-router.get("/:id", postsController.getPostById);
+router.get("/:id", professorPostsController.getPostById);
 
 /**
  * @openapi
@@ -139,7 +139,7 @@ router.get("/:id", postsController.getPostById);
  *       "200":
  *         description: Post atualizado com sucesso.
  */
-router.put("/:id", postsController.updatePost);
+router.put("/:id", professorPostsController.updatePost);
 
 /**
  * @openapi
@@ -157,6 +157,6 @@ router.put("/:id", postsController.updatePost);
  *       "204":
  *         description: Post deletado com sucesso.
  */
-router.delete("/:id", postsController.deletePost);
+router.delete("/:id", professorPostsController.deletePost);
 
 module.exports = router;
