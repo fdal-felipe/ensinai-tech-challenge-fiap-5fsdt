@@ -12,7 +12,6 @@ exports.getAllPosts = async (req, res) => {
     }
 };
 
-// Função para obter uma postagem por ID
 exports.getPostById = async (req, res) => {
     const { id } = req.params;
     try {

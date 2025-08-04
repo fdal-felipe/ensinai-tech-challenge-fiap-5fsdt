@@ -1,4 +1,5 @@
 const db = require('../db');
+const bcrypt = require('bcryptjs');
 
 // Função para obter todos os usuário
 exports.getAllUsers = async (req, res) => {
@@ -14,13 +15,13 @@ exports.getAllUsers = async (req, res) => {
 
 // Função para criar um novo usuário
 exports.createUser = async (req, res) => {
-    const { name, email, password_hash,role } = req.body;
+    const { name, email, password_hash, role } = req.body;
     if (!name || !email || !password_hash || !role) {
         return res.status(400).json({ error: 'Título, conteúdo e ID do autor são obrigatórios.' });
     }
     try {
         const sql = 'INSERT INTO users (name, email, password_hash, role) VALUES ($1, $2, $3, $4) RETURNING *';
-        const values = [name, email, password_hash,role];
+        const values = [name, email, password_hash, role];
         const { rows } = await db.query(sql, values);
         res.status(201).json(rows[0]);
     } catch (error) {
@@ -48,11 +49,19 @@ exports.getUsersById = async (req, res) => {
 // Função para atualizar usuário
 exports.updateUsers = async (req, res) => {
     const { id } = req.params;
-    const { name, email, password_hash, role } = req.body;
-    if (!name || !email || !password_hash || !role) {
-        return res.status(400).json({ error: 'Nome, email, password e função são obrigatórios.' });
+    let { name, email, password_hash, password, role } = req.body;
+
+    if (!name || !email || (!password_hash && !password) || !role) {
+        return res.status(400).json({ error: 'Nome, email, senha e função são obrigatórios.' });
     }
+
     try {
+        // Só gera hash se password for enviado
+        if (password) {
+            const salt = await bcrypt.genSalt(10);
+            password_hash = await bcrypt.hash(password, salt);
+        }
+        // Se não, usa o password_hash enviado
         const sql = 'UPDATE users SET name = $1, email = $2, password_hash = $3, role = $4, updated_at = NOW() WHERE id = $5 RETURNING *';
         const values = [name, email, password_hash, role, id];
         const { rows } = await db.query(sql, values);

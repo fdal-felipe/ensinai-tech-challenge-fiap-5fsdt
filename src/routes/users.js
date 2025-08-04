@@ -33,6 +33,8 @@ const usersController = require("../controllers/usersController");
  *   get:
  *     summary: Lista todos os usuários
  *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       "200":
  *         description: A lista de usuários.
@@ -51,6 +53,8 @@ router.get("/", usersController.getAllUsers);
  *   post:
  *     summary: Cria um novo usuário
  *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -69,6 +73,8 @@ router.post("/", usersController.createUser);
  *   get:
  *     summary: Obtém um usuário pelo ID
  *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -93,6 +99,8 @@ router.get("/:id", usersController.getUsersById);
  *   put:
  *     summary: Atualiza um usuário
  *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -119,6 +127,8 @@ router.put("/:id", usersController.updateUsers);
  *   delete:
  *     summary: Deleta um usuário
  *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id

@@ -1,71 +1,112 @@
 @baseUrl = http://localhost:3000
+@professorToken = {{professorToken}}
 
-# ROTA PROFESSORES
+// AUTENTICAÇÃO
+###
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "Paulo Jubilut",
+  "email": "jubilut@mail.com",
+  "password": "biologia123",
+  "role": "professor"
+}
+
+###
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "jubilut@mail.com",
+  "password": "biologia123"
+}
+
+# Copie o token JWT retornado e cole abaixo:
+# @professorToken = 
+
+# ROTA PROFESSORES (JWT obrigatório)
 ###
 GET {{baseUrl}}/professor/posts
+Authorization: Bearer {{professorToken}}
+
 ###
 POST {{baseUrl}}/professor/posts
+Authorization: Bearer {{professorToken}}
 Content-Type: application/json
 
 {
   "title": "O Corpo Humano: Sistemas e Órgãos",
   "content": "Uma visão geral sobre os principais sistemas do corpo humano: digestório, respiratório, circulatório e nervoso. Como eles trabalham em conjunto?",
-  "author_id": 13
+  "author_id": 128
 }
 
 ###
-GET {{baseUrl}}/professor/posts/87
+GET {{baseUrl}}/professor/posts/140
+Authorization: Bearer {{professorToken}}
+
 ###
 GET {{baseUrl}}/professor/posts/9999
+Authorization: Bearer {{professorToken}}
+
 ###
-PUT {{baseUrl}}/professor/posts/87
+PUT {{baseUrl}}/professor/posts/140
+Authorization: Bearer {{professorToken}}
 Content-Type: application/json
 
 {
-  "title": "Este Título Foi ajustado",
-  "content": "O conteúdo também foi modificado através do endpoint PUT.",
-  "status":"inativo"
+  "title": "O Corpo Humano: Sistemas e Órgãos",
+  "content": "Uma visão geral sobre os principais sistemas do corpo humano: digestório, respiratório, circulatório e nervoso. Como eles trabalham em conjunto?",
+  "status": "inativo"
 }
 
 ###
-DELETE {{baseUrl}}/professor/posts/88
+DELETE {{baseUrl}}/professor/posts/140
+Authorization: Bearer {{professorToken}}
+
 ###
-GET {{baseUrl}}/professor/posts/search?q=ajustado
+GET {{baseUrl}}/professor/posts/search?q=corpo humano  
+Authorization: Bearer {{professorToken}}
 
-
-# ROTA USERS
+# ROTA USERS (JWT obrigatório)
 ###
 GET {{baseUrl}}/users/
+Authorization: Bearer {{professorToken}}
+
 ###
 POST {{baseUrl}}/users/
+Authorization: Bearer {{professorToken}}
 Content-Type: application/json
 
 {
-  "name": "Filipe Seiji",
-  "email": "ipe@teste.com",
-  "password_hash": "6565",
-  "role":"professor"
-  }
-
-###
-PUT {{baseUrl}}/users/4
-Content-Type: application/json
-
-{
-  "name": "Camila",
-  "email": "cacazinha@gmail.com",
-  "password_hash": "2806",
+  "name": "Gustavo Guanabara",
+  "email": "guanabara@mail.com",
+  "password_hash": "gafanhotos123",
   "role": "professor"
 }
 
 ###
-DELETE {{baseUrl}}/users/4
+PUT {{baseUrl}}/users/129
+Authorization: Bearer {{professorToken}}
+Content-Type: application/json
 
+{
+  "name": "Gustavo Guanabara Silva",
+  "email": "guanabara@mail.com",
+  "password": "gafanhotos4421",
+  "role": "professor"
+}
 
-# ROTA ALUNOS
+###
+DELETE {{baseUrl}}/users/129
+Authorization: Bearer {{professorToken}}
+
+# ROTA ALUNOS (Acesso livre)
 ###
 GET {{baseUrl}}/aluno/posts
+
 ###
-GET {{baseUrl}}/aluno/posts/87
+GET {{baseUrl}}/aluno/posts/141
+
 ###
-GET {{baseUrl}}/aluno/posts/search?q=fotossíntese
+GET {{baseUrl}}/aluno/posts/search?q=corpo humano

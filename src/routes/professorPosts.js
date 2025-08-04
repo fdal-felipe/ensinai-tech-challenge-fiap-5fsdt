@@ -47,6 +47,8 @@ const professorPostsController = require("../controllers/professorPostsControlle
  *   get:
  *     summary: Lista todos os posts (para professores)
  *     tags: [Professor]
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       "200":
  *         description: Lista de todos os posts.
@@ -65,6 +67,8 @@ router.get("/", professorPostsController.getAllPosts);
  *   post:
  *     summary: Cria um novo post
  *     tags: [Professor]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -83,6 +87,8 @@ router.post("/", professorPostsController.createPost);
  *   get:
  *     summary: Busca posts por palavra-chave (para professores)
  *     tags: [Professor]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: q
@@ -101,6 +107,8 @@ router.get("/search", professorPostsController.searchPosts);
  *   get:
  *     summary: Obtém um post específico pelo ID
  *     tags: [Professor]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -123,6 +131,8 @@ router.get("/:id", professorPostsController.getPostById);
  *   put:
  *     summary: Atualiza um post existente
  *     tags: [Professor]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -147,6 +157,8 @@ router.put("/:id", professorPostsController.updatePost);
  *   delete:
  *     summary: Deleta um post
  *     tags: [Professor]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
