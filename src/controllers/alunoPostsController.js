@@ -26,7 +26,6 @@ exports.getPostById = async (req, res) => {
     }
 };
 
-// Função para buscar posts por palavra-chave
 exports.searchPosts = async (req, res) => {
     const { q } = req.query;
     if (!q) {
