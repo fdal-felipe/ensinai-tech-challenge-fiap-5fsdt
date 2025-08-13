@@ -18,3 +18,8 @@ Thumbs.db
 
 # Arquivos do editor/IDE
 .vscode/
+
+frontend/node_modules
+frontend/dist
+frontend/.env
+frontend/README.md

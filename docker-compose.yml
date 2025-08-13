@@ -14,11 +14,13 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./postgres-init:/docker-entrypoint-initdb.d
+      - ./backend/postgres-init:/docker-entrypoint-initdb.d
       - pgdata:/var/lib/postgresql/data
   
   app:
-    build: .
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
     container_name: blog_app
     ports:
       - "3000:3000"
@@ -32,6 +34,16 @@ services:
     depends_on:
       db:
         condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: blog_app_frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - app
 
 volumes:
   pgdata:

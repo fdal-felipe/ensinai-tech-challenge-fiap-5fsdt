@@ -1,9 +1,9 @@
 const express = require('express');
 const professorPostsRoutes = require('./routes/professorPosts.js');
-const usersRoutes = require('./routes/users');
-const alunoPostsRoutes = require('./routes/alunoPosts');
-const authRoutes = require('./routes/auth');
-const { authenticate, authorizeProfessor } = require('./middleware/auth');
+const usersRoutes = require('./routes/users.js');
+const alunoPostsRoutes = require('./routes/alunoPosts.js');
+const authRoutes = require('./routes/auth.js');
+const { authenticate, authorizeProfessor } = require('./middleware/auth.js');
 const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 const swaggerOptions = require('../swagger.config.js');

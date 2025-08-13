@@ -38,6 +38,7 @@ jobs:
 
       - name: Instalar dependências
         run: npm install
+        working-directory: ./backend
 
       - name: Inicializar o banco de dados
         env:
@@ -54,7 +55,8 @@ jobs:
           DB_PORT: 5432
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
         run: npm test
-        
+        working-directory: ./backend
+
   deploy:
     needs: build
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
