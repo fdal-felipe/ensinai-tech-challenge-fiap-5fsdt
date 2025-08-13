@@ -44,7 +44,7 @@ jobs:
         env:
           PGPASSWORD: ${{ secrets.DB_PASSWORD }}
         run: |
-          psql -h localhost -U ${{ secrets.DB_USER }} -d ${{ secrets.DB_DATABASE }} -p 5432 -f postgres-init/init.sql
+          psql -h localhost -U ${{ secrets.DB_USER }} -d ${{ secrets.DB_DATABASE }} -p 5432 -f backend/postgres-init/init.sql
 
       - name: Rodar os testes
         env:
