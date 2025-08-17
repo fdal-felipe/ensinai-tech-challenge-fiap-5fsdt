@@ -13,6 +13,7 @@ Criar uma aplicação backend robusta, escalável e bem documentada, permitindo:
 
 ## 🛠️ Tecnologias Utilizadas
 
+-   **Banco de Dados:** [Supabase PostgreSQL](https://supabase.com/) *(antes: Render PostgreSQL)*
 -   **Backend:** [Node.js](https://nodejs.org/), [Express.js](https://expressjs.com/)
 -   **Banco de Dados:** [PostgreSQL](https://www.postgresql.org/)
 -   **Testes:** [Jest](https://jestjs.io/), [Supertest](https://github.com/visionmedia/supertest)
