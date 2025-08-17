@@ -3,9 +3,9 @@ CREATE EXTENSION IF NOT EXISTS unaccent;
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
 
 -- 2. Cria uma função "wrapper" imutável para a unaccent
-CREATE OR REPLACE FUNCTION f_unaccent(text)
+CREATE OR REPLACE FUNCTION public.f_unaccent(text)
 RETURNS text AS $$
-SELECT unaccent('unaccent', $1)
+SELECT extensions.unaccent($1)
 $$ LANGUAGE sql IMMUTABLE;
 
 -- 3. Cria o tipo ENUM
@@ -17,7 +17,7 @@ BEGIN
 END$$;
 
 -- 4. Cria as tabelas
-CREATE TABLE IF NOT EXISTS users (
+CREATE TABLE IF NOT EXISTS public.users (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS users (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE IF NOT EXISTS posts (
+CREATE TABLE IF NOT EXISTS public.posts (
     id SERIAL PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     content TEXT NOT NULL,
@@ -37,12 +37,12 @@ CREATE TABLE IF NOT EXISTS posts (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     CONSTRAINT fk_author
         FOREIGN KEY(author_id)
-        REFERENCES users(id)
+        REFERENCES public.users(id)
         ON DELETE CASCADE
 );
 
 -- 5. Cria os índices
-CREATE INDEX IF NOT EXISTS idx_posts_author_id ON posts(author_id);
+CREATE INDEX IF NOT EXISTS idx_posts_author_id ON public.posts(author_id);
 
 DROP INDEX IF EXISTS idx_posts_search;
-CREATE INDEX idx_posts_search ON posts USING gin (f_unaccent(title || ' ' || content) gin_trgm_ops);
+CREATE INDEX idx_posts_search ON public.posts USING gin (public.f_unaccent(title || ' ' || content) gin_trgm_ops);
