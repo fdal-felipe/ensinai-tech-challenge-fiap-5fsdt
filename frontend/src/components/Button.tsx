@@ -1,22 +1,44 @@
 // src/components/Button.tsx
+'use client';
 import React from 'react';
+import styled from 'styled-components';
 
 interface ButtonProps {
   children: React.ReactNode;
-  onClick?: () => void;
+  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   type?: 'button' | 'submit' | 'reset';
-  className?: string;
+  variant?: 'primary' | 'danger' | 'success'; // Adicionada a variante 'success'
+  $fullWidth?: boolean;
 }
 
-export default function Button({ children, onClick, type = 'button', className = '' }: ButtonProps) {
-  const baseStyles = "bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-700 transition duration-300";
+const StyledButton = styled.button<ButtonProps>`
+  background-color: ${props => {
+    if (props.variant === 'danger') return '#dc2626';
+    if (props.variant === 'success') return '#16a34a'; // Cor verde
+    return '#111827'; // Cor primária (preto)
+  }};
+  color: white;
+  font-weight: bold;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  width: ${props => (props.$fullWidth ? '100%' : 'auto')};
+
+  &:hover {
+    background-color: ${props => {
+      if (props.variant === 'danger') return '#b91c1c';
+      if (props.variant === 'success') return '#15803d'; // Verde mais escuro no hover
+      return '#4b5563';
+    }};
+  }
+`;
+
+export default function Button({ children, onClick, type = 'button', variant = 'primary', $fullWidth = false }: ButtonProps) {
   return (
-    <button
-      type={type}
-      onClick={onClick}
-      className={`${baseStyles} ${className}`}
-    >
+    <StyledButton type={type} onClick={onClick} variant={variant} $fullWidth={$fullWidth}>
       {children}
-    </button>
+    </StyledButton>
   );
 }

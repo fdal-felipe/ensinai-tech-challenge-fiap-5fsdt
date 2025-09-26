@@ -1,10 +1,21 @@
 // src/components/Footer.tsx
+'use client';
 import React from 'react';
+import styled from 'styled-components';
+
+const FooterWrapper = styled.footer`
+  width: 100%;
+  background-color: #1f2937;
+  color: white;
+  padding: 1rem;
+  text-align: center;
+  margin-top: 2rem;
+`;
 
 export default function Footer() {
   return (
-    <footer className="w-full bg-gray-800 text-white p-4 text-center mt-8">
+    <FooterWrapper>
       <p>&copy; 2025 Ensinai Blog - Tech Challenge FIAP</p>
-    </footer>
+    </FooterWrapper>
   );
 }

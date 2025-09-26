@@ -1,15 +1,43 @@
 // src/components/Header.tsx
+'use client';
 import React from 'react';
+import styled from 'styled-components';
+
+const HeaderWrapper = styled.header`
+  width: 100%;
+  background-color: #1f2937;
+  color: white;
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const Logo = styled.h1`
+  font-size: 1.5rem;
+  font-weight: bold;
+`;
+
+const Nav = styled.nav`
+  a {
+    margin: 0 0.5rem;
+    color: white;
+    text-decoration: none;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+`;
 
 export default function Header() {
   return (
-    <header className="w-full bg-gray-800 text-white p-4 flex justify-between items-center">
-      <h1 className="text-2xl font-bold">Ensinai Blog</h1>
-      <nav>
-        <a href="/" className="text-white hover:underline mx-2">Home</a>
-        <a href="/admin" className="text-white hover:underline mx-2">Admin</a>
-        <a href="/login" className="text-white hover:underline mx-2">Login</a>
-      </nav>
-    </header>
+    <HeaderWrapper>
+      <Logo>Ensinai Blog</Logo>
+      <Nav>
+        <a href="/">Home</a>
+        <a href="/admin">Admin</a>
+        <a href="/login">Login</a>
+      </Nav>
+    </HeaderWrapper>
   );
 }
