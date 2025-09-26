@@ -64,7 +64,7 @@ type ModalState = {
 export default function NewPostPage() {
   const router = useRouter();
   const [title, setTitle] = useState('');
-  const [author, setAuthor] = useState('');
+  const [author_id, setAuthor] = useState('');
   const [content, setContent] = useState('');
 
   const [modalState, setModalState] = useState<ModalState>({ 
@@ -89,23 +89,51 @@ export default function NewPostPage() {
   };
 
   // 2. Esta nova função é chamada após a confirmação
-  const handleConfirmCreate = () => {
-    console.log({ title, author, content });
-    // Futura lógica de API aqui...
+  const handleConfirmCreate = async () => {
+  try {
+    const token = localStorage.getItem('token'); // pega o JWT
+    const res = await fetch('http://localhost:3000/professor/posts', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        title,
+        content,
+        author_id, // ou author_id se a API esperar ID
+      }),
+    });
 
-    // Mostra o modal de SUCESSO
+    if (!res.ok) {
+      throw new Error('Erro ao criar o post');
+    }
+
+    // Post criado com sucesso
     setModalState({
-        isOpen: true,
-        title: "Post Criado!",
-        message: "Seu novo post foi criado e publicado com sucesso.",
-        onConfirm: () => {
-            setModalState({ ...modalState, isOpen: false });
-            router.push('/posts');
-        },
-        confirmText: "Ok",
-        confirmVariant: "success"
+      isOpen: true,
+      title: "Post Criado!",
+      message: "Seu novo post foi criado e publicado com sucesso.",
+      onConfirm: () => {
+        setModalState({ ...modalState, isOpen: false });
+        router.push('/posts'); // volta para a lista de posts
+      },
+      confirmText: "Ok",
+      confirmVariant: "success"
+    });
+
+  } catch (err: any) {
+    console.error(err);
+    setModalState({
+      isOpen: true,
+      title: "Erro",
+      message: err.message || "Não foi possível criar o post.",
+      onConfirm: () => setModalState({ ...modalState, isOpen: false }),
+      confirmText: "Ok",
+      confirmVariant: "danger"
     });
   }
+};
 
   return (
     <>
@@ -132,8 +160,8 @@ export default function NewPostPage() {
           <Label htmlFor="author">AUTOR</Label>
           <Input 
             type="text" 
-            id="author" 
-            value={author}
+            id="author_id" 
+            value={author_id}
             onChange={(e) => setAuthor(e.target.value)}
             placeholder="Ex: Prof. Carlos"
           />
@@ -142,7 +170,7 @@ export default function NewPostPage() {
         <InputGroup style={{ marginTop: '1.5rem' }}>
           <Label htmlFor="description">DESCRIÇÃO</Label>
           <TextArea 
-            id="description"
+            id="content"
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="Descreva a atividade ou o conteúdo do post..."
