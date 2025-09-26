@@ -7,9 +7,9 @@ POST {{baseUrl}}/auth/register
 Content-Type: application/json
 
 {
-  "name": "Paulo Jubilut",
-  "email": "jubilut@mail.com",
-  "password": "biologia123",
+  "name": "Felipe Seiji",
+  "email": "seijimatie@mail.com",
+  "password": "fe280699",
   "role": "professor"
 }
 
@@ -18,8 +18,8 @@ POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-  "email": "jubilut@mail.com",
-  "password": "biologia123"
+  "email": "seijimatie@mail.com",
+  "password": "fe280699"
 }
 
 # Copie o token JWT retornado e cole abaixo:
@@ -38,7 +38,8 @@ Content-Type: application/json
 {
   "title": "O Corpo Humano: Sistemas e Órgãos",
   "content": "Uma visão geral sobre os principais sistemas do corpo humano: digestório, respiratório, circulatório e nervoso. Como eles trabalham em conjunto?",
-  "author_id": 128
+  "author_id": 128,
+  
 }
 
 ###

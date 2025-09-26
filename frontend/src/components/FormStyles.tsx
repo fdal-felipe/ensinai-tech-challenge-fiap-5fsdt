@@ -81,3 +81,24 @@ export const LinksContainer = styled.div`
   gap: 1rem;
   margin-top: 1rem;
 `;
+
+export const SelectGroup = styled.div`
+  width: 100%;
+`;
+
+export const Select = styled.select`
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid #d1d5db;
+  background-color: #ffffff;
+  color: #111827;
+  font-size: 1rem;
+
+  &:focus {
+    outline: none;
+    border-color: #3b82f6;
+  }
+`;
+
+export const Option = styled.option``; // Você pode estilizar se quiser

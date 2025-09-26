@@ -7,9 +7,12 @@ const { authenticate, authorizeProfessor } = require('./middleware/auth.js');
 const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 const swaggerOptions = require('../swagger.config.js');
+const cors = require('cors');
 
 const app = express();
 app.use(express.json());
+app.use(cors());
+
 
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));

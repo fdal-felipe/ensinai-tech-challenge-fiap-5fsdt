@@ -41,9 +41,9 @@ POST {{baseUrl}}/users/
 Content-Type: application/json
 
 {
-  "name": "Filipe Seiji",
-  "email": "ipe@teste.com",
-  "password_hash": "6565",
+  "name": "Felipe Seiji",
+  "email": "seijimatie@gmail.com",
+  "password_hash": "fe280699",
   "role":"professor"
   }
 

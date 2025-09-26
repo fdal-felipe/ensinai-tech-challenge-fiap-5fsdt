@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import styled from 'styled-components';
 import PostListItem from '../../../components/PostListItem';
@@ -20,7 +20,7 @@ const Title = styled.h1`
 `;
 
 const Subtitle = styled.p`
-    color: #6b7280;
+  color: #6b7280;
 `;
 
 const PostListContainer = styled.div`
@@ -73,27 +73,75 @@ const AddPostButton = styled.button`
   }
 `;
 
-const PlusIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>;
+const PlusIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" 
+       viewBox="0 0 24 24" fill="none" stroke="currentColor" 
+       strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="12" y1="5" x2="12" y2="19"></line>
+    <line x1="5" y1="12" x2="19" y2="12"></line>
+  </svg>
+);
 
-// --- Componente da Página ---
+// --- Página Principal ---
 export default function PostsPage() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
-  
-  const posts = [
-    { id: 1, title: 'Matemática I - Podcast', author: 'Prof. Carlos', description: 'Uma introdução à história da matemática através de um podcast interativo.' },
-    { id: 2, title: 'Matemática II - Livro', author: 'Prof. Carlos', description: 'Leitura e resumo do capítulo 5 do livro-base da disciplina.' },
-    { id: 3, title: 'Inglês III - Listening', author: 'Prof. Ana', description: 'Atividade de escuta e interpretação de diálogos em inglês.' },
-    { id: 4, title: 'Física VI - Artigo Científico', author: 'Prof. Pedro', description: 'Análise e apresentação de um artigo sobre física quântica.' },
-  ];
+
+interface Post {
+  id: number;
+  title: string;
+  content: string;
+  author_id: number;
+  status: string;
+  created_at: string;
+  updated_at: string;
+}
+
+
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const res = await fetch('http://localhost:3000/professor/posts', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            // Se precisar de autenticação:
+             'Authorization': `Bearer ${localStorage.getItem('token')}`
+          },
+        });
+
+        if (!res.ok) {
+          throw new Error('Erro ao buscar posts');
+        }
+
+        const data = await res.json();
+        setPosts(data); // supondo que a API retorna um array
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPosts();
+  }, []);
 
   const handleNavigateToPost = (id: number) => {
     router.push(`/posts/${id}`);
   };
-  
+
   const handleCreate = () => {
     router.push('/posts/new');
-  }
+  };
+
+  // Filtra posts com base na busca
+  const filteredPosts = posts.filter(post =>
+    post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    post.content.toLowerCase().includes(searchQuery.toLowerCase()) 
+  );
 
   return (
     <>
@@ -103,28 +151,34 @@ export default function PostsPage() {
           <Subtitle>Abaixo são mostrados os últimos posts criados</Subtitle>
         </div>
         <ActionsContainer>
-            <SearchInput 
-                type="text"
-                placeholder="Buscar por palavra-chave..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            <AddPostButton onClick={handleCreate} aria-label="Criar novo post">
-              <PlusIcon />
-            </AddPostButton>
+          <SearchInput
+            type="text"
+            placeholder="Buscar por palavra-chave..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          <AddPostButton onClick={handleCreate} aria-label="Criar novo post">
+            <PlusIcon />
+          </AddPostButton>
         </ActionsContainer>
       </PageHeader>
+
       <PostListContainer>
-        {posts.map(post => (
-          <PostListItem
-            key={post.id}
-            title={post.title}
-            author={post.author}
-            description={post.description}
-            onClick={() => handleNavigateToPost(post.id)}
-            // A propriedade 'onDelete' foi removida daqui, corrigindo o erro
-          />
-        ))}
+        {loading ? (
+          <p>Carregando posts...</p>
+        ) : filteredPosts.length === 0 ? (
+          <p>Nenhum post encontrado.</p>
+        ) : (
+          filteredPosts.map(post => (
+            <PostListItem
+                key={post.id}
+                title={post.title}
+                author={`Autor #${post.author_id}`} // até você buscar o nome real do autor
+                description={post.content}
+                onClick={() => handleNavigateToPost(post.id)}
+              />
+          ))
+        )}
       </PostListContainer>
     </>
   );

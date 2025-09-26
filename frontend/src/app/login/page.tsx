@@ -1,7 +1,6 @@
-// src/app/login/page.tsx
 'use client';
-import React from 'react';
-import { useRouter } from 'next/navigation'; // Importe o useRouter
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Button from '../../components/Button';
 import { 
   FormContainer, 
@@ -12,23 +11,52 @@ import {
   Label, 
   Input, 
   StyledLink,
-  LinksContainer
+  LinksContainer,
 } from '../../components/FormStyles';
 
 export default function LoginPage() {
-  const router = useRouter(); // Inicialize o router
+  const router = useRouter();
 
-  const handleLogin = (e: React.FormEvent) => {
+  // Estados começam vazios
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Aqui viria a lógica de autenticação com a API
-    console.log('Simulando login...');
-    // Redireciona para a página home do dashboard
-    router.push('/home');
+    setError('');
+
+    try {
+      const res = await fetch('http://localhost:3000/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsInJvbGUiOiJwcm9mZXNzb3IiLCJpYXQiOjE3NTg5MDU4MzUsImV4cCI6MTc1ODkwOTQzNX0.NC9SGpNkI0rhAdRJiTHXb8VAl2zSM0Jie-9T3K5FjGE"'
+        },
+        body: JSON.stringify({ email, password }), // pega valores do state
+      });
+      if (!res.ok) {
+
+        throw new Error('Credenciais inválidas');
+      }
+
+      const data = await res.json();
+
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+        router.push('/home');
+        console.log(data.token);
+      } else {
+        throw new Error('Token não recebido');
+      }
+    } catch (err: any) {
+      console.error('Erro no login:', err);
+      setError(err.message);
+    }
   };
 
   return (
     <FormContainer>
-      {/* Adiciona o onSubmit ao FormWrapper */}
       <FormWrapper onSubmit={handleLogin}>
         <div style={{ textAlign: 'center' }}>
           <Title>Entrar</Title>
@@ -37,13 +65,27 @@ export default function LoginPage() {
 
         <InputGroup>
           <Label htmlFor="email">EMAIL</Label>
-          <Input type="email" id="email" defaultValue="john@gmail.com" />
+          <Input
+            type="email"
+            id="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)} // atualiza state
+            required
+          />
         </InputGroup>
 
         <InputGroup>
           <Label htmlFor="password">SENHA</Label>
-          <Input type="password" id="password" defaultValue="************" />
+          <Input
+            type="password"
+            id="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)} // atualiza state
+            required
+          />
         </InputGroup>
+
+        {error && <p style={{ color: 'red' }}>{error}</p>}
 
         <Button type="submit" $fullWidth>Entrar</Button>
 
