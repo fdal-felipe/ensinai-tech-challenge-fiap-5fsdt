@@ -84,7 +84,7 @@ export default function EditPostPage() {
       try {
         setFetchLoading(true);
         setError(null);
-        
+
         const res = await fetch(`http://localhost:3000/professor/posts/${id}`, {
           method: 'GET',
           headers: {
@@ -214,8 +214,8 @@ export default function EditPostPage() {
       
       if (!res.ok) {
         const errorText = await res.text();
-        console.error('Erro na exclusão:', errorText);
-        throw new Error(`Erro ao excluir: ${res.status} - ${errorText}`);
+        //console.error('Erro na exclusão:', errorText);
+        //throw new Error(`Erro ao excluir: ${res.status} - ${errorText}`);
       }
 
       // Tenta obter a resposta como JSON, mas se não houver conteúdo, não faz nada
@@ -241,7 +241,7 @@ export default function EditPostPage() {
       });
 
     } catch (err: any) {
-      console.error('Erro na exclusão:', err);
+     // console.error('Erro na exclusão:', err);
       setModalState({
         isOpen: true,
         title: "Erro na Exclusão",

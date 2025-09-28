@@ -44,6 +44,7 @@ export default function LoginPage() {
 
       if (data.token) {
         localStorage.setItem('token', data.token);
+        localStorage.setItem('tipo', data.role);
         router.push('/home');
         console.log(data.token);
       } else {
