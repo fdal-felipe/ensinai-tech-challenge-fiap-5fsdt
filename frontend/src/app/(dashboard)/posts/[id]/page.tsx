@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import Button from '../../../../components/Button';
 import Modal from '../../../../components/Modal';
@@ -68,43 +68,120 @@ type ModalState = {
 // 2. Remova `params` das props da função
 export default function EditPostPage() {
   const router = useRouter();
-  const params = useParams(); // 3. Use o hook para obter os parâmetros
-  const id = params.id as string; // 4. Extraia o id
-  
+  const params = useParams();
+  const id = params.id as string;
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  // ✅ Adicione estados para loading e erro
+  const [fetchLoading, setFetchLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // ✅ Corrija o useEffect com dependências e tratamento de erro
+  useEffect(() => {
+    const fetchPost = async () => {
+      try {
+        setFetchLoading(true);
+        setError(null);
+        
+        const res = await fetch(`http://localhost:3000/professor/posts/${id}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          },
+        });
+        
+        if (!res.ok) {
+          throw new Error('Erro ao carregar post');
+        }
+
+        const json = await res.json();
+        console.log('Dados carregados:', json);
+        
+        // ✅ Verifique a estrutura real da resposta
+        setTitle(json.title || json.nome || '');
+        setContent(json.content || json.descricao || json.conteudo || '');
+        
+      } catch (err) {
+        console.error('Erro ao carregar:', err);
+        setError('Erro ao carregar post');
+      } finally {
+        setFetchLoading(false);
+      }
+    };
+    
+    if (id) {
+      fetchPost();
+    }
+  }, [id]); // ✅ Adicione id como dependência
+
   const [modalState, setModalState] = useState<ModalState>({ 
-      isOpen: false, 
-      title: '', 
-      message: '', 
-      onConfirm: () => {}, 
+    isOpen: false, 
+    title: '', 
+    message: '', 
+    onConfirm: () => {}, 
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setModalState({
-      isOpen: true,
-      title: 'Confirmar Alterações',
-      message: 'Deseja realmente salvar as alterações feitas neste post?',
-      onConfirm: handleConfirmSave,
-      confirmText: 'Sim, Salvar',
-      cancelText: 'Cancelar',
-      confirmVariant: 'success'
-    });
-  };
-  
-  const handleConfirmSave = () => {
-    // 5. Agora você pode usar `id` aqui sem problemas
-    console.log(`Salvando as alterações do post ${id}...`);
-    setModalState({
-      isOpen: true,
-      title: 'Post Salvo!',
-      message: 'As alterações no post foram salvas com sucesso.',
-      onConfirm: () => {
-        setModalState({ ...modalState, isOpen: false });
-        router.push('/posts');
-      },
-      confirmText: 'Ok',
-      confirmVariant: 'success'
-    });
+  const handleConfirmSave = async () => {
+    try {
+      setIsLoading(true);
+      
+      // ✅ Adicione logs para debug
+      console.log('Enviando dados:', { title, content });
+      
+      const res = await fetch(`http://localhost:3000/professor/posts/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({
+          title: title,
+          content: content,
+          author_id: 1,
+          status:'ativo'
+          // ❌ REMOVA author_id e status se não forem necessários
+          // O backend pode não permitir atualizar esses campos
+        }),
+      });
+
+      console.log('Status da resposta:', res.status);
+      
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error('Erro da API:', errorText);
+        throw new Error(`Erro ao atualizar: ${res.status} - ${errorText}`);
+      }
+
+      const updated = await res.json();
+      console.log("Post atualizado com sucesso:", updated);
+
+      setModalState({
+        isOpen: true,
+        title: "Post Salvo!",
+        message: "As alterações no post foram salvas com sucesso.",
+        onConfirm: () => {
+          setModalState(prev => ({ ...prev, isOpen: false }));
+          router.push("/posts");
+        },
+        confirmText: "Ok",
+        confirmVariant: "success",
+      });
+    } catch (err: any) {
+      console.error('Erro completo:', err);
+      setModalState({
+        isOpen: true,
+        title: "Erro",
+        message: `Não foi possível salvar as alterações: ${err.message}`,
+        onConfirm: () => setModalState(prev => ({ ...prev, isOpen: false })),
+        confirmText: "Fechar",
+        confirmVariant: "danger",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleDelete = () => {
@@ -119,12 +196,77 @@ export default function EditPostPage() {
     });
   };
   
-  const handleConfirmDelete = () => {
-      // E aqui também
+    const handleConfirmDelete = async () => {
+    try {
+      setIsLoading(true);
+      
       console.log(`Excluindo post com ID: ${id}`);
-      setModalState({ ...modalState, isOpen: false });
-      router.push('/posts');
-  }
+      
+      const res = await fetch(`http://localhost:3000/professor/posts/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      console.log(res)
+      console.log('Status da resposta DELETE:', res.status);
+      
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error('Erro na exclusão:', errorText);
+        throw new Error(`Erro ao excluir: ${res.status} - ${errorText}`);
+      }
+
+      // Tenta obter a resposta como JSON, mas se não houver conteúdo, não faz nada
+      let result;
+      const contentLength = res.headers.get('content-length');
+      if (contentLength && parseInt(contentLength) > 0) {
+        result = await res.json();
+        console.log("Post excluído com sucesso:", result);
+      } else {
+        console.log("Post excluído com sucesso (sem conteúdo na resposta)");
+      }
+
+      setModalState({
+        isOpen: true,
+        title: "Post Excluído!",
+        message: "O post foi excluído com sucesso.",
+        onConfirm: () => {
+          setModalState(prev => ({ ...prev, isOpen: false }));
+          router.push("/posts");
+        },
+        confirmText: "Ok",
+        confirmVariant: "success",
+      });
+
+    } catch (err: any) {
+      console.error('Erro na exclusão:', err);
+      setModalState({
+        isOpen: true,
+        title: "Erro na Exclusão",
+        message: `Não foi possível excluir o post: ${err.message}`,
+        onConfirm: () => setModalState(prev => ({ ...prev, isOpen: false })),
+        confirmText: "Fechar",
+        confirmVariant: "danger",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setModalState({
+      isOpen: true,
+      title: 'Confirmar Alterações',
+      message: 'Deseja realmente salvar as alterações feitas neste post?',
+      onConfirm: handleConfirmSave,
+      confirmText: 'Sim, Salvar',
+      cancelText: 'Cancelar',
+      confirmVariant: 'success'
+    });
+  };
 
   return (
     <>
@@ -133,42 +275,64 @@ export default function EditPostPage() {
           <BackButton type="button" onClick={() => router.back()}>
             <BackIcon />
           </BackButton>
-          <Title>Matemática I - Podcast</Title>
+          <Title>EDITAR POST</Title> {/* ✅ Mudei o título para ficar claro */}
         </PageHeader>
         
         <InputGroup>
-          <Label htmlFor="title">NOME DA MATÉRIA</Label>
-          <Input type="text" id="title" defaultValue="Matemática I - Podcast" />
+          <Label htmlFor="title">TÍTULO</Label>
+          <Input 
+            type="text"
+            id="title" 
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            disabled={isLoading}
+          /> 
         </InputGroup>
 
         <InputGroup style={{ marginTop: '1.5rem' }}>
           <Label htmlFor="author">AUTOR</Label>
-          <Input type="text" id="author" defaultValue="Prof. Carlos" />
+          <Input type="text" id="author" defaultValue="Prof. Carlos" disabled />
         </InputGroup>
 
         <InputGroup style={{ marginTop: '1.5rem' }}>
-          <Label htmlFor="description">DESCRIÇÃO</Label>
+          <Label htmlFor="content">CONTEÚDO</Label>
           <TextArea 
-            id="description"
-            defaultValue="Nesta atividade os alunos devem ouvir o podcast: Matemática - Sua história desde as origens. Criar uma resenha e entregar a atividade no portal da matéria respectiva."
+            id="content"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            disabled={isLoading}
           />
         </InputGroup>
         
         <Actions>
-          <Button type="button" variant="danger" onClick={handleDelete}>Excluir Post</Button>
-          <Button type="submit" variant="success">Salvar Alterações</Button>
+          <Button 
+            type="button" 
+            variant="danger" 
+            onClick={handleDelete}
+     
+          >
+            Excluir Post
+          </Button>
+          
+          {/* ✅ Mude para type="submit" e remova o onClick duplicado */}
+          <Button 
+            type="submit" 
+            variant="success" 
+          
+          >
+            {isLoading ? 'Salvando...' : 'Salvar Alterações'}
+          </Button>
         </Actions>
       </Form>
 
       <Modal
         isOpen={modalState.isOpen}
-        onClose={() => setModalState({ ...modalState, isOpen: false })}
+        onClose={() => !isLoading && setModalState(prev => ({ ...prev, isOpen: false }))}
         onConfirm={modalState.onConfirm}
         title={modalState.title}
         confirmText={modalState.confirmText}
         cancelText={modalState.cancelText}
-        confirmVariant={modalState.confirmVariant}
-      >
+        confirmVariant={modalState.confirmVariant}     >
         {modalState.message}
       </Modal>
     </>
