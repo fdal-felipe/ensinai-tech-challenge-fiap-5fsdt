@@ -176,7 +176,7 @@ export default function NewPostPage() {
       setModalState({
         isOpen: true,
         title: "Erro",
-        message: err.message || "Não foi possível criar o post.",
+        message: "Não foi possível criar o post.",
         onConfirm: () => setModalState({ ...modalState, isOpen: false }),
         confirmText: "Ok",
         confirmVariant: "danger"

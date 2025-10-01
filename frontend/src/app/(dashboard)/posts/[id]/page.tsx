@@ -166,12 +166,12 @@ export default function EditPostPage() {
         }),
       });
 
-      console.log('Status da resposta:', res.status);
+     // console.log('Status da resposta:', res.status);
       
       if (!res.ok) {
         const errorText = await res.text();
-        console.error('Erro da API:', errorText);
-        throw new Error(`Erro ao atualizar: ${res.status} - ${errorText}`);
+       // console.error('Erro da API:', errorText);
+        throw new Error(`Todos os campos devem estar preenchidos`);
       }
 
       const updated = await res.json();
