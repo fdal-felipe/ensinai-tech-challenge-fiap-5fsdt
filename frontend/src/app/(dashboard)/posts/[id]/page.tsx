@@ -4,7 +4,6 @@ import styled from 'styled-components';
 import Button from '../../../../components/Button';
 import Modal from '../../../../components/Modal';
 import { InputGroup, Label, Input } from '../../../../components/FormStyles';
-// 1. Importe o useParams junto com o useRouter
 import { useRouter, useParams } from 'next/navigation';
 
 // --- Styled Components (sem alterações) ---
@@ -35,7 +34,14 @@ const BackButton = styled.button`
     transition: background-color 0.2s;
     &:hover { background: #4b5563; }
 `;
-const BackIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>;
+const BackIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" 
+       viewBox="0 0 24 24" fill="none" stroke="currentColor" 
+       strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="19" y1="12" x2="5" y2="12"></line>
+    <polyline points="12 19 5 12 12 5"></polyline>
+  </svg>
+);
 const TextArea = styled.textarea`
   width: 100%;
   padding: 0.75rem 1rem;
@@ -63,22 +69,23 @@ type ModalState = {
   confirmText?: string;
   cancelText?: string;
   confirmVariant?: 'primary' | 'danger' | 'success';
-}
+};
 
-// 2. Remova `params` das props da função
 export default function EditPostPage() {
   const router = useRouter();
   const params = useParams();
   const id = params.id as string;
+
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [authorId, setAuthorId] = useState<number | null>(null);
+  const [authorName, setAuthorName] = useState<string>("");
 
-  // ✅ Adicione estados para loading e erro
+  const [isLoading, setIsLoading] = useState(false);
   const [fetchLoading, setFetchLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // ✅ Corrija o useEffect com dependências e tratamento de erro
+  // 🔹 Primeiro carrega o post
   useEffect(() => {
     const fetchPost = async () => {
       try {
@@ -93,29 +100,41 @@ export default function EditPostPage() {
           },
         });
         
-        if (!res.ok) {
-          throw new Error('Erro ao carregar post');
-        }
-
+        if (!res.ok) throw new Error('Erro ao carregar post');
         const json = await res.json();
-        console.log('Dados carregados:', json);
         
-        // ✅ Verifique a estrutura real da resposta
-        setTitle(json.title || json.nome || '');
-        setContent(json.content || json.descricao || json.conteudo || '');
-        
+        setTitle(json.title || "");
+        setContent(json.content || "");
+        setAuthorId(json.author_id || null); // ✅ pega o author_id
       } catch (err) {
-        console.error('Erro ao carregar:', err);
+        console.error('Erro ao carregar post:', err);
         setError('Erro ao carregar post');
       } finally {
         setFetchLoading(false);
       }
     };
-    
-    if (id) {
-      fetchPost();
-    }
-  }, [id]); // ✅ Adicione id como dependência
+    if (id) fetchPost();
+  }, [id]);
+   // 🔹 Depois busca o nome do autor
+  useEffect(() => {
+    const fetchAuthor = async () => {
+      if (!authorId) return;
+      try {
+        const res = await fetch(`http://localhost:3000/users/${authorId}`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        if (!res.ok) throw new Error('Erro ao carregar autor');
+        const user = await res.json();
+        setAuthorName(user.name || `Autor #${authorId}`);
+      } catch (err) {
+        console.error('Erro ao buscar autor:', err);
+        setAuthorName(`Autor #${authorId}`);
+      }
+    };
+    fetchAuthor();
+  }, [authorId]);
 
   const [modalState, setModalState] = useState<ModalState>({ 
     isOpen: false, 
@@ -289,10 +308,15 @@ export default function EditPostPage() {
           /> 
         </InputGroup>
 
-        <InputGroup style={{ marginTop: '1.5rem' }}>
-          <Label htmlFor="author">AUTOR</Label>
-          <Input type="text" id="author" defaultValue="Prof. Carlos" disabled />
-        </InputGroup>
+   <InputGroup style={{ marginTop: '1.5rem' }}>
+        <Label htmlFor="author">AUTOR</Label>
+        <Input 
+          type="text" 
+          id="author" 
+          value= {`Professor ${authorName}`}   // ✅ agora mostra o nome real
+          disabled
+        />
+      </InputGroup>
 
         <InputGroup style={{ marginTop: '1.5rem' }}>
           <Label htmlFor="content">CONTEÚDO</Label>

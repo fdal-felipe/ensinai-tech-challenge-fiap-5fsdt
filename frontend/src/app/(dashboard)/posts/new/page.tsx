@@ -1,12 +1,13 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import styled from 'styled-components';
 import Button from '../../../../components/Button';
 import Modal from '../../../../components/Modal';
 import { InputGroup, Label, Input } from '../../../../components/FormStyles';
+import ProfessorList from '../../../../components/ProfessorList';
 
-// --- Styled Components (sem alterações) ---
+// --- Styled Components (mantenha os existentes) ---
 const Form = styled.form` max-width: 800px; `;
 const PageHeader = styled.div`
   display: flex;
@@ -34,7 +35,14 @@ const BackButton = styled.button`
     transition: background-color 0.2s;
     &:hover { background: #4b5563; }
 `;
-const BackIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>;
+const BackIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="19" y1="12" x2="5" y2="12"></line>
+    <polyline points="12 19 5 12 12 5"></polyline>
+  </svg>
+);
 const TextArea = styled.textarea`
   width: 100%;
   padding: 0.75rem 1rem;
@@ -50,6 +58,7 @@ const TextArea = styled.textarea`
 `;
 const Actions = styled.div` margin-top: 2rem; `;
 
+// --- Tipagens ---
 type ModalState = {
   isOpen: boolean;
   title: string;
@@ -58,6 +67,29 @@ type ModalState = {
   confirmText?: string;
   cancelText?: string;
   confirmVariant?: 'primary' | 'danger' | 'success';
+};
+
+type User = {
+  id: number;
+  name: string;
+  email: string;
+  password_hash: string;
+  role: string;
+  created_at: string;
+  updated_at: string;
+};
+
+// --- Funções auxiliares ---
+async function fetchProfessor() {
+  const token = localStorage.getItem('token');
+  const response = await fetch('http://localhost:3000/users/', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    }
+  });
+  return await response.json();
 }
 
 // --- Componente da Página ---
@@ -66,74 +98,91 @@ export default function NewPostPage() {
   const [title, setTitle] = useState('');
   const [author_id, setAuthor] = useState('');
   const [content, setContent] = useState('');
+  const [professores, setProfessores] = useState<User[]>([]);
 
-  const [modalState, setModalState] = useState<ModalState>({ 
-      isOpen: false, 
-      title: '', 
-      message: '', 
-      onConfirm: () => {}, 
+  const [modalState, setModalState] = useState<ModalState>({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => { },
   });
 
-  // 1. A função de submit agora abre o MODAL DE CONFIRMAÇÃO
+  // carregar professores
+  useEffect(() => {
+    async function loadProfessores() {
+      try {
+        const data = await fetchProfessor();
+        setProfessores(data);
+      } catch (err) {
+        console.error("Erro ao buscar professores:", err);
+      }
+    }
+    loadProfessores();
+  }, []);
+
+  const handleProfessorSelect = (professorId: number) => {
+    console.log(`Professor selecionado: ${professorId}`);
+    setAuthor(String(professorId));
+  };
+
+  // submit com modal de confirmação
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setModalState({
-        isOpen: true,
-        title: "Confirmar Publicação",
-        message: "Deseja realmente criar este novo post?",
-        onConfirm: handleConfirmCreate, // A confirmação chama a função de criar
-        confirmText: "Sim, Publicar",
-        cancelText: "Cancelar",
-        confirmVariant: "success"
+      isOpen: true,
+      title: "Confirmar Publicação",
+      message: "Deseja realmente criar este novo post?",
+      onConfirm: handleConfirmCreate,
+      confirmText: "Sim, Publicar",
+      cancelText: "Cancelar",
+      confirmVariant: "success"
     });
   };
 
-  // 2. Esta nova função é chamada após a confirmação
   const handleConfirmCreate = async () => {
-  try {
-    const token = localStorage.getItem('token'); // pega o JWT
-    const res = await fetch('http://localhost:3000/professor/posts', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        title,
-        content,
-        author_id, // ou author_id se a API esperar ID
-      }),
-    });
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch('http://localhost:3000/professor/posts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          title,
+          content,
+          author_id,
+        }),
+      });
 
-    if (!res.ok) {
-      throw new Error('Erro ao criar o post');
+      if (!res.ok) {
+        throw new Error('Erro ao criar o post');
+      }
+
+      setModalState({
+        isOpen: true,
+        title: "Post Criado!",
+        message: "Seu novo post foi criado e publicado com sucesso.",
+        onConfirm: () => {
+          setModalState({ ...modalState, isOpen: false });
+          router.push('/posts');
+        },
+        confirmText: "Ok",
+        confirmVariant: "success"
+      });
+
+    } catch (err: any) {
+      console.error(err);
+      setModalState({
+        isOpen: true,
+        title: "Erro",
+        message: err.message || "Não foi possível criar o post.",
+        onConfirm: () => setModalState({ ...modalState, isOpen: false }),
+        confirmText: "Ok",
+        confirmVariant: "danger"
+      });
     }
-
-    // Post criado com sucesso
-    setModalState({
-      isOpen: true,
-      title: "Post Criado!",
-      message: "Seu novo post foi criado e publicado com sucesso.",
-      onConfirm: () => {
-        setModalState({ ...modalState, isOpen: false });
-        router.push('/posts'); // volta para a lista de posts
-      },
-      confirmText: "Ok",
-      confirmVariant: "success"
-    });
-
-  } catch (err: any) {
-    console.error(err);
-    setModalState({
-      isOpen: true,
-      title: "Erro",
-      message: err.message || "Não foi possível criar o post.",
-      onConfirm: () => setModalState({ ...modalState, isOpen: false }),
-      confirmText: "Ok",
-      confirmVariant: "danger"
-    });
-  }
-};
+  };
 
   return (
     <>
@@ -144,45 +193,41 @@ export default function NewPostPage() {
           </BackButton>
           <Title>Criar Novo Post</Title>
         </PageHeader>
-        
+
         <InputGroup>
           <Label htmlFor="title">NOME DA MATÉRIA</Label>
-          <Input 
-            type="text" 
-            id="title" 
+          <Input
+            type="text"
+            id="title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="Ex: Matemática I - Podcast" 
+            placeholder="Ex: Matemática I - Podcast"
           />
         </InputGroup>
 
         <InputGroup style={{ marginTop: '1.5rem' }}>
-          <Label htmlFor="author">AUTOR</Label>
-          <Input 
-            type="text" 
-            id="author_id" 
-            value={author_id}
-            onChange={(e) => setAuthor(e.target.value)}
-            placeholder="Ex: Prof. Carlos"
+          <Label htmlFor="author">AUTOR (ID do Professor)</Label>
+          <ProfessorList
+            users={professores}
+            onProfessorSelect={handleProfessorSelect}
           />
         </InputGroup>
 
         <InputGroup style={{ marginTop: '1.5rem' }}>
           <Label htmlFor="description">DESCRIÇÃO</Label>
-          <TextArea 
+          <TextArea
             id="content"
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="Descreva a atividade ou o conteúdo do post..."
           />
         </InputGroup>
-        
+
         <Actions>
           <Button type="submit" variant="success">Publicar</Button>
         </Actions>
       </Form>
 
-      {/* O mesmo modal é reutilizado para os dois cenários */}
       <Modal
         isOpen={modalState.isOpen}
         onClose={() => setModalState({ ...modalState, isOpen: false })}
