@@ -43,7 +43,7 @@ const CloseButton = styled.button`
 `;
 
 const Title = styled.h2`
-  font-family: var(--font-lora), serif;
+  font-family: var(--font-inter), serif;
   font-size: 1.5rem;
   color: #111827;
   margin-top: 0;

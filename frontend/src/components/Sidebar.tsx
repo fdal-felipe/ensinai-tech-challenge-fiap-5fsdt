@@ -11,10 +11,14 @@ const SidebarContainer = styled.aside`
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 
 const Title = styled.h1`
-  font-family: var(--font-lora), serif;
+  font-family: var(--font-inter), serif;
   font-size: 1.75rem;
   font-weight: bold;
   margin-bottom: 0.5rem;
@@ -78,8 +82,8 @@ export default function Sidebar() {
         {/* NOVO ITEM ADICIONADO AQUI */}
         <NavItem><Link href="/home"><HomeIcon /> Página Inicial <ChevronRight /></Link></NavItem>
         <NavItem><Link href="/posts"><PostsIcon /> Gerenciar Posts <ChevronRight /></Link></NavItem>
-        <NavItem><Link href="#"><UsersIcon /> Gerenciar Alunos <ChevronRight /></Link></NavItem>
-        <NavItem><Link href="#"><MateriasIcon /> Gerenciar Matérias <ChevronRight /></Link></NavItem>
+        <NavItem><Link href="/gerenciar-alunos"><UsersIcon /> Gerenciar Alunos <ChevronRight /></Link></NavItem>
+        <NavItem><Link href="/gerenciar-materias"><MateriasIcon /> Gerenciar Matérias <ChevronRight /></Link></NavItem>
         <NavItem><Link href="/minha-conta"><AccountIcon /> Minha Conta <ChevronRight /></Link></NavItem>
       </NavList>
       {/* Empurra o item de Sair para o final */}

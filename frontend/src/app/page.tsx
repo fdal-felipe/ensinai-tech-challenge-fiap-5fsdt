@@ -18,7 +18,7 @@ const LoadingContainer = styled.div`
 const Title = styled.h1`
   font-size: 3rem;
   font-weight: bold;
-  font-family: serif;
+  font-family: "Inter", sans-serif;
 `;
 
 export default function LoadingScreen() {
