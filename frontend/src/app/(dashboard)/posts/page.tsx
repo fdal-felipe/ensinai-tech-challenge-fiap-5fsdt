@@ -98,6 +98,8 @@ export default function PostsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
+  const role = localStorage.getItem('role');
+
 
   async function fetchProfessorById(id: number) {
     const token = localStorage.getItem('token');
@@ -116,7 +118,10 @@ export default function PostsPage() {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const res = await fetch('http://localhost:3000/professor/posts', {
+      const rota = role === 'professor' 
+        ? 'http://localhost:3000/professor/posts' 
+        : 'http://localhost:3000/aluno/posts';        
+        const res = await fetch(`${rota}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -177,9 +182,12 @@ export default function PostsPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
-          <AddPostButton onClick={handleCreate} aria-label="Criar novo post">
-            <PlusIcon />
-          </AddPostButton>
+          
+          {role == 'professor' && (
+            <AddPostButton onClick={handleCreate} aria-label="Criar novo post">
+              <PlusIcon />
+            </AddPostButton>
+          )}
         </ActionsContainer>
       </PageHeader>
 

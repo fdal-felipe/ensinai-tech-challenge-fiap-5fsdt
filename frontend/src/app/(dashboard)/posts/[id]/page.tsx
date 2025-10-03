@@ -75,6 +75,8 @@ export default function EditPostPage() {
   const router = useRouter();
   const params = useParams();
   const id = params.id as string;
+  const role = localStorage.getItem('role');
+
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -91,8 +93,10 @@ export default function EditPostPage() {
       try {
         setFetchLoading(true);
         setError(null);
-
-        const res = await fetch(`http://localhost:3000/professor/posts/${id}`, {
+        const rota = role === 'professor' 
+        ? 'http://localhost:3000/professor/posts/' 
+        : 'http://localhost:3000/aluno/posts/';
+        const res = await fetch(`${rota}${id}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -100,7 +104,7 @@ export default function EditPostPage() {
           },
         });
         
-        if (!res.ok) throw new Error('Erro ao carregar post');
+        //if (!res.ok) throw new Error('Erro ao carregar post');
         const json = await res.json();
         
         setTitle(json.title || "");
@@ -328,6 +332,9 @@ export default function EditPostPage() {
           />
         </InputGroup>
         
+
+          {role == 'professor' && (
+
         <Actions>
           <Button 
             type="button" 
@@ -347,6 +354,8 @@ export default function EditPostPage() {
             {isLoading ? 'Salvando...' : 'Salvar Alterações'}
           </Button>
         </Actions>
+          )}
+
       </Form>
 
       <Modal
