@@ -4,11 +4,11 @@ import { useRouter } from 'next/navigation';
 import Button from '../../components/Button';
 import { 
   FormContainer, 
-  FormWrapper, 
-  Title, 
-  Subtitle, 
-  InputGroup, 
-  Label, 
+  FormWrapper,
+  Title,
+  Subtitle,
+  InputGroup,
+  Label,
   Input, 
   StyledLink,
   LinksContainer,
@@ -27,6 +27,7 @@ export default function LoginPage() {
     setError('');
 
     try {
+      
       const res = await fetch('http://localhost:3000/auth/login', {
         method: 'POST',
         headers: {
@@ -36,15 +37,14 @@ export default function LoginPage() {
         body: JSON.stringify({ email, password }), // pega valores do state
       });
       if (!res.ok) {
-
         throw new Error('Credenciais inválidas');
       }
-
+      
       const data = await res.json();
 
       if (data.token) {
         localStorage.setItem('token', data.token);
-        localStorage.setItem('tipo', data.role);
+        localStorage.setItem('role', data.role);
         router.push('/home');
         console.log(data.token);
       } else {

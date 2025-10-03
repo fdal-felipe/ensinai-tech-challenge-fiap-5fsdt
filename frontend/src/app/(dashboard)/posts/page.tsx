@@ -81,44 +81,70 @@ const PlusIcon = () => (
     <line x1="5" y1="12" x2="19" y2="12"></line>
   </svg>
 );
-
-// --- Página Principal ---
-export default function PostsPage() {
-  const router = useRouter();
-  const [searchQuery, setSearchQuery] = useState('');
-
 interface Post {
   id: number;
   title: string;
   content: string;
   author_id: number;
+  authorName:string;
   status: string;
   created_at: string;
   updated_at: string;
 }
 
-
+// --- Página Principal ---
+export default function PostsPage() {
+  const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState('');
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
+  const role = localStorage.getItem('role');
+
+
+  async function fetchProfessorById(id: number) {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`http://localhost:3000/users/${id}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) throw new Error("Erro ao buscar professor");
+    return await response.json(); // esperado: { id, name, ... }
+  }
 
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const res = await fetch('http://localhost:3000/professor/posts', {
+      const rota = role === 'professor' 
+        ? 'http://localhost:3000/professor/posts' 
+        : 'http://localhost:3000/aluno/posts';        
+        const res = await fetch(`${rota}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            // Se precisar de autenticação:
-             'Authorization': `Bearer ${localStorage.getItem('token')}`
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
           },
         });
 
-        if (!res.ok) {
-          throw new Error('Erro ao buscar posts');
-        }
+        if (!res.ok) throw new Error('Erro ao buscar posts');
+        const data: Post[] = await res.json();
 
-        const data = await res.json();
-        setPosts(data); // supondo que a API retorna um array
+        // buscar nomes de autores
+        const enrichedPosts = await Promise.all(
+          data.map(async post => {
+            try {
+              const authorData = await fetchProfessorById(post.author_id);
+              return { ...post, authorName: authorData.name };
+            } catch {
+              return { ...post, authorName: `Autor #${post.author_id}` };
+            }
+          })
+        );
+
+        setPosts(enrichedPosts);
       } catch (err) {
         console.error(err);
       } finally {
@@ -137,10 +163,9 @@ interface Post {
     router.push('/posts/new');
   };
 
-  // Filtra posts com base na busca
   const filteredPosts = posts.filter(post =>
     post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    post.content.toLowerCase().includes(searchQuery.toLowerCase()) 
+    post.content.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -157,9 +182,12 @@ interface Post {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
-          <AddPostButton onClick={handleCreate} aria-label="Criar novo post">
-            <PlusIcon />
-          </AddPostButton>
+          
+          {role == 'professor' && (
+            <AddPostButton onClick={handleCreate} aria-label="Criar novo post">
+              <PlusIcon />
+            </AddPostButton>
+          )}
         </ActionsContainer>
       </PageHeader>
 
@@ -171,12 +199,12 @@ interface Post {
         ) : (
           filteredPosts.map(post => (
             <PostListItem
-                key={post.id}
-                title={post.title}
-                author={`Autor #${post.author_id}`} // até você buscar o nome real do autor
-                description={post.content}
-                onClick={() => handleNavigateToPost(post.id)}
-              />
+              key={post.id}
+              title={post.title}
+              author={post.authorName || `Autor #${post.author_id}`}
+              description={post.content}
+              onClick={() => handleNavigateToPost(post.id)}
+            />
           ))
         )}
       </PostListContainer>
