@@ -1,30 +1,41 @@
 // src/app/(dashboard)/layout.tsx
-'use client';
-import React from 'react';
-import styled from 'styled-components';
-import Sidebar from '../../components/Sidebar'; // Vamos criar este componente a seguir
+'use client'
+import React, { useState } from 'react'
+import styled from 'styled-components'
+import Sidebar from '../../components/Sidebar'
+import MobileNav from '../../components/HeaderMobile'
+import MenuMobile from '../../components/MenuMobile'
 
 const DashboardWrapper = styled.div`
   display: flex;
-  height: 100vh;
-  background-color: #f9fafb; /* Um cinza bem claro para o fundo */
-`;
+  min-height: 100vh;
+  background-color: #f9fafb;
+`
 
 const MainContent = styled.main`
   flex-grow: 1;
-  padding: 2rem 3rem; /* Mais espaçamento para desktop */
-  overflow-y: auto; /* Adiciona scroll se o conteúdo for grande */
-`;
+  padding: 2rem 3rem;
+  overflow-y: auto;
 
-export default function DashboardLayout({
-  children,
+  @media (max-width: 768px) {
+    padding: 1.2rem;
+    padding-bottom: 100px; /* Espaço para o botão de navegação flutuante */
+  }
+`
+
+export default function DashboardLayout ({
+  children
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+
   return (
     <DashboardWrapper>
-      <Sidebar />
+      <Sidebar /> {/* Sidebar original, que já se esconde no mobile */}
+      <MobileNav onMenuClick={() => setIsMenuOpen(true)} />
+      <MenuMobile isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
       <MainContent>{children}</MainContent>
     </DashboardWrapper>
-  );
+  )
 }

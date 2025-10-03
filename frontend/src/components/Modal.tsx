@@ -25,10 +25,11 @@ const ModalContent = styled.div`
   width: 100%;
   max-width: 500px;
   text-align: center;
+  margin: 2rem;
 `;
 
 const ModalTitle = styled.h2`
-  font-family: var(--font-lora), serif;
+  font-family: var(--font-inter), serif;
   font-size: 1.5rem;
   color: #111827;
   margin-top: 0;
