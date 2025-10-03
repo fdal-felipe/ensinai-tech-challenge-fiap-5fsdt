@@ -1,100 +1,221 @@
-# API de Blog Educacional (Ensinai) - Tech Challenge Fase 2
+# API de Blog Educacional (Ensinai) - Tech Challenge Fase 2 🎓
 
-Projeto desenvolvido como parte do **Tech Challenge** do curso de Pós-Graduação em Full Stack Development da FIAP, com foco na criação de uma API RESTful para uma aplicação de blogging educacional, utilizando Node.js, Express, PostgreSQL, Docker e um pipeline de CI/CD completo.
+> Projeto desenvolvido como parte do **Tech Challenge** do curso de Pós-Graduação em Full Stack Development da FIAP, com foco na criação de uma aplicação completa de blogging educacional.
+
+[![CI/CD Pipeline](https://github.com/fdal-felipe/ensinai-tech-challenge-fiap-5fsdt/actions/workflows/ci.yml/badge.svg)](https://github.com/fdal-felipe/ensinai-tech-challenge-fiap-5fsdt/actions/workflows/ci.yml)
+[![Node.js Version](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen)](https://nodejs.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+---
+
+## 📋 Índice
+
+-   [🎯 Objetivo](#-objetivo)
+-   [🏗️ Arquitetura](#️-arquitetura)
+-   [🛠️ Tecnologias](#️-tecnologias)
+-   [✨ Funcionalidades](#-funcionalidades)
+-   [📂 Estrutura do Projeto](#-estrutura-do-projeto)
+-   [🚀 Instalação e Execução](#-instalação-e-execução)
+-   [🔒 Autenticação e Autorização](#-autenticação-e-autorização)
+-   [📄 Documentação da API](#-documentação-da-api)
+-   [🧪 Testes](#-testes)
+-   [🐳 Docker](#-docker)
+-   [☁️ CI/CD e Produção](#️-cicd-e-produção)
+-   [🔍 Busca Inteligente](#-busca-inteligente)
+-   [🗄️ Banco de Dados](#️-banco-de-dados)
+-   [📬 Contato](#-contato)
+
+---
 
 ## 🎯 Objetivo
 
-Criar uma aplicação backend robusta, escalável e bem documentada, permitindo:
+Criar uma aplicação **full-stack** robusta, escalável e bem documentada para blogging educacional, que permite:
 
--   Professores(as) criarem, editarem, listarem e excluírem postagens.
--   Alunos(as) visualizarem a lista de posts, acessarem o conteúdo completo de cada postagem e realizarem buscas inteligentes por conteúdo.
+### Para Professores 👨‍🏫
+
+-   ✅ Criar, editar, listar e excluir postagens
+-   ✅ Gerenciar usuários (professores e alunos)
+-   ✅ Controlar status das postagens (ativo/inativo)
+-   ✅ Busca avançada em todo o conteúdo
+
+### Para Alunos 👨‍🎓
+
+-   ✅ Visualizar postagens ativas
+-   ✅ Buscar conteúdo por palavra-chave
+-   ✅ Acessar conteúdo educacional de qualidade
+-   ✅ Interface moderna e responsiva
 
 ---
 
-## 🛠️ Tecnologias Utilizadas
+## 🏗️ Arquitetura
 
--   **Banco de Dados:** [Supabase PostgreSQL](https://supabase.com/) *(antes: Render PostgreSQL)*
--   **Backend:** [Node.js](https://nodejs.org/), [Express.js](https://expressjs.com/)
--   **Banco de Dados:** [PostgreSQL](https://www.postgresql.org/)
--   **Testes:** [Jest](https://jestjs.io/), [Supertest](https://github.com/visionmedia/supertest)
--   **Containerização:** [Docker](https://www.docker.com/), Docker Compose
--   **Documentação da API:** [Swagger (OpenAPI)](https://swagger.io/)
+```mermaid
+graph TB
+    A[Frontend - Next.js] --> B[API Gateway - Express]
+    B --> C[Middleware - JWT Auth]
+    C --> D[Controllers]
+    D --> E[PostgreSQL Database]
+
+    F[GitHub Actions] --> G[Testes Automatizados]
+    G --> H[Deploy Render]
+
+    I[Docker Compose] --> J[Desenvolvimento Local]
+```
+
+### Separação por Papéis
+
+-   **`/professor/*`**: Endpoints protegidos por JWT, acesso completo
+-   **`/aluno/*`**: Endpoints públicos, apenas conteúdo ativo
+-   **`/users/*`**: Gestão de usuários, apenas professores
+-   **`/auth/*`**: Registro e login
+
+---
+
+## 🛠️ Tecnologias
+
+### Backend 🔧
+
+-   **Runtime:** [Node.js 18+](https://nodejs.org/)
+-   **Framework:** [Express.js 5](https://expressjs.com/)
+-   **Banco de Dados:** [PostgreSQL 15](https://www.postgresql.org/)
+-   **Autenticação:** [JWT](https://jwt.io/) + [bcryptjs](https://github.com/dcodeIO/bcrypt.js)
 -   **Validação:** [Express Validator](https://express-validator.github.io/)
+-   **Documentação:** [Swagger/OpenAPI](https://swagger.io/)
+
+### Frontend 🎨
+
+-   **Framework:** [Next.js 15](https://nextjs.org/)
+-   **UI Library:** [React 19](https://react.dev/)
+-   **Linguagem:** [TypeScript](https://www.typescriptlang.org/)
+-   **Estilização:** [TailwindCSS 4](https://tailwindcss.com/)
+-   **Componentes:** [Styled Components](https://styled-components.com/)
+
+### DevOps & Infraestrutura 🚀
+
+-   **Containerização:** [Docker](https://www.docker.com/) + Docker Compose
 -   **CI/CD:** [GitHub Actions](https://github.com/features/actions)
--   **Deploy (Produção):** [Render](https://render.com/)
+-   **Deploy Backend:** [Render](https://render.com/)
+-   **Deploy Frontend:** [Vercel](https://vercel.com/) _(configurável)_
+-   **Banco Produção:** [Supabase PostgreSQL](https://supabase.com/)
+-   **Testes:** [Jest](https://jestjs.io/) + [Supertest](https://github.com/visionmedia/supertest)
 
 ---
 
-## ✅ Funcionalidades
+## ✨ Funcionalidades
 
-A API foi arquitetada com base em papéis de usuário, oferecendo endpoints distintos para gestão de usuários, para professores (gestão de conteúdo) e para alunos (visualização de conteúdo).
+### 🔐 Gestão de Usuários (`/users`)
 
-### Gestão de Usuários (`/users`)
--   `GET /users`: Lista todos os usuários. **(JWT obrigatório, apenas professores)**
--   `GET /users/:id`: Busca um usuário específico. **(JWT obrigatório, apenas professores)**
--   `POST /users`: Cria um novo usuário (professor ou aluno). **(JWT obrigatório, apenas professores)**
--   `PUT /users/:id`: Atualiza um usuário existente. **(JWT obrigatório, apenas professores)**
--   `DELETE /users/:id`: Deleta um usuário. **(JWT obrigatório, apenas professores)**
+| Método   | Endpoint     | Descrição                | Autenticação |
+| -------- | ------------ | ------------------------ | ------------ |
+| `GET`    | `/users`     | Lista todos os usuários  | 🔒 Professor |
+| `GET`    | `/users/:id` | Busca usuário específico | 🔒 Professor |
+| `POST`   | `/users`     | Cria novo usuário        | 🔒 Professor |
+| `PUT`    | `/users/:id` | Atualiza usuário         | 🔒 Professor |
+| `DELETE` | `/users/:id` | Remove usuário           | 🔒 Professor |
 
-### Módulo do Professor (`/professor/posts`)
-Endpoints com controle total sobre as postagens.
--   `GET /professor/posts`: Lista todas as postagens, independente do status. **(JWT obrigatório, apenas professores)**
--   `POST /professor/posts`: Cria uma nova postagem. **(JWT obrigatório, apenas professores)**
--   `PUT /professor/posts/:id`: Atualiza uma postagem, incluindo seu `status` (ativo/inativo). **(JWT obrigatório, apenas professores)**
--   `DELETE /professor/posts/:id`: Deleta uma postagem. **(JWT obrigatório, apenas professores)**
--   `GET /professor/posts/search?q=termo`: Realiza uma busca inteligente em todas as postagens. **(JWT obrigatório, apenas professores)**
+### 👨‍🏫 Módulo Professor (`/professor/posts`)
 
-### Módulo do Aluno (`/aluno/posts`)
-Endpoints de leitura, com acesso apenas a postagens com `status = 'ativo'`.
--   `GET /aluno/posts`: Lista todas as postagens ativas. **(Acesso livre)**
--   `GET /aluno/posts/:id`: Busca uma postagem ativa específica. **(Acesso livre)**
--   `GET /aluno/posts/search?q=termo`: Realiza uma busca inteligente apenas em postagens ativas. **(Acesso livre)**
+| Método   | Endpoint                          | Descrição                 | Autenticação |
+| -------- | --------------------------------- | ------------------------- | ------------ |
+| `GET`    | `/professor/posts`                | Lista todas as postagens  | 🔒 Professor |
+| `POST`   | `/professor/posts`                | Cria nova postagem        | 🔒 Professor |
+| `GET`    | `/professor/posts/:id`            | Busca postagem específica | 🔒 Professor |
+| `PUT`    | `/professor/posts/:id`            | Atualiza postagem         | 🔒 Professor |
+| `DELETE` | `/professor/posts/:id`            | Remove postagem           | 🔒 Professor |
+| `GET`    | `/professor/posts/search?q=termo` | Busca inteligente         | 🔒 Professor |
+
+### 👨‍🎓 Módulo Aluno (`/aluno/posts`)
+
+| Método | Endpoint                      | Descrição                 | Autenticação |
+| ------ | ----------------------------- | ------------------------- | ------------ |
+| `GET`  | `/aluno/posts`                | Lista postagens ativas    | 🌐 Público   |
+| `GET`  | `/aluno/posts/:id`            | Visualiza postagem ativa  | 🌐 Público   |
+| `GET`  | `/aluno/posts/search?q=termo` | Busca em postagens ativas | 🌐 Público   |
+
+### 🔑 Autenticação (`/auth`)
+
+| Método | Endpoint         | Descrição                |
+| ------ | ---------------- | ------------------------ |
+| `POST` | `/auth/register` | Registro de usuário      |
+| `POST` | `/auth/login`    | Login e geração de token |
 
 ---
 
 ## 📂 Estrutura do Projeto
 
-O repositório está organizado da seguinte forma para manter uma clara separação de responsabilidades:
-
 ```
-├── .github/workflows/         # Arquivos de configuração do pipeline de CI/CD (GitHub Actions)
-├── postgres-init/             # Scripts SQL para a inicialização do banco de dados
-├── src/                       # Pasta principal com o código-fonte da aplicação
-│   ├── controllers/           # Contém a lógica de negócio de cada rota
-│   ├── db/                    # Configuração da conexão com o banco e script de migração
-│   ├── middleware/            # Configuração do middleware de autenticação                    
-│   ├── routes/                # Definição das rotas da API
-│   ├── app.js                 # Arquivo principal de configuração do Express (middlewares, rotas)
-│   └── server.js              # Arquivo que inicia o servidor
-├── tests/                     # Contém os testes automatizados com Jest e Supertest
-├── .env.example               # Arquivo de exemplo para as variáveis de ambiente
-├── docker-compose.yml         # Orquestração dos contêineres Docker para o ambiente local
-├── Dockerfile                 # Receita para construir a imagem Docker da aplicação
-├── jest.config.js             # Arquivo de configuração do Jest, define como os testes devem ser executados
-├── package.json               # Manifesto do projeto Node.js, lista as dependências e scripts
-├── package-lock.json          # "Trava" as versões exatas de todas as dependências para garantir instalações consistentes
-├── requests-dev.http          # Requisições para testar a API em ambiente de desenvolvimento (localhost)
-├── requests-prod.http         # Requisições para testar a API em produção (Render)
-└── swagger.config.js          # Configuração da documentação Swagger
+📦 ensinai-tech-challenge-fiap-5fsdt/
+├── 📁 .github/workflows/          # Pipeline CI/CD
+│   └── 📄 ci.yml                 # GitHub Actions
+├── 📁 backend/                   # API Backend
+│   ├── 📁 postgres-init/         # Scripts SQL inicialização
+│   │   ├── 📄 init.sql          # Ambiente local
+│   │   └── 📄 init.ci.sql       # Ambiente CI/CD
+│   ├── 📁 src/                  # Código-fonte principal
+│   │   ├── 📁 controllers/       # Lógica de negócio
+│   │   │   ├── 📄 professorPosts.js
+│   │   │   ├── 📄 alunoPosts.js
+│   │   │   ├── 📄 users.js
+│   │   │   └── 📄 auth.js
+│   │   ├── 📁 db/               # Configuração banco
+│   │   │   ├── 📄 index.js      # Conexão PostgreSQL
+│   │   │   └── 📄 migrate.js    # Migrações automáticas
+│   │   ├── 📁 middleware/       # Middlewares
+│   │   │   └── 📄 auth.js       # Autenticação JWT
+│   │   ├── 📁 routes/           # Definição de rotas
+│   │   │   ├── 📄 professorPosts.js
+│   │   │   ├── 📄 alunoPosts.js
+│   │   │   ├── 📄 users.js
+│   │   │   └── 📄 auth.js
+│   │   ├── 📄 app.js            # Configuração Express
+│   │   └── 📄 server.js         # Inicialização servidor
+│   ├── 📁 tests/                # Testes automatizados
+│   │   ├── 📄 setup.js          # Configuração Jest
+│   │   └── 📄 posts.test.js     # Suíte de testes
+│   ├── 📄 Dockerfile            # Container backend
+│   ├── 📄 package.json          # Dependências Node.js
+│   ├── 📄 jest.config.js        # Configuração testes
+│   └── 📄 swagger.config.js     # Documentação API
+├── 📁 frontend/                 # Interface Next.js
+│   ├── 📁 src/app/              # App Router Next.js 15
+│   ├── 📄 Dockerfile            # Container frontend
+│   ├── 📄 package.json          # Dependências frontend
+│   ├── 📄 tsconfig.json         # Configuração TypeScript
+│   ├── 📄 tailwind.config.ts    # TailwindCSS
+│   └── 📄 next.config.ts        # Configuração Next.js
+├── 📄 docker-compose.yml        # Orquestração containers
+├── 📄 README.md                 # Este arquivo
+└── 📄 CONTEXT.md                # Contexto para IAs
 ```
 
 ---
 
-## 🚀 Como Executar Localmente
+## 🚀 Instalação e Execução
 
-### 1. Pré-requisitos
+### 🔧 Pré-requisitos
+
 -   [Git](https://git-scm.com/downloads)
--   [Node.js](https://nodejs.org/) (versão 18 ou superior)
+-   [Node.js 18+](https://nodejs.org/)
 -   [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 
-### 2. Clonar o Repositório
+### 📥 1. Clone o Repositório
+
 ```bash
 git clone https://github.com/fdal-felipe/ensinai-tech-challenge-fiap-5fsdt.git
 cd ensinai-tech-challenge-fiap-5fsdt
 ```
 
-### 3. Configurar Variáveis de Ambiente
-Crie uma cópia do arquivo `.env.example`, renomeie para `.env` e preencha com as credenciais para o ambiente Docker local:
+### ⚙️ 2. Configuração Backend
+
+```bash
+# Navegar para o backend
+cd backend
+
+# Copiar e configurar variáveis de ambiente
+cp .env.example .env
+```
+
+**Edite o arquivo `.env`:**
 
 ```env
 DB_USER=userblog
@@ -102,117 +223,532 @@ DB_PASSWORD=passwordblog
 DB_DATABASE=blogdb
 DB_HOST=localhost
 DB_PORT=5432
-JWT_SECRET=sua_chave_secreta
+JWT_SECRET=sua_chave_secreta_super_forte_aqui
 ```
-> **Importante:** O campo `JWT_SECRET` é obrigatório para autenticação JWT. Use uma chave forte e secreta.
 
-### 4. Iniciar o Docker
--   Abra o seu Docker Desktop para iniciar os motores do Docker.
+### ⚙️ 3. Configuração Frontend
 
-### 5. Subir os Contêineres com Docker Compose
 ```bash
-docker-compose up --build
+# Navegar para o frontend
+cd ../frontend
+
+# Instalar dependências
+npm install
 ```
--   A API estará disponível em `http://localhost:3000`.
--   O banco de dados PostgreSQL estará acessível em `localhost:5432`.
--   Na primeira execução, o banco de dados será automaticamente criado pelo script em `postgres-init/init.sql`.
+
+### 🐳 4. Executar com Docker (Recomendado)
+
+**Na raiz do projeto:**
+
+```bash
+# Subir toda a aplicação
+docker-compose up --build
+
+# Em modo detach (background)
+docker-compose up --build -d
+```
+
+**Serviços disponíveis:**
+
+-   🌐 **Frontend:** http://localhost:80
+-   🔌 **Backend API:** http://localhost:3000
+-   📚 **Documentação:** http://localhost:3000/api-docs
+-   🗄️ **PostgreSQL:** localhost:5432
+
+### 🏃‍♂️ 5. Executar Manualmente (Desenvolvimento)
+
+**Terminal 1 - Banco de Dados:**
+
+```bash
+docker-compose up -d db
+```
+
+**Terminal 2 - Backend:**
+
+```bash
+cd backend
+npm install
+npm run dev
+```
+
+**Terminal 3 - Frontend:**
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
 ---
 
-## 🔌 Conectando ao Banco de Dados Local com DBeaver
+## 🔒 Autenticação e Autorização
 
-Com os contêineres rodando, você pode se conectar ao banco de dados para inspecionar os dados.
+### 🎫 Fluxo de Autenticação
 
-1.  **Nova Conexão:** No DBeaver, clique em `Database > New Database Connection` e selecione `PostgreSQL`.
-2.  **Configurações:** Use as mesmas informações do seu arquivo `.env`:
-    * **Host:** `localhost`
-    * **Port:** `5432`
-    * **Database:** `blogdb`
-    * **Username:** `userblog`
-    * **Password:** `passwordblog`
-3.  **Testar e Conectar:** Clique em "Test Connection..." e depois em "Finish".
+1. **Registro:** `POST /auth/register`
 
----
+```json
+{
+    "name": "João Silva",
+    "email": "joao@email.com",
+    "password": "senha123",
+    "role": "professor"
+}
+```
 
-## 🔒 Autenticação JWT
+2. **Login:** `POST /auth/login`
 
--   Endpoints de `/professor/posts` e `/users` exigem autenticação.
--   Para acessar, faça login em `/auth/login` e use o token JWT retornado no header:
-    ```
-    Authorization: Bearer SEU_TOKEN_AQUI
-    ```
--   No Swagger, clique em "Authorize" e cole o token.
+```json
+{
+    "email": "joao@email.com",
+    "password": "senha123"
+}
+```
 
----
+3. **Resposta com Token:**
 
-## 🧪 Testes Automatizados
+```json
+{
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "user": {
+        "id": 1,
+        "name": "João Silva",
+        "email": "joao@email.com",
+        "role": "professor"
+    }
+}
+```
 
-A suíte de testes garante a qualidade da API.
--   **Para rodar os testes:**
-    1.  Garanta que o contêiner do banco esteja no ar: `docker-compose up -d db`.
-    2.  Execute o comando no seu terminal:
-        ```bash
-        npm test
-        ```
--   Os testes cobrem autenticação, autorização e regras de negócio. Eles criam usuários, fazem login e usam tokens reais para validar os fluxos protegidos.
+### 🛡️ Usando o Token
+
+**Headers das requisições protegidas:**
+
+```http
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+Content-Type: application/json
+```
+
+### 👥 Níveis de Acesso
+
+| Papel         | Permissões                                                  |
+| ------------- | ----------------------------------------------------------- |
+| **Professor** | ✅ CRUD posts<br/>✅ Gestão usuários<br/>✅ Busca completa  |
+| **Aluno**     | ✅ Visualizar posts ativos<br/>✅ Busca em conteúdo público |
 
 ---
 
 ## 📄 Documentação da API
 
-A API está documentada com Swagger, gerando uma interface interativa.
+### 🌐 Swagger UI Interativo
 
--   **Local:** [http://localhost:3000/api-docs](http://localhost:3000/api-docs)
--   **Produção:** [https://blog-api-prod-mcw6.onrender.com/api-docs](https://blog-api-prod-mcw6.onrender.com/api-docs)
+-   **Local:** http://localhost:3000/api-docs
+-   **Produção:** https://blog-api-prod-mcw6.onrender.com/api-docs
 
-**Como testar endpoints protegidos no Swagger:**
--   Clique em "Authorize" (ícone de cadeado).
--   Cole o token JWT obtido via `/auth/login` no campo.
--   Agora, todos endpoints protegidos aceitarão requisições autenticadas.
+### 🔓 Testando Endpoints Protegidos
 
----
+1. Acesse a documentação Swagger
+2. Clique em **"Authorize"** (🔒)
+3. Cole o token JWT: `Bearer SEU_TOKEN_AQUI`
+4. Teste os endpoints diretamente na interface
 
-## 🧑‍💻 Testando com arquivos .http
+### 📋 Exemplos de Requisição
 
--   Use `requests-dev.http` ou `requests-prod.http` para testar a API diretamente pelo VS Code.
--   Para endpoints protegidos, obtenha o token via `/auth/login` e adicione o header `Authorization` nas requisições:
-    ```
-    Authorization: Bearer SEU_TOKEN_AQUI
-    ```
--   Endpoints de aluno não exigem token.
+**Criar Post (Professor):**
 
----
+```http
+POST /professor/posts
+Authorization: Bearer TOKEN_AQUI
+Content-Type: application/json
 
-## ☁️ Automação (CI/CD) e Produção
+{
+  "title": "Introdução à Matemática",
+  "content": "Conceitos fundamentais...",
+  "author_id": 1
+}
+```
 
-O projeto está configurado com um pipeline de Integração e Implantação Contínua (CI/CD) usando GitHub Actions.
+**Buscar Posts (Aluno):**
 
--   **CI:** A cada `push` ou `pull request` na branch `main`, o workflow executa a suíte de testes (`npm test`) para validar o código.
--   **CD:** Se os testes passarem, o workflow dispara um "Deploy Hook" no Render, publicando a nova versão em produção.
--   **API em Produção:** `https://blog-api-prod-mcw6.onrender.com`
--   **Documentação em Produção:** `https://blog-api-prod-mcw6.onrender.com/api-docs`
-
----
-
-## ⚠️ Avisos sobre Dependências
-
--   Durante o deploy, podem aparecer avisos de pacotes deprecated. Eles não impedem o funcionamento, mas recomenda-se atualizar dependências sempre que possível.
--   O comando `npm audit fix` pode ser usado para corrigir vulnerabilidades conhecidas.
+```http
+GET /aluno/posts/search?q=matemática
+```
 
 ---
 
-## 💡 Relato de Experiências e Desafios
+## 🧪 Testes
 
-Durante o desenvolvimento, enfrentamos desafios significativos que contribuíram para um grande aprendizado:
--   **Configuração do Ambiente de Testes:** A integração do Jest com um banco de dados em Docker exigiu uma configuração cuidadosa das variáveis de ambiente (`.env` vs. `ci.yml`) e do ciclo de vida da conexão com o banco.
--   **Pipeline de CI/CD:** Garantir que o banco de dados fosse corretamente inicializado no ambiente do GitHub Actions foi um desafio, resolvido com o uso do `psql` nativo para executar o script de setup do banco.
--   **Busca Inteligente no PostgreSQL:** A implementação da busca "fuzzy" com tolerância a erros de digitação nos levou a estudar e implementar extensões do PostgreSQL como `unaccent` e `pg_trgm`, além de entender o funcionamento de índices GIN e funções como `similarity()`.
--   **Evolução do Esquema em Produção:** Após o deploy inicial, novas alterações no banco de dados (como a adição da extensão `pg_trgm`) não eram aplicadas automaticamente. Aprendemos a importância de realizar "migrações" manuais em bancos já existentes para sincronizá-los com as novas versões do código.
+### 🎯 Cobertura de Testes
+
+-   ✅ **Autenticação:** Registro, login, validação JWT
+-   ✅ **Autorização:** Controle de acesso por papel
+-   ✅ **CRUD Posts:** Criação, leitura, atualização, exclusão
+-   ✅ **Busca:** Funcionalidade de pesquisa textual
+-   ✅ **Validação:** Dados obrigatórios e formatos
+
+### 🏃‍♂️ Executar Testes
+
+```bash
+# Garantir que o banco esteja rodando
+docker-compose up -d db
+
+# Executar suíte de testes
+cd backend
+npm test
+
+# Com coverage
+npm test -- --coverage
+```
+
+### 📊 Resultados Esperados
+
+```
+✅ Testes dos Endpoints de Professor (/professor/posts)
+✅ Testes dos Endpoints de Aluno (/aluno/posts)
+✅ Testes dos Endpoints de Usuários (/users)
+✅ Testes de Autenticação (/auth)
+
+Test Suites: 1 passed
+Tests: 20+ passed
+```
+
+---
+
+## 🐳 Docker
+
+### 🏗️ Multi-Container Setup
+
+```yaml
+# docker-compose.yml
+services:
+    db: # PostgreSQL 15 + extensões
+    app: # Backend Node.js
+    frontend: # Frontend Next.js
+```
+
+### 📦 Comandos Úteis
+
+```bash
+# Construir e subir todos os serviços
+docker-compose up --build
+
+# Apenas o banco (para desenvolvimento)
+docker-compose up -d db
+
+# Ver logs específicos
+docker-compose logs app
+docker-compose logs frontend
+
+# Parar todos os serviços
+docker-compose down
+
+# Limpar volumes (CUIDADO: apaga dados!)
+docker-compose down -v
+```
+
+### 🔍 Conectar ao Banco com DBeaver
+
+| Campo    | Valor          |
+| -------- | -------------- |
+| Host     | `localhost`    |
+| Port     | `5432`         |
+| Database | `blogdb`       |
+| Username | `userblog`     |
+| Password | `passwordblog` |
+
+---
+
+## ☁️ CI/CD e Produção
+
+### 🔄 Pipeline Automatizado
+
+```mermaid
+graph LR
+    A[Push/PR] --> B[GitHub Actions]
+    B --> C[Build & Test]
+    C --> D{Testes OK?}
+    D -->|✅| E[Deploy Render]
+    D -->|❌| F[Falha]
+```
+
+### 🚀 Ambientes
+
+| Ambiente            | URL                                     | Descrição            |
+| ------------------- | --------------------------------------- | -------------------- |
+| **Desenvolvimento** | http://localhost:3000                   | Local com Docker     |
+| **CI/CD**           | GitHub Actions                          | Testes automatizados |
+| **Produção**        | https://blog-api-prod-mcw6.onrender.com | Deploy automático    |
+
+### 📋 Processo de Deploy
+
+1. **Commit** na branch `main`
+2. **GitHub Actions** executa:
+    - Setup Node.js 18
+    - Instalar dependências
+    - Inicializar banco PostgreSQL
+    - Executar testes com Jest
+3. **Se testes passam:**
+    - Dispara webhook do Render
+    - Deploy automático em produção
+
+### 🔧 Configuração de Secrets
+
+No GitHub, configure em `Settings > Secrets and variables > Actions`:
+
+```
+DB_USER=usuario_prod
+DB_PASSWORD=senha_prod
+DB_DATABASE=blogdb_prod
+JWT_SECRET=chave_super_secreta
+RENDER_DEPLOY_HOOK=https://api.render.com/deploy/...
+```
+
+---
+
+## 🔍 Busca Inteligente
+
+### 🧠 Recursos Avançados
+
+-   **📝 Busca Textual:** Título + conteúdo
+-   **🔤 Normalização:** Remove acentos automaticamente
+-   **🎯 Similaridade:** Algoritmo trigram para palavras similares
+-   **⚡ Performance:** Índices GIN otimizados
+
+### 🛠️ Implementação Técnica
+
+**Extensões PostgreSQL:**
+
+```sql
+CREATE EXTENSION IF NOT EXISTS unaccent;
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+```
+
+**Função de Busca:**
+
+```sql
+CREATE OR REPLACE FUNCTION public.f_unaccent(text)
+RETURNS text AS $$
+SELECT extensions.unaccent($1)
+$$ LANGUAGE sql IMMUTABLE;
+```
+
+**Índice Otimizado:**
+
+```sql
+CREATE INDEX idx_posts_search ON posts
+USING gin (f_unaccent(title || ' ' || content) gin_trgm_ops);
+```
+
+### 📝 Exemplos de Busca
+
+```javascript
+// Busca por "matemática" encontra:
+// - "Matemática Básica"
+// - "matematica avançada"
+// - "Conceitos matemáticos"
+
+GET /aluno/posts/search?q=matematica
+GET /professor/posts/search?q=geometria
+```
+
+---
+
+## 🗄️ Banco de Dados
+
+### 📊 Modelo Relacional
+
+```mermaid
+erDiagram
+    USERS {
+        serial id PK
+        varchar name
+        varchar email UK
+        varchar password_hash
+        user_role role
+        timestamptz created_at
+        timestamptz updated_at
+    }
+
+    POSTS {
+        serial id PK
+        varchar title
+        text content
+        integer author_id FK
+        varchar status
+        timestamptz created_at
+        timestamptz updated_at
+    }
+
+    USERS ||--o{ POSTS : "author_id"
+```
+
+### 🏷️ Tipos Customizados
+
+```sql
+-- Enum para papéis de usuário
+CREATE TYPE user_role AS ENUM ('professor', 'aluno');
+
+-- Status das postagens
+status VARCHAR(20) DEFAULT 'ativo'  -- 'ativo' | 'inativo'
+```
+
+### 🔧 Migrações Automáticas
+
+O sistema executa migrações automaticamente na inicialização:
+
+```javascript
+// src/db/migrate.js
+async function runMigrations() {
+    // Verifica e aplica mudanças no schema
+    // Cria extensões, tabelas e índices
+}
+```
+
+---
+
+## 🚨 Solução de Problemas
+
+### ❓ Problemas Comuns
+
+**🐳 Docker não inicia:**
+
+```bash
+# Verificar se o Docker Desktop está rodando
+docker --version
+
+# Limpar containers antigos
+docker system prune -f
+```
+
+**🔒 Erro de autenticação:**
+
+```bash
+# Verificar se o JWT_SECRET está configurado
+echo $JWT_SECRET
+
+# Gerar novo token via login
+POST /auth/login
+```
+
+**🗄️ Banco não conecta:**
+
+```bash
+# Verificar se o container do DB está rodando
+docker-compose ps
+
+# Ver logs do banco
+docker-compose logs db
+```
+
+**🧪 Testes falhando:**
+
+```bash
+# Garantir que o banco de teste está limpo
+docker-compose down -v
+docker-compose up -d db
+npm test
+```
+
+### 📋 Checklist de Verificação
+
+-   [ ] Docker Desktop rodando
+-   [ ] Arquivo `.env` configurado
+-   [ ] Portas 3000, 5432 e 80 disponíveis
+-   [ ] Node.js 18+ instalado
+-   [ ] Dependências instaladas com `npm install`
+
+---
+
+## 🔮 Próximos Passos
+
+### 🌟 Melhorias Planejadas
+
+-   [ ] **📱 App Mobile:** React Native
+-   [ ] **🔔 Notificações:** WebSocket em tempo real
+-   [ ] **📊 Analytics:** Dashboard de métricas
+-   [ ] **🎨 Temas:** Dark/Light mode
+-   [ ] **🌐 i18n:** Internacionalização
+-   [ ] **🔍 Elasticsearch:** Busca ainda mais avançada
+-   [ ] **📷 Upload:** Imagens nas postagens
+-   [ ] **💬 Comentários:** Sistema de feedback
+
+### 🎯 Roadmap Técnico
+
+-   [ ] **Microserviços:** Separação por domínio
+-   [ ] **GraphQL:** API mais flexível
+-   [ ] **Redis:** Cache distribuído
+-   [ ] **Kubernetes:** Orquestração avançada
+-   [ ] **Monitoramento:** Prometheus + Grafana
+
+---
+
+## 💡 Experiências e Aprendizados
+
+### 🎓 Desafios Superados
+
+**🔧 Configuração CI/CD:**
+
+> A integração do Jest com PostgreSQL no GitHub Actions exigiu configuração cuidadosa das variáveis de ambiente e scripts SQL específicos para o ambiente de testes.
+
+**🔍 Busca Inteligente:**
+
+> Implementar busca com tolerância a erros e acentos nos levou a estudar extensões PostgreSQL avançadas como `unaccent` e `pg_trgm`, além de otimização com índices GIN.
+
+**🚀 Deploy Contínuo:**
+
+> Sincronizar mudanças de schema entre desenvolvimento e produção exigiu estratégias de migração automática e rollback seguro.
+
+**🐳 Docker Multi-Stage:**
+
+> Otimizar builds para produção com containers menores e mais seguros foi crucial para performance.
+
+### 📚 Conhecimentos Adquiridos
+
+-   **Arquitetura Backend:** Separação clara de responsabilidades
+-   **Segurança:** Implementação robusta de JWT e autorização
+-   **DevOps:** Pipeline completo de CI/CD com testes automatizados
+-   **Banco de Dados:** Modelagem, índices e otimização de queries
+-   **Frontend Moderno:** Next.js 15 com App Router e TypeScript
 
 ---
 
 ## 📬 Contato
 
-Dúvidas, sugestões ou colaborações são bem-vindas! Entre em contato:
--   **Felipe Laudano** - [LinkedIn](https://www.linkedin.com/in/felipe-laudano/) | [GitHub](https://github.com/fdal-felipe)
--   **E-mail:** fdal.felipe@gmail.com
+### 👨‍💻 Desenvolvedores
+
+**Felipe Laudano**
+
+-   🌐 [LinkedIn](https://www.linkedin.com/in/felipe-laudano/)
+-   🐙 [GitHub](https://github.com/fdal-felipe)
+-   ✉️ **Email:** fdal.felipe@gmail.com
+
+### 🤝 Contribuições
+
+Contribuições são bem-vindas! Siga o processo:
+
+1. **Fork** o repositório
+2. **Clone** sua fork
+3. **Crie** uma branch: `git checkout -b feature/nova-funcionalidade`
+4. **Commit** suas mudanças: `git commit -m 'Adiciona nova funcionalidade'`
+5. **Push** para a branch: `git push origin feature/nova-funcionalidade`
+6. **Abra** um Pull Request
+
+### 📄 Licença
+
+Este projeto está sob a licença **MIT**. Veja o arquivo `LICENSE` para mais detalhes.
+
+### 🙏 Agradecimentos
+
+-   **FIAP** - Pela excelente estrutura do curso
+-   **Comunidade Open Source** - Pelas tecnologias incríveis
+-   **Render & Supabase** - Pela infraestrutura gratuita
+-   **GitHub** - Pela plataforma de desenvolvimento colaborativo
+
+---
+
+<div align="center">
+
+**⭐ Se este projeto te ajudou, considere dar uma estrela!**
+
+</div>
+
+---
