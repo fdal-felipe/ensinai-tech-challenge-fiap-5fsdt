@@ -1,13 +1,11 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import Button from '../../../../components/Button'
 import Modal from '../../../../components/Modal'
 import { InputGroup, Label, Input } from '../../../../components/FormStyles'
-// 1. Importe o useParams junto com o useRouter
 import { useRouter, useParams } from 'next/navigation'
 
-// --- Styled Components (sem alterações) ---
 const Form = styled.form`
   max-width: 800px;
 `
@@ -44,7 +42,7 @@ const BackIcon = () => (
     xmlns='http://www.w3.org/2000/svg'
     width='24'
     height='24'
-    viewBox='0 0 24'
+    viewBox='0 0 24 24'
     fill='none'
     stroke='currentColor'
     strokeWidth='2'
@@ -87,11 +85,77 @@ type ModalState = {
   confirmVariant?: 'primary' | 'danger' | 'success'
 }
 
-// 2. Remova `params` das props da função
-export default function EditPostPage () {
+export default function EditPostPage() {
   const router = useRouter()
-  const params = useParams() // 3. Use o hook para obter os parâmetros
-  const id = params.id as string // 4. Extraia o id
+  const params = useParams()
+  const id = params.id as string
+  const role = localStorage.getItem('role')
+
+  const [title, setTitle] = useState('')
+  const [description, setDescription] = useState('')
+  const [authorId, setAuthorId] = useState<number | null>(null)
+  const [authorName, setAuthorName] = useState('')
+
+  const [isLoading, setIsLoading] = useState(false)
+  const [fetchLoading, setFetchLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  // --- 🔹 Buscar post existente ---
+  useEffect(() => {
+    const fetchPost = async () => {
+      try {
+        setFetchLoading(true)
+        setError(null)
+
+        const rota =
+          role === 'professor'
+            ? 'http://localhost:3000/professor/posts/'
+            : 'http://localhost:3000/aluno/posts/'
+
+        const res = await fetch(`${rota}${id}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        })
+
+        const json = await res.json()
+
+        setTitle(json.title || '')
+        setDescription(json.content || '')
+        setAuthorId(json.author_id || null)
+      } catch (err) {
+        console.error('Erro ao carregar post:', err)
+        setError('Erro ao carregar post')
+      } finally {
+        setFetchLoading(false)
+      }
+    }
+
+    if (id) fetchPost()
+  }, [id, role])
+
+  // --- 🔹 Buscar nome do autor ---
+  useEffect(() => {
+    const fetchAuthor = async () => {
+      if (!authorId) return
+      try {
+        const res = await fetch(`http://localhost:3000/users/${authorId}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        })
+        const user = await res.json()
+        setAuthorName(user.name || `Autor #${authorId}`)
+      } catch (err) {
+        console.error('Erro ao buscar autor:', err)
+        setAuthorName(`Autor #${authorId}`)
+      }
+    }
+
+    fetchAuthor()
+  }, [authorId])
 
   const [modalState, setModalState] = useState<ModalState>({
     isOpen: false,
@@ -100,31 +164,99 @@ export default function EditPostPage () {
     onConfirm: () => {}
   })
 
+  // --- 🔹 Salvar post ---
+  const handleConfirmSave = async () => {
+    try {
+      setIsLoading(true)
+
+      const res = await fetch(`http://localhost:3000/professor/posts/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          title,
+          content: description,
+          status: 'ativo'
+        })
+      })
+
+      if (!res.ok) throw new Error('Erro ao salvar post.')
+
+      setModalState({
+        isOpen: true,
+        title: 'Post Salvo!',
+        message: 'As alterações foram salvas com sucesso.',
+        onConfirm: () => {
+          setModalState(prev => ({ ...prev, isOpen: false }))
+          router.push('/posts')
+        },
+        confirmText: 'Ok',
+        confirmVariant: 'success'
+      })
+    } catch (err: any) {
+      setModalState({
+        isOpen: true,
+        title: 'Erro',
+        message: `Não foi possível salvar o post: ${err.message}`,
+        onConfirm: () => setModalState(prev => ({ ...prev, isOpen: false })),
+        confirmText: 'Fechar',
+        confirmVariant: 'danger'
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // --- 🔹 Excluir post ---
+  const handleConfirmDelete = async () => {
+    try {
+      setIsLoading(true)
+      const res = await fetch(`http://localhost:3000/professor/posts/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      })
+
+      if (!res.ok) throw new Error('Erro ao excluir post.')
+
+      setModalState({
+        isOpen: true,
+        title: 'Post Excluído!',
+        message: 'O post foi excluído com sucesso.',
+        onConfirm: () => {
+          setModalState(prev => ({ ...prev, isOpen: false }))
+          router.push('/posts')
+        },
+        confirmText: 'Ok',
+        confirmVariant: 'success'
+      })
+    } catch (err: any) {
+      setModalState({
+        isOpen: true,
+        title: 'Erro na Exclusão',
+        message: `Não foi possível excluir o post: ${err.message}`,
+        onConfirm: () => setModalState(prev => ({ ...prev, isOpen: false })),
+        confirmText: 'Fechar',
+        confirmVariant: 'danger'
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     setModalState({
       isOpen: true,
       title: 'Confirmar Alterações',
-      message: 'Deseja realmente salvar as alterações feitas neste post?',
+      message: 'Deseja realmente salvar as alterações neste post?',
       onConfirm: handleConfirmSave,
       confirmText: 'Sim, Salvar',
       cancelText: 'Cancelar',
-      confirmVariant: 'success'
-    })
-  }
-
-  const handleConfirmSave = () => {
-    // 5. Agora você pode usar `id` aqui sem problemas
-    console.log(`Salvando as alterações do post ${id}...`)
-    setModalState({
-      isOpen: true,
-      title: 'Post Salvo!',
-      message: 'As alterações no post foram salvas com sucesso.',
-      onConfirm: () => {
-        setModalState({ ...modalState, isOpen: false })
-        router.push('/posts')
-      },
-      confirmText: 'Ok',
       confirmVariant: 'success'
     })
   }
@@ -142,13 +274,6 @@ export default function EditPostPage () {
     })
   }
 
-  const handleConfirmDelete = () => {
-    // E aqui também
-    console.log(`Excluindo post com ID: ${id}`)
-    setModalState({ ...modalState, isOpen: false })
-    router.push('/posts')
-  }
-
   return (
     <>
       <Form onSubmit={handleSubmit}>
@@ -156,40 +281,62 @@ export default function EditPostPage () {
           <BackButton type='button' onClick={() => router.back()}>
             <BackIcon />
           </BackButton>
-          <Title>Matemática I - Podcast</Title>
+          <Title>Editar Post</Title>
         </PageHeader>
 
         <InputGroup>
           <Label htmlFor='title'>NOME DA MATÉRIA</Label>
-          <Input type='text' id='title' defaultValue='Matemática I - Podcast' />
+          <Input
+            type='text'
+            id='title'
+            value={title}
+            onChange={e => setTitle(e.target.value)}
+            disabled={isLoading || fetchLoading}
+          />
         </InputGroup>
 
         <InputGroup style={{ marginTop: '1.5rem' }}>
           <Label htmlFor='author'>AUTOR</Label>
-          <Input type='text' id='author' defaultValue='Prof. Carlos' />
+          <Input
+            type='text'
+            id='author'
+            value={authorName ? `Professor ${authorName}` : 'Carregando...'}
+            disabled
+          />
         </InputGroup>
 
         <InputGroup style={{ marginTop: '1.5rem' }}>
           <Label htmlFor='description'>DESCRIÇÃO</Label>
           <TextArea
             id='description'
-            defaultValue='Nesta atividade os alunos devem ouvir o podcast: Matemática - Sua história desde as origens. Criar uma resenha e entregar a atividade no portal da matéria respectiva.'
+            value={description}
+            onChange={e => setDescription(e.target.value)}
+            disabled={isLoading || fetchLoading}
           />
         </InputGroup>
 
-        <Actions>
-          <Button type='button' variant='danger' onClick={handleDelete}>
-            Excluir Post
-          </Button>
-          <Button type='submit' variant='success'>
-            Salvar Alterações
-          </Button>
-        </Actions>
+        {role == 'professor' && (
+          <Actions>
+            <Button
+              type='button'
+              variant='danger'
+              onClick={handleDelete}
+             // disabled={isLoading}
+            >
+              Excluir Post
+            </Button>
+            <Button type='submit' variant='success'>
+              {isLoading ? 'Salvando...' : 'Salvar Alterações'}
+            </Button>
+          </Actions>
+        )}
       </Form>
 
       <Modal
         isOpen={modalState.isOpen}
-        onClose={() => setModalState({ ...modalState, isOpen: false })}
+        onClose={() =>
+          !isLoading && setModalState(prev => ({ ...prev, isOpen: false }))
+        }
         onConfirm={modalState.onConfirm}
         title={modalState.title}
         confirmText={modalState.confirmText}

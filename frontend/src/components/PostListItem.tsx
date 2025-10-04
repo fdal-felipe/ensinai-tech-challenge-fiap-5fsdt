@@ -50,7 +50,7 @@ export default function PostListItem({ title, author, description, onClick }: Po
   return (
     <Card onClick={onClick}>
       <Title>{title}</Title>
-      <Author>por {author}</Author>
+      <Author>Prof {author}</Author>
       <Description>{description}</Description>
     </Card>
   );

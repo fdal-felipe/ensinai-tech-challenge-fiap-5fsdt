@@ -46,7 +46,7 @@ exports.login = async (req, res) => {
             { expiresIn: '1h' }
         );
 
-        res.json({ token });
+        res.json({ token,role: user.role });
     } catch (error) {
         console.error('Erro no login:', error);
         res.status(500).json({ error: 'Erro interno do servidor.' });

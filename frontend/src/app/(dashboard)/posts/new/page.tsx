@@ -1,28 +1,28 @@
-'use client'
-import React, { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import styled from 'styled-components'
-import Button from '../../../../components/Button'
-import Modal from '../../../../components/Modal'
-import { InputGroup, Label, Input } from '../../../../components/FormStyles'
+'use client';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import styled from 'styled-components';
+import Button from '../../../../components/Button';
+import Modal from '../../../../components/Modal';
+import ProfessorList from '../../../../components/ProfessorList';
+import { InputGroup, Label, Input } from '../../../../components/FormStyles';
 
 // --- Styled Components ---
 const Form = styled.form`
   max-width: 800px;
-`
+`;
 
-// Header ajustado para empilhar os elementos
 const PageHeader = styled.div`
   margin-bottom: 2rem;
-`
+`;
 
 const Title = styled.h1`
   font-family: var(--font-inter), serif;
   font-size: 2.25rem;
   font-weight: bold;
   color: #111827;
-  margin: 1rem 0 0 0; /* Adiciona margem acima do título */
-`
+  margin: 1rem 0 0 0;
+`;
 
 const BackButton = styled.button`
   background: #111827;
@@ -39,7 +39,7 @@ const BackButton = styled.button`
   &:hover {
     background: #4b5563;
   }
-`
+`;
 
 const BackIcon = () => (
   <svg
@@ -56,7 +56,7 @@ const BackIcon = () => (
     <line x1='19' y1='12' x2='5' y2='12'></line>
     <polyline points='12 19 5 12 12 5'></polyline>
   </svg>
-)
+);
 
 const TextArea = styled.textarea`
   width: 100%;
@@ -73,39 +73,76 @@ const TextArea = styled.textarea`
     outline: none;
     border-color: #3b82f6;
   }
-`
+`;
 
 const Actions = styled.div`
   margin-top: 2rem;
   display: flex;
   justify-content: flex-end;
-`
+`;
 
 type ModalState = {
-  isOpen: boolean
-  title: string
-  message: string
-  onConfirm: () => void
-  confirmText?: string
-  cancelText?: string
-  confirmVariant?: 'primary' | 'danger' | 'success'
-}
+  isOpen: boolean;
+  title: string;
+  message: string;
+  onConfirm: () => void;
+  confirmText?: string;
+  cancelText?: string;
+  confirmVariant?: 'primary' | 'danger' | 'success';
+};
 
-// --- Componente da Página ---
-export default function NewPostPage () {
-  const router = useRouter()
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [content, setContent] = useState('')
+
+// --- Função auxiliar ---
+async function fetchProfessores() {
+  const token = localStorage.getItem('token');
+  const res = await fetch('http://localhost:3000/users', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+  return res.json();
+}
+type User = {
+  id: number;
+  name: string;
+  email: string;
+  password_hash: string;
+  role: string;
+  created_at: string;
+  updated_at: string;
+};
+
+// --- Componente ---
+export default function NewPostPage() {
+  const router = useRouter();
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
+  const [author_id, setAuthorId] = useState('');
+  const [professores, setProfessores] = useState<User[]>([]);
+
+
   const [modalState, setModalState] = useState<ModalState>({
     isOpen: false,
     title: '',
     message: '',
-    onConfirm: () => {}
-  })
+    onConfirm: () => {},
+  });
+
+  // Carregar professores ao montar
+  useEffect(() => {
+    fetchProfessores()
+      .then(setProfessores)
+      .catch(err => console.error('Erro ao buscar professores:', err));
+  }, []);
+
+  const handleProfessorSelect = (id: number) => {
+    setAuthorId(String(id));
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     setModalState({
       isOpen: true,
       title: 'Confirmar Publicação',
@@ -113,29 +150,47 @@ export default function NewPostPage () {
       onConfirm: handleConfirmCreate,
       confirmText: 'Sim, Publicar',
       cancelText: 'Cancelar',
-      confirmVariant: 'success'
-    })
-  }
+      confirmVariant: 'success',
+    });
+  };
 
-  const handleConfirmCreate = () => {
-    console.log({ title, author, content })
-    setModalState({
-      isOpen: true,
-      title: 'Post Criado!',
-      message: 'Seu novo post foi criado e publicado com sucesso.',
-      onConfirm: () => {
-        setModalState({
-          isOpen: false,
-          title: '',
-          message: '',
-          onConfirm: () => {}
-        })
-        router.push('/posts')
-      },
-      confirmText: 'Ok',
-      confirmVariant: 'success'
-    })
-  }
+  const handleConfirmCreate = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch('http://localhost:3000/professor/posts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ title, content, author_id }),
+      });
+
+      if (!res.ok) throw new Error('Erro ao criar post');
+
+      setModalState({
+        isOpen: true,
+        title: 'Post Criado!',
+        message: 'Seu novo post foi criado e publicado com sucesso.',
+        onConfirm: () => {
+          setModalState({ ...modalState, isOpen: false });
+          router.push('/posts');
+        },
+        confirmText: 'Ok',
+        confirmVariant: 'success',
+      });
+    } catch (err) {
+      console.error(err);
+      setModalState({
+        isOpen: true,
+        title: 'Erro',
+        message: 'Não foi possível criar o post.',
+        onConfirm: () => setModalState({ ...modalState, isOpen: false }),
+        confirmText: 'Ok',
+        confirmVariant: 'danger',
+      });
+    }
+  };
 
   return (
     <>
@@ -158,16 +213,13 @@ export default function NewPostPage () {
           />
         </InputGroup>
 
-        <InputGroup style={{ marginTop: '1.5rem' }}>
-          <Label htmlFor='author'>AUTOR</Label>
-          <Input
-            type='text'
-            id='author'
-            value={author}
-            onChange={e => setAuthor(e.target.value)}
-            placeholder='Ex: Prof. Carlos'
-          />
-        </InputGroup>
+<InputGroup style={{ marginTop: '1.5rem' }}>
+  <Label htmlFor='author'>AUTOR (Professor)</Label>
+  <ProfessorList 
+    users={professores} 
+    onProfessorSelect={handleProfessorSelect} />
+</InputGroup>
+
 
         <InputGroup style={{ marginTop: '1.5rem' }}>
           <Label htmlFor='description'>DESCRIÇÃO</Label>
@@ -198,5 +250,5 @@ export default function NewPostPage () {
         {modalState.message}
       </Modal>
     </>
-  )
+  );
 }

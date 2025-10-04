@@ -1,5 +1,6 @@
+// src/app/cadastro/page.tsx
 'use client';
-import React from 'react';
+import React, { useState } from 'react';
 import Button from '../../components/Button';
 import { 
   FormContainer, 
@@ -9,27 +10,81 @@ import {
   InputGroup, 
   Label, 
   Input, 
-  StyledLink 
+  StyledLink,
+  SelectGroup,
+  Select,
+  Option
 } from '../../components/FormStyles';
-import { useRouter } from 'next/navigation'; // 1. Importe o useRouter
+import { useRouter } from 'next/navigation';
 
 export default function CadastroPage() {
-  const router = useRouter(); // 2. Inicialize o router
+  const router = useRouter();
 
-  // 3. Crie a função para lidar com o envio do formulário
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault(); // Impede o recarregamento da página
-    
-    // Aqui viria a lógica para enviar os dados para a API do backend
-    console.log('Criando conta...');
-    
-    // Redireciona para a página de login
-    router.push('/login');
+  // Estados do formulário
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    role: 'aluno',
+  });
+
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
+
+  // Atualiza os valores dos campos
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  // Envia o formulário
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (formData.password !== formData.confirmPassword) {
+      setMessage('As senhas não coincidem!');
+      return;
+    }
+
+    setLoading(true);
+    setMessage('');
+
+    try {
+      const res = await fetch('http://localhost:3000/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsInJvbGUiOiJwcm9mZXNzb3IiLCJpYXQiOjE3NTg5MDU4MzUsImV4cCI6MTc1ODkwOTQzNX0.NC9SGpNkI0rhAdRJiTHXb8VAl2zSM0Jie-9T3K5FjGE"'
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+          role: formData.role,
+        }),
+      });
+
+      if (res.ok) {
+        setMessage('✅ Cadastro realizado com sucesso! Redirecionando...');
+        setFormData({ name: '', email: '', password: '', confirmPassword: '', role: 'aluno' });
+
+        // Redireciona após 1.5s
+        setTimeout(() => {
+          router.push('/login');
+        }, 1500);
+      } else {
+        const errorData = await res.json();
+        setMessage(errorData.message || 'Erro ao cadastrar.');
+      }
+    } catch (error) {
+      setMessage('Erro de conexão com o servidor.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <FormContainer>
-      {/* 4. Conecte a função ao onSubmit do formulário */}
       <FormWrapper onSubmit={handleSubmit}>
         <div style={{ textAlign: 'center' }}>
           <Title>Cadastro</Title>
@@ -38,24 +93,92 @@ export default function CadastroPage() {
 
         <InputGroup>
           <Label htmlFor="name">NOME COMPLETO</Label>
-          <Input type="text" id="name" placeholder="John Doe" required />
+          <Input
+            type="text"
+            id="name"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            placeholder="John Doe"
+            required
+          />
         </InputGroup>
 
         <InputGroup>
           <Label htmlFor="email">EMAIL</Label>
-          <Input type="email" id="email" placeholder="john@gmail.com" required />
+          <Input
+            type="email"
+            id="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            placeholder="john@gmail.com"
+            required
+          />
         </InputGroup>
 
         <InputGroup>
           <Label htmlFor="password">SENHA</Label>
-          <Input type="password" id="password" placeholder="************" required />
+          <Input
+            type="password"
+            id="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            placeholder="************"
+            required
+          />
         </InputGroup>
 
-        <Button type="submit" $fullWidth>Criar</Button>
+        <InputGroup>
+          <Label htmlFor="confirmPassword">CONFIRME SUA SENHA</Label>
+          <Input
+            type="password"
+            id="confirmPassword"
+            name="confirmPassword"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            placeholder="************"
+            required
+          />
+        </InputGroup>
 
-        <StyledLink href="/login">Já tem uma conta? Entrar</StyledLink>
+        <SelectGroup>
+          <Label htmlFor="role">ESCOLHA UM PAPEL</Label>
+          <Select
+            id="role"
+            name="role"
+            value={formData.role}
+            onChange={handleChange}
+          >
+            <Option value="aluno">Aluno</Option>
+            <Option value="professor">Professor</Option>
+          </Select>
+        </SelectGroup>
+
+        {message && (
+          <p
+            style={{
+              color: message.startsWith('✅') ? 'green' : 'red',
+              textAlign: 'center',
+              marginTop: '1rem',
+            }}
+          >
+            {message}
+          </p>
+        )}
+
+        <Button type="submit" $fullWidth>
+          {loading ? 'Cadastrando...' : 'Criar'}
+        </Button>
+
+        <StyledLink
+          href="/login"
+          style={{ display: 'block', textAlign: 'center', marginTop: '15px' }}
+        >
+          Já tem uma conta? Entrar
+        </StyledLink>
       </FormWrapper>
     </FormContainer>
   );
 }
-
