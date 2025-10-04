@@ -178,7 +178,7 @@ export default function PostsPage() {
 
   async function fetchProfessorById(id: number) {
     const token = localStorage.getItem('token');
-    const response = await fetch(`http://localhost:3000/users/${id}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/${id}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -194,8 +194,8 @@ export default function PostsPage() {
     const fetchPosts = async () => {
       try {
         const rota = role == 'professor'
-          ? 'http://localhost:3000/professor/posts'
-          : 'http://localhost:3000/aluno/posts';
+          ? `${process.env.NEXT_PUBLIC_API_URL}/professor/posts`
+          : `${process.env.NEXT_PUBLIC_API_URL}/aluno/posts`;
 
         const res = await fetch(rota, {
           method: 'GET',
@@ -242,7 +242,7 @@ export default function PostsPage() {
     if (postToDelete !== null) {
       try {
         const token = localStorage.getItem('token');
-        const res = await fetch(`http://localhost:3000/posts/${postToDelete}`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/posts/${postToDelete}`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${token}`,

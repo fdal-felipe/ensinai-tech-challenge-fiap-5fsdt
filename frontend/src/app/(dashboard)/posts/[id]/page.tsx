@@ -109,8 +109,8 @@ export default function EditPostPage() {
 
         const rota =
           role === 'professor'
-            ? 'http://localhost:3000/professor/posts/'
-            : 'http://localhost:3000/aluno/posts/'
+            ? `${process.env.NEXT_PUBLIC_API_URL}/professor/posts/`
+            : `${process.env.NEXT_PUBLIC_API_URL}/aluno/posts/`
 
         const res = await fetch(`${rota}${id}`, {
           method: 'GET',
@@ -141,7 +141,7 @@ export default function EditPostPage() {
     const fetchAuthor = async () => {
       if (!authorId) return
       try {
-        const res = await fetch(`http://localhost:3000/users/${authorId}`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/${authorId}`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`
           }
@@ -169,7 +169,7 @@ export default function EditPostPage() {
     try {
       setIsLoading(true)
 
-      const res = await fetch(`http://localhost:3000/professor/posts/${id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/professor/posts/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -213,7 +213,7 @@ export default function EditPostPage() {
   const handleConfirmDelete = async () => {
     try {
       setIsLoading(true)
-      const res = await fetch(`http://localhost:3000/professor/posts/${id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/professor/posts/${id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
