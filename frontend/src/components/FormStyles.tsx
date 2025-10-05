@@ -82,7 +82,6 @@ export const LinksContainer = styled.div`
   margin-top: 1rem;
 `;
 
-
 export const SelectGroup = styled.div`
   width: 100%;
 `;
@@ -103,3 +102,11 @@ export const Select = styled.select`
 `;
 
 export const Option = styled.option``;
+
+// Adicionando o ErrorMessage que estava faltando
+export const ErrorMessage = styled.p`
+  color: #dc2626;
+  font-size: 0.875rem;
+  text-align: center;
+  margin: 0.5rem 0;
+`;
