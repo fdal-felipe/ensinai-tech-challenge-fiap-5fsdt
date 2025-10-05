@@ -14,12 +14,7 @@ interface ApiError {
 
 interface LoginResponse {
   token: string;
-  user: {
-    id: number;
-    name: string;
-    email: string;
-    role: string;
-  };
+  role: string;
 }
 
 export default function LoginPage() {
@@ -43,6 +38,10 @@ export default function LoginPage() {
         body: JSON.stringify({ email, password }),
       });
 
+      console.log('Response status:', res.status);
+      console.log('Response headers:', res.headers);
+      console.log('Response body:', await res.clone().text());
+
       if (!res.ok) {
         const errorData = await res.json() as ApiError;
         setError(errorData.message || 'Erro ao fazer login');
@@ -51,7 +50,7 @@ export default function LoginPage() {
 
       const data = await res.json() as LoginResponse;
       localStorage.setItem('token', data.token);
-      localStorage.setItem('role', data.user.role);
+      localStorage.setItem('role', data.role);
       router.push('/home');
     } catch {
       setError('Erro de conexão com o servidor');
