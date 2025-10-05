@@ -2,6 +2,7 @@
 'use client';
 import React from 'react';
 import styled from 'styled-components';
+import Link from 'next/link';
 
 const HeaderWrapper = styled.header`
   width: 100%;
@@ -34,9 +35,9 @@ export default function Header() {
     <HeaderWrapper>
       <Logo>Ensinai Blog</Logo>
       <Nav>
-        <a href="/">Home</a>
-        <a href="/admin">Admin</a>
-        <a href="/login">Login</a>
+        <Link href="/">Home</Link>
+        <Link href="/admin">Admin</Link>
+        <Link href="/login">Login</Link>
       </Nav>
     </HeaderWrapper>
   );
