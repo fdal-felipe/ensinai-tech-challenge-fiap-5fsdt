@@ -89,7 +89,7 @@ export default function LoginPage() {
 
         {error && <ErrorMessage>{error}</ErrorMessage>}
 
-        <Button type="submit" $fullWidth disabled={loading}>
+        <Button type="submit" $fullWidth>
           {loading ? 'Entrando...' : 'Entrar'}
         </Button>
 
