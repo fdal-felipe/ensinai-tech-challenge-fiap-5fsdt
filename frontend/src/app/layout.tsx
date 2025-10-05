@@ -2,7 +2,7 @@
 import "./globals.css";
 import type { ReactNode } from "react";
 import StyledComponentsRegistry from "../lib/registry";
-import { Inter, Lora } from 'next/font/google';
+import { Inter } from 'next/font/google';
 
 // Configuração das fontes
 const inter = Inter({

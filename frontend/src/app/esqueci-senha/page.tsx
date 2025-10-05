@@ -1,18 +1,10 @@
 'use client';
+
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import styled from 'styled-components';
+import { FormContainer, FormWrapper, Title, Subtitle, InputGroup, Label, Input, StyledLink } from '../../components/FormStyles';
 import Button from '../../components/Button';
-import { 
-  FormContainer, 
-  FormWrapper, 
-  Title, 
-  Subtitle, 
-  InputGroup, 
-  Label, 
-  Input,
-  StyledLink
-} from '../../components/FormStyles';
 import OtpInput from '../../components/OtpInput';
 import PasswordInput from '../../components/PasswordInput';
 
@@ -30,15 +22,13 @@ const SuccessContainer = styled.div`
   gap: 1.5rem;
 `;
 
-// Ícone de sucesso (SVG) - ATUALIZADO
 const CheckIcon = () => (
-    <svg width="100" height="100" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="12" cy="12" r="10" fill="#16a34a" /> 
-        <path d="M7.5 12.5L10.5 15.5L16.5 9.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
+  <svg width="100" height="100" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="12" cy="12" r="10" fill="#16a34a" /> 
+    <path d="M7.5 12.5L10.5 15.5L16.5 9.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
 );
 
-// Wrapper para adicionar margem superior aos links e botões quando necessário
 const SpacedElement = styled.div`
   margin-top: 1rem;
   width: 100%;
@@ -46,100 +36,173 @@ const SpacedElement = styled.div`
   justify-content: center;
 `;
 
+type StepType = 'email' | 'otp' | 'reset' | 'success';
+
+interface ApiError {
+  message: string;
+}
 
 export default function ForgotPasswordPage() {
-  const [step, setStep] = useState('email'); // email, otp, reset, success
+  const [step, setStep] = useState<StepType>('email');
   const [email, setEmail] = useState('');
-  const [otpError, setOtpError] = useState('');
+  const [otp, setOtp] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleEmailSubmit = (e: React.FormEvent) => {
+  const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Enviando código para:", email);
-    // Lógica para chamar a API de envio de código
-    setStep('otp'); // Avança para a próxima etapa
-  };
+    setLoading(true);
+    setError('');
 
-  const handleOtpSubmit = (otp: string) => {
-    console.log("Verificando OTP:", otp);
-    // Lógica para verificar o código na API
-    if (otp === '123456') { // Simulação de sucesso
-        setOtpError('');
-        setStep('reset');
-    } else { // Simulação de erro
-        setOtpError('Código errado, tente novamente por favor');
+    try {
+      const response = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+
+      if (response.ok) {
+        setStep('otp');
+      } else {
+        const errorData = await response.json() as ApiError;
+        setError(errorData.message || 'Erro ao enviar email');
+      }
+    } catch {
+      setError('Erro de conexão');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleResetSubmit = (e: React.FormEvent) => {
+  const handleOtpComplete = (otpValue: string) => {
+    setOtp(otpValue);
+    setStep('reset');
+  };
+
+  const handlePasswordReset = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Redefinindo a senha...");
-    // Lógica para chamar a API de redefinição
-    setStep('success');
+    if (newPassword !== confirmPassword) {
+      setError('Senhas não coincidem');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    try {
+      const response = await fetch('/api/auth/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, otp, newPassword }),
+      });
+
+      if (response.ok) {
+        setStep('success');
+      } else {
+        const errorData = await response.json() as ApiError;
+        setError(errorData.message || 'Erro ao redefinir senha');
+      }
+    } catch {
+      setError('Erro de conexão');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <FormContainer>
-      {step === 'email' && (
-        <FormWrapper onSubmit={handleEmailSubmit}>
-          <div style={{ textAlign: 'center' }}>
-            <Title>Esqueceu a sua senha?</Title>
-            <Subtitle>Não se preocupe! Por favor insira seu email abaixo para enviarmos um código de recuperação!</Subtitle>
-          </div>
-          <InputGroup>
-            <Label htmlFor="email">EMAIL</Label>
-            <Input type="email" id="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="john@gmail.com" />
-          </InputGroup>
-          <Button type="submit" $fullWidth>Enviar</Button>
-          <SpacedElement>
-            <StyledLink href="/login">Lembrou da sua Senha? Entrar</StyledLink>
-          </SpacedElement>
-        </FormWrapper>
-      )}
+      <FormWrapper>
+        {step === 'email' && (
+          <>
+            <Title>Esqueci minha senha</Title>
+            <Subtitle>Digite seu email para receber o código de recuperação</Subtitle>
+            
+            <form onSubmit={handleEmailSubmit} style={{ width: '100%' }}>
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+              
+              {error && <ErrorMessage>{error}</ErrorMessage>}
+              
+              <SpacedElement>
+                <Button type="submit" $fullWidth disabled={loading}>
+                  {loading ? 'Enviando...' : 'Enviar código'}
+                </Button>
+              </SpacedElement>
+            </form>
+            
+            <SpacedElement>
+              <Button variant="secondary" onClick={() => router.push('/login')}>
+                Voltar ao login
+              </Button>
+            </SpacedElement>
+          </>
+        )}
 
-      {step === 'otp' && (
-        <FormWrapper>
-          <div style={{ textAlign: 'center' }}>
-            <Title>Código OTP</Title>
-            <Subtitle>Insira o código OTP enviado no seu email para recuperar a sua conta.</Subtitle>
-          </div>
-          <OtpInput onComplete={handleOtpSubmit} />
-          {otpError && <ErrorMessage>{otpError}</ErrorMessage>}
-          <SpacedElement>
-            <Button onClick={() => handleOtpSubmit('123456')} $fullWidth>Verificar</Button>
-          </SpacedElement>
-          <SpacedElement>
-            <StyledLink href="#">Não recebeu o código? Reenviar</StyledLink>
-          </SpacedElement>
-        </FormWrapper>
-      )}
+        {step === 'otp' && (
+          <>
+            <Title>Digite o código</Title>
+            <Subtitle>Enviamos um código de 6 dígitos para {email}</Subtitle>
+            
+            <OtpInput length={6} onComplete={handleOtpComplete} />
+            
+            {error && <ErrorMessage>{error}</ErrorMessage>}
+          </>
+        )}
 
-      {step === 'reset' && (
-        <FormWrapper onSubmit={handleResetSubmit}>
-            <div style={{ textAlign: 'center' }}>
-                <Title>Criar nova Senha</Title>
-                <Subtitle>Sua nova senha deve ser diferente da última usada.</Subtitle>
-            </div>
-            <InputGroup>
-                <Label>SENHA</Label>
-                <PasswordInput id="new-password" placeholder="************" />
-            </InputGroup>
-            <InputGroup>
-                <Label>CONFIRMAR SENHA</Label>
-                <PasswordInput id="confirm-password" placeholder="************" />
-            </InputGroup>
-            <Button type="submit" $fullWidth>Mudar senha</Button>
-        </FormWrapper>
-      )}
+        {step === 'reset' && (
+          <>
+            <Title>Nova senha</Title>
+            <Subtitle>Digite sua nova senha</Subtitle>
+            
+            <form onSubmit={handlePasswordReset} style={{ width: '100%' }}>
+              <Label htmlFor="newPassword">Nova senha</Label>
+              <PasswordInput
+                id="newPassword"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                required
+              />
+              
+              <Label htmlFor="confirmPassword">Confirmar senha</Label>
+              <PasswordInput
+                id="confirmPassword"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+              />
+              
+              {error && <ErrorMessage>{error}</ErrorMessage>}
+              
+              <SpacedElement>
+                <Button type="submit" $fullWidth disabled={loading}>
+                  {loading ? 'Redefinindo...' : 'Redefinir senha'}
+                </Button>
+              </SpacedElement>
+            </form>
+          </>
+        )}
 
-      {step === 'success' && (
-        <SuccessContainer>
+        {step === 'success' && (
+          <SuccessContainer>
             <CheckIcon />
-            <Title>Senha confirmada!</Title>
-            <Subtitle>Sua nova senha foi confirmada com sucesso!</Subtitle>
-            <Button onClick={() => router.push('/login')}>Voltar ao login</Button>
-        </SuccessContainer>
-      )}
+            <Title>Senha redefinida!</Title>
+            <Subtitle>Sua senha foi alterada com sucesso</Subtitle>
+            
+            <Button onClick={() => router.push('/login')} $fullWidth>
+              Fazer login
+            </Button>
+          </SuccessContainer>
+        )}
+      </FormWrapper>
     </FormContainer>
   );
 }

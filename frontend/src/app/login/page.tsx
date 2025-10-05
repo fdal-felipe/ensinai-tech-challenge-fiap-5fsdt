@@ -1,31 +1,38 @@
 // src/app/login/page.tsx
 'use client';
+
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { FormContainer, FormWrapper, Title, Subtitle, InputGroup, Input, Label, ErrorMessage } from '../../components/FormStyles';
 import Button from '../../components/Button';
-import { 
-  FormContainer, 
-  FormWrapper, 
-  Title, 
-  Subtitle, 
-  InputGroup, 
-  Label, 
-  Input, 
-  StyledLink,
-  LinksContainer
-} from '../../components/FormStyles';
+import PasswordInput from '../../components/PasswordInput';
+
+interface ApiError {
+  message: string;
+}
+
+interface LoginResponse {
+  token: string;
+  user: {
+    id: number;
+    name: string;
+    email: string;
+    role: string;
+  };
+}
 
 export default function LoginPage() {
   const router = useRouter();
-
-  // Estados de entrada e erro
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
 
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
@@ -34,48 +41,36 @@ export default function LoginPage() {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({ email, password }),
-        });
+      });
+
       if (!res.ok) {
-        throw new Error('Credenciais inválidas');
+        const errorData = await res.json() as ApiError;
+        setError(errorData.message || 'Erro ao fazer login');
+        return;
       }
 
-      const data = await res.json();
-      type User = {
-          id: number;
-          name: string;
-          email: string;
-          password_hash: string;
-          role: string;
-          created_at: string;
-          updated_at: string;
-        };
-      if (data.token) {
-        localStorage.setItem('token',data.token);
-        localStorage.setItem('role',data.role)
-        // Redireciona após login bem-sucedido
-        router.push('/home');
-      } else {
-        throw new Error('Token não recebido');
-      }
-    } catch (err: any) {
-      console.error('Erro no login:', err);
-      setError(err.message);
+      const data = await res.json() as LoginResponse;
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('userRole', data.user.role);
+      router.push('/home');
+    } catch {
+      setError('Erro de conexão com o servidor');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <FormContainer>
       <FormWrapper onSubmit={handleLogin}>
-        <div style={{ textAlign: 'center' }}>
-          <Title>Entrar</Title>
-          <Subtitle>Entre para continuar</Subtitle>
-        </div>
+        <Title>Ensinai</Title>
+        <Subtitle>Faça login em sua conta</Subtitle>
 
         <InputGroup>
-          <Label htmlFor="email">EMAIL</Label>
+          <Label htmlFor="email">Email</Label>
           <Input
-            type="email"
             id="email"
+            type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -83,9 +78,8 @@ export default function LoginPage() {
         </InputGroup>
 
         <InputGroup>
-          <Label htmlFor="password">SENHA</Label>
-          <Input
-            type="password"
+          <Label htmlFor="password">Senha</Label>
+          <PasswordInput
             id="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -93,19 +87,19 @@ export default function LoginPage() {
           />
         </InputGroup>
 
-        {/* Mensagem de erro */}
-        {error && (
-          <p style={{ color: 'red', textAlign: 'center', marginTop: '10px' }}>
-            {error}
-          </p>
-        )}
+        {error && <ErrorMessage>{error}</ErrorMessage>}
 
-        <Button type="submit" $fullWidth>Entrar</Button>
+        <Button type="submit" $fullWidth disabled={loading}>
+          {loading ? 'Entrando...' : 'Entrar'}
+        </Button>
 
-        <LinksContainer>
-          <StyledLink href="/esqueci-senha">Esqueci minha senha</StyledLink>
-          <StyledLink href="/cadastro">Cadastrar</StyledLink>
-        </LinksContainer>
+        <Link href="/esqueci-senha" style={{ color: '#2563eb', textDecoration: 'none' }}>
+          Esqueci minha senha
+        </Link>
+
+        <Link href="/cadastro" style={{ color: '#2563eb', textDecoration: 'none' }}>
+          Criar conta
+        </Link>
       </FormWrapper>
     </FormContainer>
   );

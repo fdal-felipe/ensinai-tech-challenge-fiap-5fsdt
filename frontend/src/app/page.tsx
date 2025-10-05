@@ -1,7 +1,7 @@
 // src/app/page.tsx
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import styled from 'styled-components';
 import Spinner from '../components/Spinner';
@@ -22,16 +22,14 @@ const Title = styled.h1`
 `;
 
 export default function LoadingScreen() {
-  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setLoading(false);
-      router.push('/login'); // Redireciona para a página de login
-    }, 3000); // 3 segundos
+      router.push('/login');
+    }, 3000);
 
-    return () => clearTimeout(timer); // Limpa o timer se o componente for desmontado
+    return () => clearTimeout(timer);
   }, [router]);
 
   return (
