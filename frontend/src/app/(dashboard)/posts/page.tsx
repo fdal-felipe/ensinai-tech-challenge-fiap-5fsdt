@@ -166,6 +166,10 @@ interface Post {
   updated_at: string;
 }
 
+interface UserData {
+  name: string;
+}
+
 // --- Página Principal ---
 export default function PostsPage() {
   const router = useRouter();
@@ -174,9 +178,16 @@ export default function PostsPage() {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [postToDelete, setPostToDelete] = useState<number | null>(null);
-  const role = localStorage.getItem('role');
+  
+  // Obter role do localStorage de forma segura
+  const [role, setRole] = useState<string | null>(null);
 
-  async function fetchProfessorById(id: number) {
+  // Obter role no cliente (evitar erro de hidratação)
+  useEffect(() => {
+    setRole(localStorage.getItem('role'));
+  }, []);
+
+  async function fetchProfessorById(id: number): Promise<UserData> {
     const token = localStorage.getItem('token');
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/${id}`, {
       method: 'GET',
@@ -187,7 +198,7 @@ export default function PostsPage() {
     });
 
     if (!response.ok) throw new Error("Erro ao buscar professor");
-    return await response.json();
+    return await response.json() as UserData;
   }
 
   useEffect(() => {
@@ -227,16 +238,14 @@ export default function PostsPage() {
       }
     };
 
-    fetchPosts();
-  }, []);
+    // Só buscar posts se role estiver definido
+    if (role) {
+      fetchPosts();
+    }
+  }, [role]); // Adicionando 'role' nas dependências
 
   const handleNavigateToPost = (id: number) => router.push(`/posts/${id}`);
   const handleCreate = () => router.push('/posts/new');
-
-  const handleDeleteClick = (id: number) => {
-    setPostToDelete(id);
-    setIsModalOpen(true);
-  };
 
   const handleConfirmDelete = async () => {
     if (postToDelete !== null) {

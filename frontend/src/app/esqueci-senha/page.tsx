@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import styled from 'styled-components';
-import { FormContainer, FormWrapper, Title, Subtitle, InputGroup, Label, Input, StyledLink } from '../../components/FormStyles';
+import { FormContainer, FormWrapper, Title, Subtitle, Label, Input } from '../../components/FormStyles';
 import Button from '../../components/Button';
 import OtpInput from '../../components/OtpInput';
 import PasswordInput from '../../components/PasswordInput';
@@ -133,14 +133,14 @@ export default function ForgotPasswordPage() {
               {error && <ErrorMessage>{error}</ErrorMessage>}
               
               <SpacedElement>
-                <Button type="submit" $fullWidth disabled={loading}>
+                <Button type="submit" $fullWidth>
                   {loading ? 'Enviando...' : 'Enviar código'}
                 </Button>
               </SpacedElement>
             </form>
             
             <SpacedElement>
-              <Button variant="secondary" onClick={() => router.push('/login')}>
+              <Button variant="primary" onClick={() => router.push('/login')}>
                 Voltar ao login
               </Button>
             </SpacedElement>
@@ -183,7 +183,7 @@ export default function ForgotPasswordPage() {
               {error && <ErrorMessage>{error}</ErrorMessage>}
               
               <SpacedElement>
-                <Button type="submit" $fullWidth disabled={loading}>
+                <Button type="submit" $fullWidth>
                   {loading ? 'Redefinindo...' : 'Redefinir senha'}
                 </Button>
               </SpacedElement>

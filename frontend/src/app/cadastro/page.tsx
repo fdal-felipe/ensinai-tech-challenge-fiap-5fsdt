@@ -17,6 +17,10 @@ import {
 } from '../../components/FormStyles';
 import { useRouter } from 'next/navigation';
 
+interface ErrorResponse {
+  message: string;
+}
+
 export default function CadastroPage() {
   const router = useRouter();
 
@@ -73,10 +77,10 @@ export default function CadastroPage() {
           router.push('/login');
         }, 1500);
       } else {
-        const errorData = await res.json();
+        const errorData: ErrorResponse = await res.json();
         setMessage(errorData.message || 'Erro ao cadastrar.');
       }
-    } catch (error) {
+    } catch {
       setMessage('Erro de conexão com o servidor.');
     } finally {
       setLoading(false);

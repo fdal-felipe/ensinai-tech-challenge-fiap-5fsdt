@@ -85,6 +85,21 @@ type ModalState = {
   confirmVariant?: 'primary' | 'danger' | 'success'
 }
 
+// Tipos para melhor tipagem
+interface ApiError extends Error {
+  message: string;
+}
+
+interface PostData {
+  title: string;
+  content: string;
+  author_id: number;
+}
+
+interface UserData {
+  name: string;
+}
+
 export default function EditPostPage() {
   const router = useRouter()
   const params = useParams()
@@ -98,14 +113,12 @@ export default function EditPostPage() {
 
   const [isLoading, setIsLoading] = useState(false)
   const [fetchLoading, setFetchLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
 
   // --- 🔹 Buscar post existente ---
   useEffect(() => {
     const fetchPost = async () => {
       try {
         setFetchLoading(true)
-        setError(null)
 
         const rota =
           role === 'professor'
@@ -120,14 +133,13 @@ export default function EditPostPage() {
           }
         })
 
-        const json = await res.json()
+        const json: PostData = await res.json()
 
         setTitle(json.title || '')
         setDescription(json.content || '')
         setAuthorId(json.author_id || null)
       } catch (err) {
         console.error('Erro ao carregar post:', err)
-        setError('Erro ao carregar post')
       } finally {
         setFetchLoading(false)
       }
@@ -146,7 +158,7 @@ export default function EditPostPage() {
             Authorization: `Bearer ${localStorage.getItem('token')}`
           }
         })
-        const user = await res.json()
+        const user: UserData = await res.json()
         setAuthorName(user.name || `Autor #${authorId}`)
       } catch (err) {
         console.error('Erro ao buscar autor:', err)
@@ -195,11 +207,12 @@ export default function EditPostPage() {
         confirmText: 'Ok',
         confirmVariant: 'success'
       })
-    } catch (err: any) {
+    } catch (err) {
+      const error = err as ApiError
       setModalState({
         isOpen: true,
         title: 'Erro',
-        message: `Não foi possível salvar o post: ${err.message}`,
+        message: `Não foi possível salvar o post: ${error.message}`,
         onConfirm: () => setModalState(prev => ({ ...prev, isOpen: false })),
         confirmText: 'Fechar',
         confirmVariant: 'danger'
@@ -234,11 +247,12 @@ export default function EditPostPage() {
         confirmText: 'Ok',
         confirmVariant: 'success'
       })
-    } catch (err: any) {
+    } catch (err) {
+      const error = err as ApiError
       setModalState({
         isOpen: true,
         title: 'Erro na Exclusão',
-        message: `Não foi possível excluir o post: ${err.message}`,
+        message: `Não foi possível excluir o post: ${error.message}`,
         onConfirm: () => setModalState(prev => ({ ...prev, isOpen: false })),
         confirmText: 'Fechar',
         confirmVariant: 'danger'
@@ -321,7 +335,7 @@ export default function EditPostPage() {
               type='button'
               variant='danger'
               onClick={handleDelete}
-             // disabled={isLoading}
+              // disabled={isLoading}
             >
               Excluir Post
             </Button>
