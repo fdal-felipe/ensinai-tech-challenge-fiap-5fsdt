@@ -22,7 +22,7 @@ const Title = styled.h1`
 `;
 
 export default function LoadingScreen() {
-  const [setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
@@ -42,3 +42,4 @@ export default function LoadingScreen() {
   );
 
 }
+
