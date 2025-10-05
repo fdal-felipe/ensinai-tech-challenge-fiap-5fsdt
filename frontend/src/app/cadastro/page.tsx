@@ -57,8 +57,7 @@ export default function CadastroPage() {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/register`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsInJvbGUiOiJwcm9mZXNzb3IiLCJpYXQiOjE3NTg5MDU4MzUsImV4cCI6MTc1ODkwOTQzNX0.NC9SGpNkI0rhAdRJiTHXb8VAl2zSM0Jie-9T3K5FjGE"'
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           name: formData.name,
