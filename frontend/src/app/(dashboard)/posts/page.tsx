@@ -197,7 +197,7 @@ export default function PostsPage() {
       },
     });
 
-    if (!response.ok) throw new Error("Erro ao buscar professor");
+   // if (!response.ok) throw new Error("Erro ao buscar professor");
     return await response.json() as UserData;
   }
 
