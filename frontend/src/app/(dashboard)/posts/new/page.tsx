@@ -95,7 +95,7 @@ type ModalState = {
 // --- Função auxiliar ---
 async function fetchProfessores() {
   const token = localStorage.getItem('token');
-  const res = await fetch('http://localhost:3000/users', {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
