@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import styled from 'styled-components';
 import PostListItem from '../../../components/PostListItem';
@@ -166,6 +166,10 @@ interface Post {
   updated_at: string;
 }
 
+interface PostWithAuthorName extends Post {
+  author_name: string;
+}
+
 interface UserData {
   name: string;
 }
@@ -203,8 +207,8 @@ export default function PostsPage() {
     return await response.json() as UserData;
   }
 
-  // Função para buscar posts via API
-  const searchPosts = async (query: string) => {
+  // Função para buscar posts via API - usando useCallback para evitar dependency warning
+  const searchPosts = useCallback(async (query: string) => {
     if (!query.trim()) {
       setFilteredPosts(posts);
       return;
@@ -231,14 +235,14 @@ export default function PostsPage() {
       });
 
       if (!res.ok) throw new Error('Erro ao buscar posts');
-      const searchResults: Post[] = await res.json();
+      const searchResults: (Post | PostWithAuthorName)[] = await res.json();
 
       // Enriquecer com dados do autor se necessário
       const enrichedResults = await Promise.all(
         searchResults.map(async post => {
           // Se o post já tem author_name da busca, usa ele
           if ('author_name' in post) {
-            return { ...post, authorName: (post as any).author_name };
+            return { ...post, authorName: post.author_name };
           }
           
           // Caso contrário, busca o autor
@@ -258,7 +262,7 @@ export default function PostsPage() {
     } finally {
       setIsSearching(false);
     }
-  };
+  }, [posts, role]); // Incluindo as dependências corretas
 
   // Effect para buscar posts iniciais
   useEffect(() => {
@@ -305,14 +309,14 @@ export default function PostsPage() {
     }
   }, [role]);
 
-  // Effect para busca com debounce
+  // Effect para busca com debounce - agora com searchPosts como dependência
   useEffect(() => {
     const debounceTimer = setTimeout(() => {
       searchPosts(searchQuery);
     }, 500); // 500ms de delay
 
     return () => clearTimeout(debounceTimer);
-  }, [searchQuery, posts, role]);
+  }, [searchQuery, searchPosts]); // Incluindo searchPosts como dependência
 
   const handleNavigateToPost = (id: number) => router.push(`/posts/${id}`);
   const handleCreate = () => router.push('/posts/new');
