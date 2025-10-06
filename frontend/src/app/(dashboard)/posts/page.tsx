@@ -175,7 +175,9 @@ export default function PostsPage() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   const [posts, setPosts] = useState<Post[]>([]);
+  const [filteredPosts, setFilteredPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isSearching, setIsSearching] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [postToDelete, setPostToDelete] = useState<number | null>(null);
   
@@ -201,6 +203,64 @@ export default function PostsPage() {
     return await response.json() as UserData;
   }
 
+  // Função para buscar posts via API
+  const searchPosts = async (query: string) => {
+    if (!query.trim()) {
+      setFilteredPosts(posts);
+      return;
+    }
+
+    setIsSearching(true);
+    try {
+      const searchEndpoint = role === 'professor'
+        ? `${process.env.NEXT_PUBLIC_API_URL}/professor/posts/search?q=${encodeURIComponent(query)}`
+        : `${process.env.NEXT_PUBLIC_API_URL}/aluno/posts/search?q=${encodeURIComponent(query)}`;
+
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+
+      // Adiciona token apenas para professor
+      if (role === 'professor') {
+        headers['Authorization'] = `Bearer ${localStorage.getItem('token')}`;
+      }
+
+      const res = await fetch(searchEndpoint, {
+        method: 'GET',
+        headers,
+      });
+
+      if (!res.ok) throw new Error('Erro ao buscar posts');
+      const searchResults: Post[] = await res.json();
+
+      // Enriquecer com dados do autor se necessário
+      const enrichedResults = await Promise.all(
+        searchResults.map(async post => {
+          // Se o post já tem author_name da busca, usa ele
+          if ('author_name' in post) {
+            return { ...post, authorName: (post as any).author_name };
+          }
+          
+          // Caso contrário, busca o autor
+          try {
+            const authorData = await fetchProfessorById(post.author_id);
+            return { ...post, authorName: authorData.name };
+          } catch {
+            return { ...post, authorName: `Autor #${post.author_id}` };
+          }
+        })
+      );
+
+      setFilteredPosts(enrichedResults);
+    } catch (err) {
+      console.error('Erro na busca:', err);
+      setFilteredPosts([]);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  // Effect para buscar posts iniciais
   useEffect(() => {
     const fetchPosts = async () => {
       try {
@@ -231,6 +291,7 @@ export default function PostsPage() {
         );
 
         setPosts(enrichedPosts);
+        setFilteredPosts(enrichedPosts); // Inicializa filteredPosts
       } catch (err) {
         console.error(err);
       } finally {
@@ -242,7 +303,16 @@ export default function PostsPage() {
     if (role) {
       fetchPosts();
     }
-  }, [role]); // Adicionando 'role' nas dependências
+  }, [role]);
+
+  // Effect para busca com debounce
+  useEffect(() => {
+    const debounceTimer = setTimeout(() => {
+      searchPosts(searchQuery);
+    }, 500); // 500ms de delay
+
+    return () => clearTimeout(debounceTimer);
+  }, [searchQuery, posts, role]);
 
   const handleNavigateToPost = (id: number) => router.push(`/posts/${id}`);
   const handleCreate = () => router.push('/posts/new');
@@ -259,6 +329,7 @@ export default function PostsPage() {
         });
         if (!res.ok) throw new Error('Erro ao excluir post');
         setPosts(prev => prev.filter(p => p.id !== postToDelete));
+        setFilteredPosts(prev => prev.filter(p => p.id !== postToDelete));
       } catch (err) {
         console.error(err);
       }
@@ -266,11 +337,6 @@ export default function PostsPage() {
     setIsModalOpen(false);
     setPostToDelete(null);
   };
-
-  const filteredPosts = posts.filter(post =>
-    post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    post.content.toLowerCase().includes(searchQuery.toLowerCase())
-  );
 
   return (
     <>
@@ -303,6 +369,8 @@ export default function PostsPage() {
       <PostListContainer>
         {loading ? (
           <p>Carregando posts...</p>
+        ) : isSearching ? (
+          <p>Buscando...</p>
         ) : filteredPosts.length === 0 ? (
           <p>Nenhum post encontrado.</p>
         ) : (
