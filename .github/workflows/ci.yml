@@ -172,10 +172,11 @@ jobs:
                   test -d frontend/.next || exit 1
                   echo "Build do frontend executado com sucesso"
 
+            # Corrigir o comando docker-compose para docker compose
             - name: Verificar arquivo docker-compose.yml
               run: |
                   test -f docker-compose.yml || exit 1
-                  docker-compose config
+                  docker compose config
 
             - name: Verificar Dockerfiles
               run: |
