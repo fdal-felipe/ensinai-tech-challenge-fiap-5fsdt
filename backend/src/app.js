@@ -21,6 +21,6 @@ app.use('/auth', authRoutes);
 app.use('/aluno/posts', alunoPostsRoutes);
 
 app.use('/professor/posts', authenticate, authorizeProfessor, professorPostsRoutes);
-app.use('/users', authenticate, authorizeProfessor, usersRoutes);
+app.use('/users', authenticate, usersRoutes);
 
 module.exports = app;
