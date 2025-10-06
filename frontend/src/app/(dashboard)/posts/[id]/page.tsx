@@ -295,7 +295,11 @@ export default function EditPostPage() {
           <BackButton type='button' onClick={() => router.back()}>
             <BackIcon />
           </BackButton>
-          <Title>Editar Post</Title>
+          {role == 'professor' ? (
+              <Title>Editar Post</Title>
+            ) : (
+              <Title>Ler Post</Title>
+            )}
         </PageHeader>
 
         <InputGroup>
