@@ -1,10 +1,18 @@
-# API de Blog Educacional (Ensinai) - Tech Challenge Fase 2 🎓
+# API de Blog Educacional (Ensinai) - Tech Challenge Fase 3 🎓
 
 > Projeto desenvolvido como parte do **Tech Challenge** do curso de Pós-Graduação em Full Stack Development da FIAP, com foco na criação de uma aplicação completa de blogging educacional.
 
 [![CI/CD Pipeline](https://github.com/fdal-felipe/ensinai-tech-challenge-fiap-5fsdt/actions/workflows/ci.yml/badge.svg)](https://github.com/fdal-felipe/ensinai-tech-challenge-fiap-5fsdt/actions/workflows/ci.yml)
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen)](https://nodejs.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+---
+
+## 🌐 Aplicação em Produção
+
+-   **Frontend**: [https://ensinai-tech-challenge-fiap-5fsdt.vercel.app/](https://ensinai-tech-challenge-fiap-5fsdt.vercel.app/) (Vercel)
+-   **Backend API**: [https://blog-api-prod-mcw6.onrender.com](https://blog-api-prod-mcw6.onrender.com) (Render)
+-   **Documentação da API**: [https://blog-api-prod-mcw6.onrender.com/api-docs](https://blog-api-prod-mcw6.onrender.com/api-docs) (Swagger)
 
 ---
 
@@ -23,6 +31,7 @@
 -   [☁️ CI/CD e Produção](#️-cicd-e-produção)
 -   [🔍 Busca Inteligente](#-busca-inteligente)
 -   [🗄️ Banco de Dados](#️-banco-de-dados)
+-   [📚 Documentação](#-documentação)
 -   [📬 Contato](#-contato)
 
 ---
@@ -36,7 +45,8 @@ Criar uma aplicação **full-stack** robusta, escalável e bem documentada para 
 -   ✅ Criar, editar, listar e excluir postagens
 -   ✅ Gerenciar usuários (professores e alunos)
 -   ✅ Controlar status das postagens (ativo/inativo)
--   ✅ Busca avançada em todo o conteúdo
+-   ✅ Buscar conteúdo avançado em todo o sistema
+-   ✅ Dashboard administrativo completo
 
 ### Para Alunos 👨‍🎓
 
@@ -49,17 +59,14 @@ Criar uma aplicação **full-stack** robusta, escalável e bem documentada para 
 
 ## 🏗️ Arquitetura
 
-```mermaid
-graph TB
-    A[Frontend - Next.js] --> B[API Gateway - Express]
-    B --> C[Middleware - JWT Auth]
-    C --> D[Controllers]
-    D --> E[PostgreSQL Database]
+A aplicação segue uma arquitetura moderna e escalável:
 
-    F[GitHub Actions] --> G[Testes Automatizados]
-    G --> H[Deploy Render]
-
-    I[Docker Compose] --> J[Desenvolvimento Local]
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   Frontend      │    │   Backend API   │    │   Database      │
+│   (Next.js)     │◄──►│   (Express.js)  │◄──►│  (PostgreSQL)   │
+│   Vercel        │    │   Render        │    │   Supabase      │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
 ```
 
 ### Separação por Papéis
@@ -95,7 +102,7 @@ graph TB
 -   **Containerização:** [Docker](https://www.docker.com/) + Docker Compose
 -   **CI/CD:** [GitHub Actions](https://github.com/features/actions)
 -   **Deploy Backend:** [Render](https://render.com/)
--   **Deploy Frontend:** [Vercel](https://vercel.com/) _(configurável)_
+-   **Deploy Frontend:** [Vercel](https://vercel.com/)
 -   **Banco Produção:** [Supabase PostgreSQL](https://supabase.com/)
 -   **Testes:** [Jest](https://jestjs.io/) + [Supertest](https://github.com/visionmedia/supertest)
 
@@ -115,29 +122,22 @@ graph TB
 
 ### 👨‍🏫 Módulo Professor (`/professor/posts`)
 
-| Método   | Endpoint                          | Descrição                 | Autenticação |
-| -------- | --------------------------------- | ------------------------- | ------------ |
-| `GET`    | `/professor/posts`                | Lista todas as postagens  | 🔒 Professor |
-| `POST`   | `/professor/posts`                | Cria nova postagem        | 🔒 Professor |
-| `GET`    | `/professor/posts/:id`            | Busca postagem específica | 🔒 Professor |
-| `PUT`    | `/professor/posts/:id`            | Atualiza postagem         | 🔒 Professor |
-| `DELETE` | `/professor/posts/:id`            | Remove postagem           | 🔒 Professor |
-| `GET`    | `/professor/posts/search?q=termo` | Busca inteligente         | 🔒 Professor |
+| Método   | Endpoint                          | Descrição                | Autenticação |
+| -------- | --------------------------------- | ------------------------ | ------------ |
+| `GET`    | `/professor/posts`                | Lista todos os posts     | 🔒 Professor |
+| `POST`   | `/professor/posts`                | Cria novo post           | 🔒 Professor |
+| `GET`    | `/professor/posts/:id`            | Busca post específico    | 🔒 Professor |
+| `PUT`    | `/professor/posts/:id`            | Atualiza post            | 🔒 Professor |
+| `DELETE` | `/professor/posts/:id`            | Remove post              | 🔒 Professor |
+| `GET`    | `/professor/posts/search?q=termo` | Busca posts por conteúdo | 🔒 Professor |
 
 ### 👨‍🎓 Módulo Aluno (`/aluno/posts`)
 
-| Método | Endpoint                      | Descrição                 | Autenticação |
-| ------ | ----------------------------- | ------------------------- | ------------ |
-| `GET`  | `/aluno/posts`                | Lista postagens ativas    | 🌐 Público   |
-| `GET`  | `/aluno/posts/:id`            | Visualiza postagem ativa  | 🌐 Público   |
-| `GET`  | `/aluno/posts/search?q=termo` | Busca em postagens ativas | 🌐 Público   |
-
-### 🔑 Autenticação (`/auth`)
-
-| Método | Endpoint         | Descrição                |
-| ------ | ---------------- | ------------------------ |
-| `POST` | `/auth/register` | Registro de usuário      |
-| `POST` | `/auth/login`    | Login e geração de token |
+| Método | Endpoint                      | Descrição                   | Autenticação |
+| ------ | ----------------------------- | --------------------------- | ------------ |
+| `GET`  | `/aluno/posts`                | Lista posts ativos          | 🌐 Público   |
+| `GET`  | `/aluno/posts/:id`            | Busca post ativo específico | 🌐 Público   |
+| `GET`  | `/aluno/posts/search?q=termo` | Busca em posts ativos       | 🌐 Público   |
 
 ---
 
@@ -145,79 +145,63 @@ graph TB
 
 ```
 📦 ensinai-tech-challenge-fiap-5fsdt/
-├── 📁 .github/workflows/          # Pipeline CI/CD
-│   └── 📄 ci.yml                 # GitHub Actions
-├── 📁 backend/                   # API Backend
-│   ├── 📁 postgres-init/         # Scripts SQL inicialização
-│   │   ├── 📄 init.sql          # Ambiente local
-│   │   └── 📄 init.ci.sql       # Ambiente CI/CD
-│   ├── 📁 src/                  # Código-fonte principal
-│   │   ├── 📁 controllers/       # Lógica de negócio
-│   │   │   ├── 📄 professorPosts.js
-│   │   │   ├── 📄 alunoPosts.js
-│   │   │   ├── 📄 users.js
-│   │   │   └── 📄 auth.js
-│   │   ├── 📁 db/               # Configuração banco
-│   │   │   ├── 📄 index.js      # Conexão PostgreSQL
-│   │   │   └── 📄 migrate.js    # Migrações automáticas
-│   │   ├── 📁 middleware/       # Middlewares
-│   │   │   └── 📄 auth.js       # Autenticação JWT
-│   │   ├── 📁 routes/           # Definição de rotas
-│   │   │   ├── 📄 professorPosts.js
-│   │   │   ├── 📄 alunoPosts.js
-│   │   │   ├── 📄 users.js
-│   │   │   └── 📄 auth.js
-│   │   ├── 📄 app.js            # Configuração Express
-│   │   └── 📄 server.js         # Inicialização servidor
-│   ├── 📁 tests/                # Testes automatizados
-│   │   ├── 📄 setup.js          # Configuração Jest
-│   │   └── 📄 posts.test.js     # Suíte de testes
-│   ├── 📄 Dockerfile            # Container backend
-│   ├── 📄 package.json          # Dependências Node.js
-│   ├── 📄 jest.config.js        # Configuração testes
-│   └── 📄 swagger.config.js     # Documentação API
-├── 📁 frontend/                 # Interface Next.js
-│   ├── 📁 src/app/              # App Router Next.js 15
-│   ├── 📄 Dockerfile            # Container frontend
-│   ├── 📄 package.json          # Dependências frontend
-│   ├── 📄 tsconfig.json         # Configuração TypeScript
-│   ├── 📄 tailwind.config.ts    # TailwindCSS
-│   └── 📄 next.config.ts        # Configuração Next.js
-├── 📄 docker-compose.yml        # Orquestração containers
-├── 📄 README.md                 # Este arquivo
-└── 📄 CONTEXT.md                # Contexto para IAs
+├── 📁 backend/                     # API Node.js/Express
+│   ├── 📁 src/
+│   │   ├── 📁 controllers/         # Lógica de negócio
+│   │   ├── 📁 routes/              # Definição das rotas
+│   │   ├── 📁 middleware/          # Middlewares (auth, etc.)
+│   │   └── 📁 db/                  # Conexão e migrations
+│   ├── 📁 tests/                   # Testes automatizados
+│   ├── 📁 postgres-init/           # Scripts de inicialização do DB
+│   ├── 🐳 Dockerfile               # Container do backend
+│   └── 📄 package.json
+├── 📁 frontend/                    # Aplicação Next.js/React
+│   ├── 📁 src/
+│   │   ├── 📁 app/                 # Pages (App Router)
+│   │   ├── 📁 components/          # Componentes reutilizáveis
+│   │   └── 📁 lib/                 # Utilitários
+│   ├── 🐳 Dockerfile               # Container do frontend
+│   └── 📄 package.json
+├── 📁 docs/                        # 📚 Documentação do projeto
+│   ├── 📁 diagramas/               # Diagramas de arquitetura
+│   ├── 📄 guia-de-uso.md          # Manual do usuário
+│   └── 📄 arquitetura.md          # Documentação técnica
+├── 📁 .github/workflows/           # Pipeline CI/CD
+├── 🐳 docker-compose.yml           # Orquestração dos containers
+├── 📄 README.md                    # Este arquivo
+└── 📄 CONTEXT.md                   # Contexto para ferramentas de IA
 ```
 
 ---
 
 ## 🚀 Instalação e Execução
 
-### 🔧 Pré-requisitos
+### Pré-requisitos
 
--   [Git](https://git-scm.com/downloads)
--   [Node.js 18+](https://nodejs.org/)
--   [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+-   **Node.js** v18+
+-   **Docker & Docker Compose**
+-   **PostgreSQL** (ou usar via Docker)
+-   **Git**
 
-### 📥 1. Clone o Repositório
+### 1️⃣ Clone o Repositório
 
 ```bash
 git clone https://github.com/fdal-felipe/ensinai-tech-challenge-fiap-5fsdt.git
 cd ensinai-tech-challenge-fiap-5fsdt
 ```
 
-### ⚙️ 2. Configuração Backend
+### 2️⃣ Configuração das Variáveis de Ambiente
+
+Copie e configure o arquivo de ambiente:
 
 ```bash
-# Navegar para o backend
-cd backend
-
-# Copiar e configurar variáveis de ambiente
-cp .env.example .env
+# Backend
+cp backend/.env.example backend/.env
 ```
 
-**Edite o arquivo `.env`:**
+Configure as variáveis no arquivo `backend/.env`:
 
-```env
+```bash
 DB_USER=userblog
 DB_PASSWORD=passwordblog
 DB_DATABASE=blogdb
@@ -226,251 +210,142 @@ DB_PORT=5432
 JWT_SECRET=sua_chave_secreta_super_forte_aqui
 ```
 
-### ⚙️ 3. Configuração Frontend
+### 3️⃣ Execução com Docker (Recomendado)
 
 ```bash
-# Navegar para o frontend
-cd ../frontend
+# Inicia todos os serviços
+docker-compose up -d
 
-# Instalar dependências
-npm install
+# Verifica os logs
+docker-compose logs -f
 ```
 
-### 🐳 4. Executar com Docker (Recomendado)
-
-**Na raiz do projeto:**
+### 4️⃣ Execução Manual (Desenvolvimento)
 
 ```bash
-# Subir toda a aplicação
-docker-compose up --build
-
-# Em modo detach (background)
-docker-compose up --build -d
-```
-
-**Serviços disponíveis:**
-
--   🌐 **Frontend:** http://localhost:80
--   🔌 **Backend API:** http://localhost:3000
--   📚 **Documentação:** http://localhost:3000/api-docs
--   🗄️ **PostgreSQL:** localhost:5432
-
-### 🏃‍♂️ 5. Executar Manualmente (Desenvolvimento)
-
-**Terminal 1 - Banco de Dados:**
-
-```bash
-docker-compose up -d db
-```
-
-**Terminal 2 - Backend:**
-
-```bash
+# Backend
 cd backend
 npm install
 npm run dev
-```
 
-**Terminal 3 - Frontend:**
-
-```bash
+# Frontend (em outro terminal)
 cd frontend
 npm install
 npm run dev
 ```
 
+### 5️⃣ Acesso às Aplicações
+
+-   **Frontend**: http://localhost (Docker) ou http://localhost:3001 (manual)
+-   **Backend API**: http://localhost:3000
+-   **Documentação Swagger**: http://localhost:3000/api-docs
+
 ---
 
 ## 🔒 Autenticação e Autorização
 
-### 🎫 Fluxo de Autenticação
+### Sistema JWT
 
-1. **Registro:** `POST /auth/register`
+A aplicação utiliza **JSON Web Tokens** para autenticação:
 
-```json
-{
-    "name": "João Silva",
-    "email": "joao@email.com",
+1. **Registro**: `POST /auth/register`
+2. **Login**: `POST /auth/login`
+3. **Token**: Incluir no header `Authorization: Bearer <token>`
+
+### Exemplo de Uso
+
+```bash
+# Registrar usuário
+curl -X POST http://localhost:3000/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Professor Silva",
+    "email": "silva@email.com",
     "password": "senha123",
     "role": "professor"
-}
-```
+  }'
 
-2. **Login:** `POST /auth/login`
-
-```json
-{
-    "email": "joao@email.com",
+# Fazer login
+curl -X POST http://localhost:3000/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "silva@email.com",
     "password": "senha123"
-}
+  }'
+
+# Usar o token retornado
+curl -X GET http://localhost:3000/professor/posts \
+  -H "Authorization: Bearer SEU_TOKEN_AQUI"
 ```
-
-3. **Resposta com Token:**
-
-```json
-{
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-    "user": {
-        "id": 1,
-        "name": "João Silva",
-        "email": "joao@email.com",
-        "role": "professor"
-    }
-}
-```
-
-### 🛡️ Usando o Token
-
-**Headers das requisições protegidas:**
-
-```http
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-Content-Type: application/json
-```
-
-### 👥 Níveis de Acesso
-
-| Papel         | Permissões                                                  |
-| ------------- | ----------------------------------------------------------- |
-| **Professor** | ✅ CRUD posts<br/>✅ Gestão usuários<br/>✅ Busca completa  |
-| **Aluno**     | ✅ Visualizar posts ativos<br/>✅ Busca em conteúdo público |
 
 ---
 
 ## 📄 Documentação da API
 
-### 🌐 Swagger UI Interativo
+### Swagger/OpenAPI
 
--   **Local:** http://localhost:3000/api-docs
--   **Produção:** https://blog-api-prod-mcw6.onrender.com/api-docs
+A documentação interativa está disponível em:
 
-### 🔓 Testando Endpoints Protegidos
+-   **Produção**: [https://blog-api-prod-mcw6.onrender.com/api-docs](https://blog-api-prod-mcw6.onrender.com/api-docs)
+-   **Local**: [http://localhost:3000/api-docs](http://localhost:3000/api-docs)
 
-1. Acesse a documentação Swagger
-2. Clique em **"Authorize"** (🔒)
-3. Cole o token JWT: `Bearer SEU_TOKEN_AQUI`
-4. Teste os endpoints diretamente na interface
+### Exemplos de Requisições
 
-### 📋 Exemplos de Requisição
-
-**Criar Post (Professor):**
-
-```http
-POST /professor/posts
-Authorization: Bearer TOKEN_AQUI
-Content-Type: application/json
-
-{
-  "title": "Introdução à Matemática",
-  "content": "Conceitos fundamentais...",
-  "author_id": 1
-}
-```
-
-**Buscar Posts (Aluno):**
-
-```http
-GET /aluno/posts/search?q=matemática
-```
+Também disponível o arquivo `backend/requests-dev.http` com exemplos práticos para teste com VS Code REST Client.
 
 ---
 
 ## 🧪 Testes
 
-### 🎯 Cobertura de Testes
-
--   ✅ **Autenticação:** Registro, login, validação JWT
--   ✅ **Autorização:** Controle de acesso por papel
--   ✅ **CRUD Posts:** Criação, leitura, atualização, exclusão
--   ✅ **Busca:** Funcionalidade de pesquisa textual
--   ✅ **Validação:** Dados obrigatórios e formatos
-
-### 🏃‍♂️ Executar Testes
+### Testes Automatizados
 
 ```bash
-# Garantir que o banco esteja rodando
-docker-compose up -d db
-
-# Executar suíte de testes
 cd backend
 npm test
-
-# Com coverage
-npm test -- --coverage
 ```
 
-### 📊 Resultados Esperados
+### Cobertura dos Testes
 
-```
-✅ Testes dos Endpoints de Professor (/professor/posts)
-✅ Testes dos Endpoints de Aluno (/aluno/posts)
-✅ Testes dos Endpoints de Usuários (/users)
-✅ Testes de Autenticação (/auth)
+-   ✅ Endpoints de Professor
+-   ✅ Endpoints de Aluno
+-   ✅ Endpoints de Usuários
+-   ✅ Autenticação e Autorização
+-   ✅ Busca com PostgreSQL + unaccent
 
-Test Suites: 1 passed
-Tests: 20+ passed
-```
+### Pipeline de CI/CD
+
+Os testes são executados automaticamente no GitHub Actions a cada push/PR.
 
 ---
 
 ## 🐳 Docker
 
-### 🏗️ Multi-Container Setup
-
-```yaml
-# docker-compose.yml
-services:
-    db: # PostgreSQL 15 + extensões
-    app: # Backend Node.js
-    frontend: # Frontend Next.js
-```
-
-### 📦 Comandos Úteis
+### Desenvolvimento
 
 ```bash
-# Construir e subir todos os serviços
-docker-compose up --build
-
-# Apenas o banco (para desenvolvimento)
-docker-compose up -d db
-
-# Ver logs específicos
-docker-compose logs app
-docker-compose logs frontend
-
-# Parar todos os serviços
-docker-compose down
-
-# Limpar volumes (CUIDADO: apaga dados!)
-docker-compose down -v
+docker-compose up -d
 ```
 
-### 🔍 Conectar ao Banco com DBeaver
+### Produção
 
-| Campo    | Valor          |
-| -------- | -------------- |
-| Host     | `localhost`    |
-| Port     | `5432`         |
-| Database | `blogdb`       |
-| Username | `userblog`     |
-| Password | `passwordblog` |
+Os Dockerfiles estão otimizados para produção com multi-stage builds:
+
+-   **Backend**: `backend/Dockerfile`
+-   **Frontend**: `frontend/Dockerfile`
 
 ---
 
 ## ☁️ CI/CD e Produção
 
-### 🔄 Pipeline Automatizado
+### GitHub Actions
 
-```mermaid
-graph LR
-    A[Push/PR] --> B[GitHub Actions]
-    B --> C[Build & Test]
-    C --> D{Testes OK?}
-    D -->|✅| E[Deploy Render]
-    D -->|❌| F[Falha]
-```
+Pipeline automatizado que executa:
 
-### 🚀 Ambientes
+1. 🧪 **Testes** - Jest + Supertest
+2. 🏗️ **Build** - Aplicações e containers
+3. 🚀 **Deploy** - Automático para produção
+
+### Ambientes de Produção
 
 | Ambiente            | URL                                     | Descrição            |
 | ------------------- | --------------------------------------- | -------------------- |
@@ -478,7 +353,7 @@ graph LR
 | **CI/CD**           | GitHub Actions                          | Testes automatizados |
 | **Produção**        | https://blog-api-prod-mcw6.onrender.com | Deploy automático    |
 
-### 📋 Processo de Deploy
+### Processo de Deploy
 
 1. **Commit** na branch `main`
 2. **GitHub Actions** executa:
@@ -490,7 +365,7 @@ graph LR
     - Dispara webhook do Render
     - Deploy automático em produção
 
-### 🔧 Configuração de Secrets
+### Configuração de Secrets
 
 No GitHub, configure em `Settings > Secrets and variables > Actions`:
 
@@ -506,249 +381,149 @@ RENDER_DEPLOY_HOOK=https://api.render.com/deploy/...
 
 ## 🔍 Busca Inteligente
 
-### 🧠 Recursos Avançados
+### Recursos Avançados
 
--   **📝 Busca Textual:** Título + conteúdo
--   **🔤 Normalização:** Remove acentos automaticamente
--   **🎯 Similaridade:** Algoritmo trigram para palavras similares
--   **⚡ Performance:** Índices GIN otimizados
+-   **PostgreSQL Extensions**: `unaccent` + `pg_trgm`
+-   **Busca Fuzzy**: Tolerante a erros de digitação
+-   **Índices GIN**: Performance otimizada
+-   **Busca sem Acentos**: Resultados mais abrangentes
 
-### 🛠️ Implementação Técnica
+### Exemplo de Busca
 
-**Extensões PostgreSQL:**
-
-```sql
-CREATE EXTENSION IF NOT EXISTS unaccent;
-CREATE EXTENSION IF NOT EXISTS pg_trgm;
-```
-
-**Função de Busca:**
-
-```sql
-CREATE OR REPLACE FUNCTION public.f_unaccent(text)
-RETURNS text AS $$
-SELECT extensions.unaccent($1)
-$$ LANGUAGE sql IMMUTABLE;
-```
-
-**Índice Otimizado:**
-
-```sql
-CREATE INDEX idx_posts_search ON posts
-USING gin (f_unaccent(title || ' ' || content) gin_trgm_ops);
-```
-
-### 📝 Exemplos de Busca
-
-```javascript
-// Busca por "matemática" encontra:
-// - "Matemática Básica"
-// - "matematica avançada"
-// - "Conceitos matemáticos"
-
-GET /aluno/posts/search?q=matematica
-GET /professor/posts/search?q=geometria
+```bash
+# Busca por "geometria" encontra também "GEOMETRÍA", "geometria", etc.
+GET /aluno/posts/search?q=geometria
 ```
 
 ---
 
 ## 🗄️ Banco de Dados
 
-### 📊 Modelo Relacional
-
-```mermaid
-erDiagram
-    USERS {
-        serial id PK
-        varchar name
-        varchar email UK
-        varchar password_hash
-        user_role role
-        timestamptz created_at
-        timestamptz updated_at
-    }
-
-    POSTS {
-        serial id PK
-        varchar title
-        text content
-        integer author_id FK
-        varchar status
-        timestamptz created_at
-        timestamptz updated_at
-    }
-
-    USERS ||--o{ POSTS : "author_id"
-```
-
-### 🏷️ Tipos Customizados
+### Estrutura
 
 ```sql
--- Enum para papéis de usuário
-CREATE TYPE user_role AS ENUM ('professor', 'aluno');
+-- Tabela de usuários
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    role user_role NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
 
--- Status das postagens
-status VARCHAR(20) DEFAULT 'ativo'  -- 'ativo' | 'inativo'
+-- Tabela de posts
+CREATE TABLE posts (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    content TEXT NOT NULL,
+    author_id INTEGER REFERENCES users(id),
+    status VARCHAR(20) DEFAULT 'ativo',
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
 ```
 
-### 🔧 Migrações Automáticas
+### Migrações
 
-O sistema executa migrações automaticamente na inicialização:
-
-```javascript
-// src/db/migrate.js
-async function runMigrations() {
-    // Verifica e aplica mudanças no schema
-    // Cria extensões, tabelas e índices
-}
-```
+As migrações são executadas automaticamente na inicialização via `backend/src/db/migrate.js`.
 
 ---
 
-## 🚨 Solução de Problemas
+## 📚 Documentação
 
-### ❓ Problemas Comuns
+O projeto conta com documentação completa na pasta `docs/`:
 
-**🐳 Docker não inicia:**
+### 📋 Documentos Disponíveis
 
-```bash
-# Verificar se o Docker Desktop está rodando
-docker --version
+-   **[Arquitetura do Sistema](docs/arquitetura.md)** - Documentação técnica completa
+-   **[Guia de Uso](docs/guia-de-uso.md)** - Manual do usuário final
+-   **[Diagramas](docs/diagramas/)** - Diagramas de arquitetura (C4 Model)
 
-# Limpar containers antigos
-docker system prune -f
-```
+### 🏗️ Arquitetura Técnica
 
-**🔒 Erro de autenticação:**
+-   Padrões de design utilizados
+-   Estrutura de pastas detalhada
+-   Decisões arquiteturais
+-   Diagramas C4 (Contexto, Container, Componente)
 
-```bash
-# Verificar se o JWT_SECRET está configurado
-echo $JWT_SECRET
+### 👥 Manual do Usuário
 
-# Gerar novo token via login
-POST /auth/login
-```
-
-**🗄️ Banco não conecta:**
-
-```bash
-# Verificar se o container do DB está rodando
-docker-compose ps
-
-# Ver logs do banco
-docker-compose logs db
-```
-
-**🧪 Testes falhando:**
-
-```bash
-# Garantir que o banco de teste está limpo
-docker-compose down -v
-docker-compose up -d db
-npm test
-```
-
-### 📋 Checklist de Verificação
-
--   [ ] Docker Desktop rodando
--   [ ] Arquivo `.env` configurado
--   [ ] Portas 3000, 5432 e 80 disponíveis
--   [ ] Node.js 18+ instalado
--   [ ] Dependências instaladas com `npm install`
+-   Guia de uso para professores
+-   Guia de uso para alunos
+-   Screenshots da aplicação
+-   Casos de uso práticos
 
 ---
 
-## 🔮 Próximos Passos
+## 🤝 Contribuição
 
-### 🌟 Melhorias Planejadas
+### Como Contribuir
 
--   [ ] **📱 App Mobile:** React Native
--   [ ] **🔔 Notificações:** WebSocket em tempo real
--   [ ] **📊 Analytics:** Dashboard de métricas
--   [ ] **🎨 Temas:** Dark/Light mode
--   [ ] **🌐 i18n:** Internacionalização
--   [ ] **🔍 Elasticsearch:** Busca ainda mais avançada
--   [ ] **📷 Upload:** Imagens nas postagens
--   [ ] **💬 Comentários:** Sistema de feedback
+1. Fork o projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
+3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
+4. Push para a branch (`git push origin feature/AmazingFeature`)
+5. Abra um Pull Request
 
-### 🎯 Roadmap Técnico
+### Padrões de Código
 
--   [ ] **Microserviços:** Separação por domínio
--   [ ] **GraphQL:** API mais flexível
--   [ ] **Redis:** Cache distribuído
--   [ ] **Kubernetes:** Orquestração avançada
--   [ ] **Monitoramento:** Prometheus + Grafana
-
----
-
-## 💡 Experiências e Aprendizados
-
-### 🎓 Desafios Superados
-
-**🔧 Configuração CI/CD:**
-
-> A integração do Jest com PostgreSQL no GitHub Actions exigiu configuração cuidadosa das variáveis de ambiente e scripts SQL específicos para o ambiente de testes.
-
-**🔍 Busca Inteligente:**
-
-> Implementar busca com tolerância a erros e acentos nos levou a estudar extensões PostgreSQL avançadas como `unaccent` e `pg_trgm`, além de otimização com índices GIN.
-
-**🚀 Deploy Contínuo:**
-
-> Sincronizar mudanças de schema entre desenvolvimento e produção exigiu estratégias de migração automática e rollback seguro.
-
-**🐳 Docker Multi-Stage:**
-
-> Otimizar builds para produção com containers menores e mais seguros foi crucial para performance.
-
-### 📚 Conhecimentos Adquiridos
-
--   **Arquitetura Backend:** Separação clara de responsabilidades
--   **Segurança:** Implementação robusta de JWT e autorização
--   **DevOps:** Pipeline completo de CI/CD com testes automatizados
--   **Banco de Dados:** Modelagem, índices e otimização de queries
--   **Frontend Moderno:** Next.js 15 com App Router e TypeScript
+-   **Backend**: ESLint + Prettier
+-   **Frontend**: ESLint + TypeScript
+-   **Commits**: Conventional Commits
 
 ---
 
 ## 📬 Contato
 
-### 👨‍💻 Desenvolvedores
+### Desenvolvedores
 
-**Felipe Laudano**
+**Felipe Laudano** - Pós-Graduação FIAP Full Stack Development (5FSDT)
 
--   🌐 [LinkedIn](https://www.linkedin.com/in/felipe-laudano/)
--   🐙 [GitHub](https://github.com/fdal-felipe)
--   ✉️ **Email:** fdal.felipe@gmail.com
+-   📧 Email: [fdal.felipe@gmail.com](mailto:fdal.felipe@gmail.com)
+-   💼 LinkedIn: [@felipelaudano](https://www.linkedin.com/in/felipe-laudano/)
+-   🐱 GitHub: [@fdal-felipe](https://github.com/fdal-felipe)
 
-### 🤝 Contribuições
+**Felipe Seiji** - Pós-Graduação FIAP Full Stack Development (5FSDT)
 
-Contribuições são bem-vindas! Siga o processo:
+-   📧 Email: [seijimatie@gmail.com](mailto:seijimatie@gmail.com)
+-   💼 LinkedIn: [@felipeseiji](https://www.linkedin.com/in/felipe-seiji-souza-matie-82835a150/)
+-   🐱 GitHub: [@FeSeiji](https://github.com/FeSeiji)
 
-1. **Fork** o repositório
-2. **Clone** sua fork
-3. **Crie** uma branch: `git checkout -b feature/nova-funcionalidade`
-4. **Commit** suas mudanças: `git commit -m 'Adiciona nova funcionalidade'`
-5. **Push** para a branch: `git push origin feature/nova-funcionalidade`
-6. **Abra** um Pull Request
+**Nicholas Gerade** - Pós-Graduação FIAP Full Stack Development (5FSDT)
 
-### 📄 Licença
+-   📧 Email: [nicholasgerade@gmail.com](mailto:nicholasgerade@gmail.com)
+-   💼 LinkedIn: [@nicholasgerade](https://www.linkedin.com/in/nicholas-gerade-b21a8019b/)
+-   🐱 GitHub: [@nigerade](https://github.com/nigerade)
 
-Este projeto está sob a licença **MIT**. Veja o arquivo `LICENSE` para mais detalhes.
+**Tiago Mendes** - Pós-Graduação FIAP Full Stack Development (5FSDT)
 
-### 🙏 Agradecimentos
+-   📧 Email: [tiagoletras123@gmail.com](mailto:tiagoletras123@gmail.com)
+-   💼 LinkedIn: [@tiagomendes](https://www.linkedin.com/in/tiagomendescarvalho/)
+-   🐱 GitHub: [@TiagoMendes-pixel](https://github.com/TiagoMendes-pixel)
 
--   **FIAP** - Pela excelente estrutura do curso
--   **Comunidade Open Source** - Pelas tecnologias incríveis
--   **Render & Supabase** - Pela infraestrutura gratuita
--   **GitHub** - Pela plataforma de desenvolvimento colaborativo
+### Links do Projeto
+
+-   🌐 **Aplicação**: [https://ensinai-tech-challenge-fiap-5fsdt.vercel.app/](https://ensinai-tech-challenge-fiap-5fsdt.vercel.app/)
+-   📚 **Repositório**: [https://github.com/fdal-felipe/ensinai-tech-challenge-fiap-5fsdt](https://github.com/fdal-felipe/ensinai-tech-challenge-fiap-5fsdt)
+-   📖 **API Docs**: [https://blog-api-prod-mcw6.onrender.com/api-docs](https://blog-api-prod-mcw6.onrender.com/api-docs)
+
+---
+
+## 📝 Licença
+
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 
 ---
 
 <div align="center">
 
-**⭐ Se este projeto te ajudou, considere dar uma estrela!**
+**Desenvolvido para o Tech Challenge FIAP**
+
+[![FIAP](https://img.shields.io/badge/FIAP-Tech%20Challenge-red?style=for-the-badge)](https://www.fiap.com.br/)
+[![Next.js](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-18+-green?style=for-the-badge&logo=node.js)](https://nodejs.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue?style=for-the-badge&logo=postgresql)](https://www.postgresql.org/)
 
 </div>
-
----
