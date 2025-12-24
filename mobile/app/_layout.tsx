@@ -7,6 +7,7 @@ import { useEffect } from 'react';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/components/useColorScheme';
+import { AuthProvider } from '../src/contexts/AuthContext';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -46,14 +47,22 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
-  const colorScheme = useColorScheme();
+  // Forçando tema claro conforme mockups do Figma
+  // const colorScheme = useColorScheme();
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-      </Stack>
-    </ThemeProvider>
+    <AuthProvider>
+      <ThemeProvider value={DefaultTheme}>
+        <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="post/[id]" options={{ headerShown: false }} />
+          <Stack.Screen name="profile/edit" options={{ headerShown: false }} />
+          <Stack.Screen name="profile/settings" options={{ headerShown: false }} />
+          <Stack.Screen name="profile/notifications" options={{ headerShown: false }} />
+          <Stack.Screen name="profile/integrations" options={{ headerShown: false }} />
+          <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+        </Stack>
+      </ThemeProvider>
+    </AuthProvider>
   );
 }
