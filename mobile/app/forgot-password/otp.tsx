@@ -9,6 +9,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Dimensions,
 } from 'react-native';
 import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -16,6 +17,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text, View } from '@/components/Themed';
 import Colors from '@/constants/Colors';
 import { useTheme } from '../../src/contexts/ThemeContext';
+
+const { width } = Dimensions.get('window');
+const PADDING = 20;
+const GAP = 16;
+// Calculate square size: (screen width - padding on both sides - 3 gaps) / 4
+const SQUARE_SIZE = (width - (PADDING * 2) - (GAP * 3)) / 4;
 
 export default function OTPScreen() {
   const { isDark } = useTheme();
@@ -36,7 +43,6 @@ export default function OTPScreen() {
     setOtp(newOtp);
     setError(false);
 
-    // Auto focus next input
     if (value && index < 3) {
       inputRefs.current[index + 1]?.focus();
     }
@@ -58,14 +64,9 @@ export default function OTPScreen() {
 
     setLoading(true);
     
-    // Hardcoded: any 4-digit code works (e.g., 5100, 1234, etc.)
     setTimeout(() => {
       setLoading(false);
-      if (code.length === 4) {
-        router.push('/forgot-password/new-password');
-      } else {
-        setError(true);
-      }
+      router.push('/forgot-password/new-password');
     }, 1000);
   };
 
@@ -94,7 +95,7 @@ export default function OTPScreen() {
             </Text>
           </RNView>
 
-          {/* OTP Inputs */}
+          {/* OTP Inputs - Perfect squares */}
           <RNView style={styles.otpContainer}>
             {otp.map((digit, index) => (
               <TextInput
@@ -103,6 +104,8 @@ export default function OTPScreen() {
                 style={[
                   styles.otpInput, 
                   { 
+                    width: SQUARE_SIZE,
+                    height: SQUARE_SIZE,
                     borderColor: error ? Colors.error : colors.border, 
                     color: colors.text,
                     backgroundColor: colors.card,
@@ -162,10 +165,10 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    padding: 20,
+    paddingHorizontal: PADDING,
   },
   titleContainer: {
-    marginBottom: 40,
+    marginBottom: 48,
   },
   title: {
     fontSize: 36,
@@ -178,16 +181,13 @@ const styles = StyleSheet.create({
   },
   otpContainer: {
     flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 12,
-    marginBottom: 24,
+    justifyContent: 'space-between',
+    marginBottom: 32,
   },
   otpInput: {
-    width: 56,
-    height: 56,
-    borderRadius: 8,
+    borderRadius: 12,
     borderWidth: 1,
-    fontSize: 24,
+    fontSize: 32,
     fontWeight: 'bold',
   },
   errorText: {
@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 'auto',
-    paddingBottom: 40,
+    paddingBottom: 80,
   },
   resendText: {
     fontSize: 15,

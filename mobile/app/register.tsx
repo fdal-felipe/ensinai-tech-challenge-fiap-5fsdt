@@ -6,9 +6,9 @@ import {
   TouchableOpacity,
   StatusBar,
   Alert,
-  KeyboardAvoidingView,
-  Platform,
   ScrollView,
+  Keyboard,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import { router } from 'expo-router';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
@@ -30,6 +30,8 @@ export default function RegisterScreen() {
   const [loading, setLoading] = useState(false);
 
   const handleRegister = async () => {
+    Keyboard.dismiss();
+    
     if (!name.trim() || !email.trim() || !password.trim()) {
       Alert.alert('Erro', 'Por favor, preencha todos os campos.');
       return;
@@ -52,14 +54,18 @@ export default function RegisterScreen() {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
       
-      <KeyboardAvoidingView 
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.keyboardView}
-      >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <ScrollView 
-          contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 60 }]}
+          contentContainerStyle={[
+            styles.scrollContent, 
+            { 
+              paddingTop: insets.top + 60,
+              paddingBottom: insets.bottom + 20,
+            }
+          ]}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
+          bounces={false}
         >
           {/* Title - Centered */}
           <RNView style={styles.titleContainer}>
@@ -146,7 +152,7 @@ export default function RegisterScreen() {
             </TouchableOpacity>
           </RNView>
         </ScrollView>
-      </KeyboardAvoidingView>
+      </TouchableWithoutFeedback>
     </View>
   );
 }
@@ -155,12 +161,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  keyboardView: {
-    flex: 1,
-  },
   scrollContent: {
     flexGrow: 1,
-    padding: 20,
+    paddingHorizontal: 20,
   },
   titleContainer: {
     alignItems: 'center',
@@ -221,8 +224,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 'auto',
-    paddingBottom: 80,
+    paddingVertical: 40,
   },
   loginText: {
     fontSize: 15,

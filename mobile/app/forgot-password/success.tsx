@@ -26,21 +26,24 @@ export default function PasswordSuccessScreen() {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
       
-      <RNView style={[styles.content, { paddingTop: insets.top + 60 }]}>
-        {/* Success Icon */}
-        <RNView style={[styles.iconContainer, { backgroundColor: Colors.primary }]}>
-          <FontAwesome name="check" size={48} color="#FFFFFF" />
+      <RNView style={[styles.content, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
+        {/* Centered content */}
+        <RNView style={styles.centerContent}>
+          {/* Success Icon - Large green circle with checkmark */}
+          <RNView style={[styles.iconContainer, { backgroundColor: Colors.primary }]}>
+            <FontAwesome name="check" size={80} color="#FFFFFF" />
+          </RNView>
+
+          {/* Title */}
+          <Text style={[styles.title, { color: colors.text }]}>Senha confirmada!</Text>
+          
+          {/* Subtitle */}
+          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+            Sua nova senha foi confirmada com sucesso!
+          </Text>
         </RNView>
 
-        {/* Title */}
-        <Text style={[styles.title, { color: colors.text }]}>Senha confirmada!</Text>
-        
-        {/* Subtitle */}
-        <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-          Sua nova senha foi confirmada com sucesso!
-        </Text>
-
-        {/* Back to Login Button */}
+        {/* Back to Login Button - Fixed at bottom */}
         <TouchableOpacity 
           style={[styles.loginButton, { backgroundColor: colors.text }]}
           onPress={handleBackToLogin}
@@ -60,14 +63,17 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    padding: 20,
+    paddingHorizontal: 20,
+  },
+  centerContent: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
   iconContainer: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: 160,
+    height: 160,
+    borderRadius: 80,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 32,
@@ -81,14 +87,14 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 16,
     textAlign: 'center',
-    marginBottom: 40,
     lineHeight: 24,
   },
   loginButton: {
+    width: '100%',
     paddingVertical: 16,
-    paddingHorizontal: 60,
     borderRadius: 50,
     alignItems: 'center',
+    marginBottom: 40,
   },
   loginButtonText: {
     fontSize: 17,
