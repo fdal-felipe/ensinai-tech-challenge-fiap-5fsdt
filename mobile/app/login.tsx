@@ -19,6 +19,7 @@ import { Text, View } from '@/components/Themed';
 import Colors from '@/constants/Colors';
 import { useTheme } from '../src/contexts/ThemeContext';
 import { useAuth } from '../src/contexts/AuthContext';
+import api from '@/src/api/api';
 
 export default function LoginScreen() {
   const { isDark } = useTheme();
@@ -41,25 +42,47 @@ export default function LoginScreen() {
 
     setLoading(true);
 
-    // Hardcoded login: admin/admin
-    if (email.toLowerCase() === 'admin' && password === 'admin') {
-      try {
-        await SecureStore.setItemAsync('userToken', 'mock-token-12345');
-        signIn({
-          id: 1,
-          name: 'Administrador',
-          email: 'admin@ensinai.com',
-          role: 'professor',
-        }, 'mock-token-12345');
-        router.replace('/(tabs)');
-      } catch (error) {
-        Alert.alert('Erro', 'Erro ao fazer login.');
-      }
-    } else {
-      Alert.alert('Erro', 'Credenciais inválidas.\n\nUse: admin / admin');
-    }
+    try {
+      console.log('Tentando logar com:', email);
 
-    setLoading(false);
+      const response = await api.post('/auth/login', { 
+        email, 
+        password 
+      });
+
+      console.log('RESPOSTA DO BACKEND:', JSON.stringify(response.data, null, 2));
+
+      // 1. Pegamos o token e a role que o backend confirmou que envia
+      const { token, role } = response.data;
+
+      // 2. Trava de segurança apenas para o token
+      if (!token || typeof token !== 'string') {
+        Alert.alert('Erro Técnico', 'O servidor não retornou um token válido.');
+        return;
+      }
+
+      // 3. CONSTRUÇÃO MANUAL DO USUÁRIO (A CORREÇÃO ESTÁ AQUI)
+      // Como o backend não mandou o objeto 'user', nós criamos um objeto temporário
+      // usando o e-mail do formulário e a role da resposta.
+      const user = {
+        id: 0, // Usamos 0 temporariamente pois o ID real está encriptado dentro do token
+        name: email.split('@')[0], // Pega a parte antes do @ como "nome" provisório
+        email: email,
+        role: role // 'aluno' ou 'professor' (veio do backend)
+      };
+
+      // 4. Agora chamamos o signIn com o objeto que acabamos de montar
+      await signIn(user, token);
+
+      router.replace('/(tabs)');
+
+    } catch (error: any) {
+      console.log('ERRO COMPLETO:', error);
+      const msg = error.response?.data?.message || 'Email ou senha incorretos.';
+      Alert.alert('Falha no Login', msg);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

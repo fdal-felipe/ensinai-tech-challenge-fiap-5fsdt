@@ -21,6 +21,7 @@ import Colors from '@/constants/Colors';
 import { useTheme } from '../../src/contexts/ThemeContext';
 import { postsService } from '../../src/api/postsService';
 import { Post } from '../../src/types';
+import { useAuth } from '@/src/contexts/AuthContext';
 
 export default function PostsScreen() {
   const { isDark } = useTheme();
@@ -33,9 +34,10 @@ export default function PostsScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [searching, setSearching] = useState(false);
+  const { user } = useAuth();
   
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const isProfessor = false;
+  const isProfessor = user?.role === 'professor';
 
   // Handle back button press - show exit confirmation
   useFocusEffect(

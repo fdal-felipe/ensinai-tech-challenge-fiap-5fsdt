@@ -17,6 +17,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text, View } from '@/components/Themed';
 import Colors from '@/constants/Colors';
 import { useTheme } from '../src/contexts/ThemeContext';
+import api from '@/src/api/api';
 
 export default function RegisterScreen() {
   const { isDark } = useTheme();
@@ -39,15 +40,27 @@ export default function RegisterScreen() {
 
     setLoading(true);
 
-    // Mockup - just show success and redirect to login
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      await api.post('/auth/register', {
+        name,
+        email,
+        password,
+        role: 'aluno' 
+      });
+
       Alert.alert(
         'Sucesso!', 
-        'Conta criada com sucesso. Faça login para continuar.',
+        'Conta criada! Faça login para continuar.',
         [{ text: 'OK', onPress: () => router.replace('/login') }]
       );
-    }, 1000);
+
+    } catch (error: any) {
+      console.log(error);
+      const msg = error.response?.data?.message || error.response?.data?.error || 'Erro ao criar conta.';
+      Alert.alert('Erro', msg);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
