@@ -1,35 +1,41 @@
-// EnsinAI Official Brand Colors
-// Fonte: Inter
+// EnsinAI - Paleta de Cores (Conforme Figma)
+// Tema minimalista preto e branco com suporte a dark mode
 
-export default {
-  // Paleta Principal
-  primary: '#27AE60',       // Verde primário - Botões principais, links, destaques
-  secondary: '#6FCF97',     // Verde secundário - CTAs, avisos, destaques menores
-  success: '#219653',       // Sucesso/Notificação - Feedback positivo
-  error: '#EB5757',         // Erro/Notificação - Feedback negativo
+const Colors = {
+  // Cores principais
+  primary: '#27AE60',
+  secondary: '#6FCF97',
+  success: '#27AE60',
+  error: '#EB5757',
+  warning: '#F2994A',
 
+  // Tema Light
   light: {
-    text: '#000000',              // Texto Principal - Melhor legibilidade
-    textSecondary: '#4F4F4F',     // Subtítulos, legendas
-    background: '#FFFFFF',        // Fundo branco
-    tint: '#27AE60',
-    tabIconDefault: '#828282',    // Neutro
-    tabIconSelected: '#27AE60',
+    background: '#FFFFFF',
     card: '#FFFFFF',
-    border: '#F2F2F2',            // Bordas neutras
-    notification: '#EB5757',
-    inputBackground: '#F2F2F2',   // Background de inputs/cards
-  },
-  dark: {
-    text: '#FFFFFF',
-    textSecondary: '#BDBDBD',
-    background: '#1A1A2E',        // Fundo escuro
+    text: '#000000',
+    textSecondary: '#4F4F4F',
+    border: '#E0E0E0',
+    inputBackground: '#FFFFFF',
     tint: '#27AE60',
     tabIconDefault: '#828282',
-    tabIconSelected: '#27AE60',
-    card: '#16213E',
-    border: '#4F4F4F',
+    tabIconSelected: '#000000',
     notification: '#EB5757',
-    inputBackground: '#16213E',
+  },
+
+  // Tema Dark (cores invertidas)
+  dark: {
+    background: '#000000',
+    card: '#1A1A1A',
+    text: '#FFFFFF',
+    textSecondary: '#BDBDBD',
+    border: '#333333',
+    inputBackground: '#1A1A1A',
+    tint: '#27AE60',
+    tabIconDefault: '#828282',
+    tabIconSelected: '#FFFFFF',
+    notification: '#EB5757',
   },
 };
+
+export default Colors;

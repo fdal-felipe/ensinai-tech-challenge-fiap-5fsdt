@@ -1,85 +1,60 @@
 import React from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Text } from './Themed';
+import { router } from 'expo-router';
+
+import { Text } from '@/components/Themed';
+import { Post } from '../src/types';
 import Colors from '@/constants/Colors';
-import { useColorScheme } from './useColorScheme';
-import { Post } from '@/src/types';
+import { useTheme } from '../src/contexts/ThemeContext';
 
 interface PostCardProps {
   post: Post;
-  onPress: () => void;
-  showEditIcon?: boolean;
+  isProfessor?: boolean;
 }
 
-export function PostCard({ post, onPress, showEditIcon = false }: PostCardProps) {
-  const colorScheme = useColorScheme() ?? 'light';
-  const colors = Colors[colorScheme];
+export function PostCard({ post, isProfessor = false }: PostCardProps) {
+  const { isDark } = useTheme();
+  const colors = Colors[isDark ? 'dark' : 'light'];
+
+  const handlePress = () => {
+    router.push(`/post/${post.id}`);
+  };
 
   return (
-    <TouchableOpacity
-      style={[
-        styles.container,
-        { 
-          backgroundColor: colors.card,
-          borderColor: colors.border,
-        }
-      ]}
-      onPress={onPress}
+    <TouchableOpacity 
+      style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}
+      onPress={handlePress}
       activeOpacity={0.7}
     >
       <View style={styles.content}>
-        <Text style={[styles.title, { color: colors.text }]} numberOfLines={2}>
+        <Text style={[styles.title, { color: colors.text }]} numberOfLines={1}>
           {post.title}
         </Text>
-        {post.status === 'ativo' && (
-          <View style={[styles.statusBadge, { backgroundColor: colors.success + '20' }]}>
-            <FontAwesome name="check" size={12} color={colors.success} />
-          </View>
-        )}
       </View>
       
-      {showEditIcon && (
-        <TouchableOpacity style={styles.editButton}>
-          <FontAwesome name="pencil" size={16} color={colors.textSecondary} />
-        </TouchableOpacity>
-      )}
+      <FontAwesome name="chevron-right" size={16} color={colors.textSecondary} />
     </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  card: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 16,
+    paddingVertical: 18,
     paddingHorizontal: 20,
     borderWidth: 1,
     borderRadius: 8,
-    marginHorizontal: 16,
-    marginVertical: 6,
+    marginBottom: 12,
   },
   content: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
+    marginRight: 12,
   },
   title: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '500',
-    flex: 1,
-  },
-  statusBadge: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  editButton: {
-    padding: 8,
-    marginLeft: 8,
   },
 });

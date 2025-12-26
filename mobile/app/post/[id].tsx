@@ -5,35 +5,29 @@ import {
   ActivityIndicator,
   View as RNView,
   TouchableOpacity,
-  TextInput,
-  Platform,
   StatusBar,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router } from 'expo-router';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Text, View } from '@/components/Themed';
 import Colors from '@/constants/Colors';
-import { useColorScheme } from '@/components/useColorScheme';
-import { useAuth } from '../../src/contexts/AuthContext';
+import { useTheme } from '../../src/contexts/ThemeContext';
 import { postsService } from '../../src/api/postsService';
 import { Post } from '../../src/types';
 
 export default function PostDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  // Forçando tema claro conforme Figma
-  const colors = Colors.light;
+  const { isDark } = useTheme();
+  const colors = Colors[isDark ? 'dark' : 'light'];
   const insets = useSafeAreaInsets();
-  // const { user } = useAuth(); // TODO: Habilitar quando login for implementado
   
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // TODO: Quando login for implementado, usar: user?.role === 'professor'
   const isProfessor = false;
-
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -55,24 +49,25 @@ export default function PostDetailsScreen() {
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={colors.tint} />
+      <View style={[styles.loadingContainer, { backgroundColor: colors.background }]}>
+        <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
+        <ActivityIndicator size="large" color={colors.text} />
       </View>
     );
   }
 
   if (error || !post) {
     return (
-      <View style={styles.errorContainer}>
-        <FontAwesome name="exclamation-circle" size={48} color={colors.notification} />
+      <View style={[styles.errorContainer, { backgroundColor: colors.background }]}>
+        <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
         <Text style={[styles.errorText, { color: colors.text }]}>
           {error || 'Post não encontrado'}
         </Text>
         <TouchableOpacity 
-          style={[styles.backButton, { backgroundColor: colors.tint }]}
+          style={[styles.backButtonError, { backgroundColor: Colors.primary }]}
           onPress={() => router.back()}
         >
-          <Text style={styles.backButtonText}>Voltar</Text>
+          <Text style={styles.backButtonErrorText}>Voltar</Text>
         </TouchableOpacity>
       </View>
     );
@@ -80,66 +75,46 @@ export default function PostDetailsScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      {/* Header with Back Button - with safe area padding */}
-      <RNView style={[
-        styles.header, 
-        { 
-          borderBottomColor: colors.border,
-          paddingTop: insets.top + 12,
-        }
-      ]}>
-        <TouchableOpacity 
-          style={[styles.backCircle, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}
-          onPress={() => router.back()}
-        >
-          <FontAwesome name="arrow-left" size={16} color={colors.text} />
-        </TouchableOpacity>
-        
-        {isProfessor && (
-          <TouchableOpacity style={styles.settingsButton}>
-            <FontAwesome name="cog" size={20} color={colors.text} />
-          </TouchableOpacity>
-        )}
-      </RNView>
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
 
       <ScrollView 
         style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 20 }]}
         showsVerticalScrollIndicator={false}
       >
-        {/* Title Section */}
+        {/* Title */}
         <Text style={[styles.title, { color: colors.text }]}>
           {post.title}
         </Text>
 
-        {/* Matéria Field (Figma shows NOME DA MATÉRIA) */}
+        {/* Nome da Matéria Field */}
         <RNView style={styles.fieldContainer}>
           <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>
             NOME DA MATÉRIA
           </Text>
-          <RNView style={[styles.fieldInput, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}>
+          <RNView style={[styles.fieldInput, { borderColor: colors.border, backgroundColor: colors.card }]}>
             <Text style={[styles.fieldValue, { color: colors.text }]}>
               {post.title.split(' - ')[0] || 'Geral'}
             </Text>
           </RNView>
         </RNView>
 
-        {/* Description Section */}
+        {/* Descrição Field */}
         <RNView style={styles.fieldContainer}>
           <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>
             DESCRIÇÃO
           </Text>
-          <RNView style={[styles.descriptionContainer, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}>
+          <RNView style={[styles.descriptionContainer, { borderColor: colors.border, backgroundColor: colors.card }]}>
             <Text style={[styles.descriptionText, { color: colors.text }]}>
               {post.content}
             </Text>
           </RNView>
         </RNView>
 
-        {/* Save Button (visible for professors) */}
+        {/* Save Button (for professors) */}
         {isProfessor && (
           <TouchableOpacity 
-            style={[styles.saveButton, { backgroundColor: colors.tint }]}
+            style={[styles.saveButton, { backgroundColor: Colors.primary }]}
           >
             <Text style={styles.saveButtonText}>Salvar</Text>
           </TouchableOpacity>
@@ -165,38 +140,29 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   errorText: {
-    fontSize: 16,
-    marginTop: 16,
+    fontSize: 17,
     marginBottom: 24,
     textAlign: 'center',
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
+  backButtonError: {
+    paddingHorizontal: 24,
     paddingVertical: 12,
-    borderBottomWidth: 1,
+    borderRadius: 8,
   },
-  backCircle: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    borderWidth: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  settingsButton: {
-    padding: 8,
+  backButtonErrorText: {
+    color: '#ffffff',
+    fontSize: 17,
+    fontWeight: '600',
   },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
     padding: 20,
+    paddingBottom: 40,
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
     marginBottom: 24,
   },
@@ -204,7 +170,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   fieldLabel: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '600',
     letterSpacing: 0.5,
     marginBottom: 8,
@@ -216,7 +182,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   fieldValue: {
-    fontSize: 16,
+    fontSize: 17,
   },
   descriptionContainer: {
     paddingHorizontal: 16,
@@ -226,18 +192,8 @@ const styles = StyleSheet.create({
     minHeight: 120,
   },
   descriptionText: {
-    fontSize: 15,
-    lineHeight: 22,
-  },
-  backButton: {
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 8,
-  },
-  backButtonText: {
-    color: '#ffffff',
     fontSize: 16,
-    fontWeight: '600',
+    lineHeight: 24,
   },
   saveButton: {
     paddingVertical: 14,
@@ -247,7 +203,7 @@ const styles = StyleSheet.create({
   },
   saveButtonText: {
     color: '#ffffff',
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '600',
   },
 });

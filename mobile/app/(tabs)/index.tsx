@@ -6,24 +6,26 @@ import {
   View as RNView, 
   ActivityIndicator,
   RefreshControl,
-  TouchableOpacity 
+  TouchableOpacity,
+  StatusBar,
+  BackHandler,
+  Alert,
 } from 'react-native';
-import { router } from 'expo-router';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useFocusEffect } from 'expo-router';
 
 import { Text, View } from '@/components/Themed';
 import { PostCard } from '@/components/PostCard';
 import Colors from '@/constants/Colors';
-import { useColorScheme } from '@/components/useColorScheme';
-// TODO: Habilitar quando login for implementado
-// import { useAuth } from '../../src/contexts/AuthContext';
+import { useTheme } from '../../src/contexts/ThemeContext';
 import { postsService } from '../../src/api/postsService';
 import { Post } from '../../src/types';
 
 export default function PostsScreen() {
-  // Forçando tema claro conforme Figma
-  const colors = Colors.light;
-  // const { user } = useAuth(); // TODO: Habilitar quando login for implementado
+  const { isDark } = useTheme();
+  const colors = Colors[isDark ? 'dark' : 'light'];
+  const insets = useSafeAreaInsets();
   
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
@@ -32,12 +34,29 @@ export default function PostsScreen() {
   const [error, setError] = useState<string | null>(null);
   const [searching, setSearching] = useState(false);
   
-  // Debounce timer ref
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  // TODO: Quando login for implementado, usar: user?.role === 'professor'
-  // Por enquanto, força uso dos endpoints de aluno (públicos, sem auth)
   const isProfessor = false;
+
+  // Handle back button press - show exit confirmation
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = () => {
+        Alert.alert(
+          'Sair do aplicativo',
+          'Tem certeza que deseja sair do aplicativo?',
+          [
+            { text: 'Cancelar', style: 'cancel' },
+            { text: 'Sair', style: 'destructive', onPress: () => BackHandler.exitApp() },
+          ]
+        );
+        return true; // Prevent default back behavior
+      };
+
+      const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+      return () => subscription.remove();
+    }, [])
+  );
 
   const fetchPosts = useCallback(async () => {
     try {
@@ -46,30 +65,25 @@ export default function PostsScreen() {
       setPosts(data);
     } catch (err: any) {
       console.error('Error fetching posts:', err);
-      setError(err.message || 'Erro ao conectar com o servidor');
+      setError('Erro ao conectar. Verifique se o backend está rodando.');
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
   }, [isProfessor]);
 
-  // Live search with debounce (500ms delay)
   useEffect(() => {
-    // Clear previous timeout
     if (searchTimeoutRef.current) {
       clearTimeout(searchTimeoutRef.current);
     }
 
-    // If search is empty, reload all posts
     if (!searchQuery.trim()) {
-      // Small delay to avoid flickering when typing fast
       searchTimeoutRef.current = setTimeout(() => {
         fetchPosts();
       }, 100);
       return;
     }
 
-    // Set new timeout for debounced search
     setSearching(true);
     searchTimeoutRef.current = setTimeout(async () => {
       try {
@@ -84,14 +98,12 @@ export default function PostsScreen() {
       }
     }, 500);
 
-    // Cleanup on unmount
     return () => {
       if (searchTimeoutRef.current) {
         clearTimeout(searchTimeoutRef.current);
       }
     };
   }, [searchQuery, isProfessor, fetchPosts]);
-
 
   useEffect(() => {
     fetchPosts();
@@ -103,30 +115,25 @@ export default function PostsScreen() {
     fetchPosts();
   }, [fetchPosts]);
 
-  const handlePostPress = (postId: number) => {
-    router.push(`/post/${postId}`);
-  };
-
-  const renderEmptyList = () => (
-    <View style={styles.emptyContainer}>
-      <FontAwesome name="inbox" size={48} color={colors.textSecondary} />
-      <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
-        Nenhum post encontrado
-      </Text>
-    </View>
+  const renderPost = ({ item }: { item: Post }) => (
+    <PostCard post={item} isProfessor={isProfessor} />
   );
 
-  // Error state
-  if (error && posts.length === 0) {
+  if (loading) {
+    return (
+      <View style={[styles.loadingContainer, { backgroundColor: colors.background }]}>
+        <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
+        <ActivityIndicator size="large" color={colors.text} />
+      </View>
+    );
+  }
+
+  if (error) {
     return (
       <View style={[styles.errorContainer, { backgroundColor: colors.background }]}>
-        <FontAwesome name="exclamation-triangle" size={48} color={Colors.error} />
-        <Text style={[styles.errorTitle, { color: colors.text }]}>
-          Erro de Conexão
-        </Text>
-        <Text style={[styles.errorText, { color: colors.textSecondary }]}>
-          {error}
-        </Text>
+        <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
+        <FontAwesome name="wifi" size={48} color={colors.textSecondary} style={{ marginBottom: 16 }} />
+        <Text style={[styles.errorText, { color: colors.text }]}>{error}</Text>
         <TouchableOpacity 
           style={[styles.retryButton, { backgroundColor: Colors.primary }]}
           onPress={fetchPosts}
@@ -137,63 +144,56 @@ export default function PostsScreen() {
     );
   }
 
-  // Loading state
-  if (loading && posts.length === 0) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={colors.tint} />
-        <Text style={[styles.loadingText, { color: colors.textSecondary }]}>
-          Carregando posts...
-        </Text>
-      </View>
-    );
-  }
-
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      {/* Header Section */}
-      <RNView style={styles.header}>
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
+      
+      {/* Title Section */}
+      <RNView style={[styles.titleSection, { paddingTop: insets.top + 20 }]}>
+        <Text style={[styles.title, { color: colors.text }]}>Home</Text>
         <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-          Seja Bem vindo!
+          Abaixo são mostrados os últimos posts criados
         </Text>
       </RNView>
 
       {/* Search Bar */}
-      <RNView style={[styles.searchContainer, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}>
-        <FontAwesome name="search" size={16} color={colors.textSecondary} style={styles.searchIcon} />
-        <TextInput
-          style={[styles.searchInput, { color: colors.text }]}
-          placeholder="Buscar posts..."
-          placeholderTextColor={colors.textSecondary}
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          returnKeyType="search"
-          autoCorrect={false}
-        />
+      <RNView style={styles.searchSection}>
+        <RNView style={[styles.searchContainer, { borderColor: colors.border, backgroundColor: colors.card }]}>
+          <FontAwesome name="search" size={16} color={colors.textSecondary} style={styles.searchIcon} />
+          <TextInput
+            style={[styles.searchInput, { color: colors.text }]}
+            placeholder="Buscar posts..."
+            placeholderTextColor={colors.textSecondary}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            returnKeyType="search"
+            autoCorrect={false}
+          />
+          {searching && <ActivityIndicator size="small" color={colors.textSecondary} />}
+        </RNView>
       </RNView>
 
       {/* Posts List */}
       <FlatList
         data={posts}
+        renderItem={renderPost}
         keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <PostCard
-            post={item}
-            onPress={() => handlePostPress(item.id)}
-            showEditIcon={isProfessor}
-          />
-        )}
         contentContainerStyle={styles.listContent}
-        ListEmptyComponent={renderEmptyList}
+        showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor={colors.tint}
-            colors={[colors.tint]}
+            tintColor={colors.text}
           />
         }
-        showsVerticalScrollIndicator={false}
+        ListEmptyComponent={
+          <RNView style={styles.emptyContainer}>
+            <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
+              Nenhum post encontrado
+            </Text>
+          </RNView>
+        }
       />
     </View>
   );
@@ -208,60 +208,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  header: {
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 8,
-  },
-  subtitle: {
-    fontSize: 14,
-  },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginHorizontal: 16,
-    marginVertical: 12,
-    paddingHorizontal: 16,
-    height: 48,
-    borderRadius: 8,
-    borderWidth: 1,
-  },
-  searchIcon: {
-    marginRight: 12,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 16,
-  },
-  listContent: {
-    paddingBottom: 24,
-  },
-  emptyContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 60,
-  },
-  emptyText: {
-    fontSize: 16,
-    marginTop: 16,
-  },
   errorContainer: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     padding: 20,
   },
-  errorTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginTop: 16,
-    marginBottom: 8,
-  },
   errorText: {
-    fontSize: 14,
+    fontSize: 17,
+    marginBottom: 20,
     textAlign: 'center',
-    marginBottom: 24,
   },
   retryButton: {
     paddingHorizontal: 24,
@@ -270,11 +226,51 @@ const styles = StyleSheet.create({
   },
   retryButtonText: {
     color: '#FFFFFF',
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '600',
   },
-  loadingText: {
-    fontSize: 14,
-    marginTop: 12,
+  titleSection: {
+    paddingHorizontal: 20,
+    paddingBottom: 16,
+  },
+  title: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 16,
+    lineHeight: 22,
+  },
+  searchSection: {
+    paddingHorizontal: 20,
+    paddingBottom: 16,
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+  },
+  searchIcon: {
+    marginRight: 12,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 17,
+    padding: 0,
+  },
+  listContent: {
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+  },
+  emptyContainer: {
+    alignItems: 'center',
+    paddingVertical: 40,
+  },
+  emptyText: {
+    fontSize: 17,
   },
 });
