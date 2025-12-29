@@ -63,7 +63,9 @@ export default function PostsScreen() {
   const fetchPosts = useCallback(async () => {
     try {
       setError(null);
+      console.log('Fetching posts, isProfessor:', isProfessor);
       const data = await postsService.getPosts(isProfessor);
+      console.log('Posts received:', data?.length || 0, 'posts');
       setPosts(data);
     } catch (err: any) {
       console.error('Error fetching posts:', err);

@@ -16,47 +16,69 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text, View } from '@/components/Themed';
 import Colors from '@/constants/Colors';
 import { useTheme } from '../../src/contexts/ThemeContext';
-import { postsService } from '../../src/api/postsService';
-import { Post } from '../../src/types';
+import api from '../../src/api/api';
 
-export default function PostsAdminScreen() {
+interface Subject {
+  id: number;
+  name: string;
+  description?: string;
+}
+
+// Mock data for now (will be replaced with API)
+const mockSubjects: Subject[] = [
+  { id: 1, name: 'Matemática I' },
+  { id: 2, name: 'Matemática II' },
+  { id: 3, name: 'Inglês I' },
+  { id: 4, name: 'Inglês II' },
+  { id: 5, name: 'Inglês III' },
+  { id: 6, name: 'Inglês IV' },
+];
+
+export default function SubjectsScreen() {
   const { isDark } = useTheme();
   const colors = Colors[isDark ? 'dark' : 'light'];
   const insets = useSafeAreaInsets();
   
-  const [posts, setPosts] = useState<Post[]>([]);
+  const [subjects, setSubjects] = useState<Subject[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
-  const fetchPosts = useCallback(async () => {
+  const fetchSubjects = useCallback(async () => {
     try {
-      const data = await postsService.professor.getAll();
-      setPosts(data);
+      // TODO: Replace with actual API call when endpoint is ready
+      // const response = await api.get('/professor/subjects');
+      // setSubjects(response.data);
+      
+      // Using mock data for now
+      setTimeout(() => {
+        setSubjects(mockSubjects);
+        setLoading(false);
+        setRefreshing(false);
+      }, 500);
     } catch (error) {
-      console.error('Error fetching posts:', error);
-    } finally {
+      console.error('Error fetching subjects:', error);
       setLoading(false);
       setRefreshing(false);
     }
   }, []);
 
   useEffect(() => {
-    fetchPosts();
-  }, [fetchPosts]);
+    fetchSubjects();
+  }, [fetchSubjects]);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-    fetchPosts();
-  }, [fetchPosts]);
+    fetchSubjects();
+  }, [fetchSubjects]);
 
-  const handleEditPost = (postId: number) => {
-    router.push(`/posts/form?id=${postId}`);
+  const handleEditSubject = (subjectId: number) => {
+    router.push(`/subjects/form?id=${subjectId}`);
   };
 
-  const handleDeletePost = async (postId: number) => {
+  const handleDeleteSubject = async (subjectId: number) => {
     Alert.alert(
       'Atenção!',
-      'Tem certeza de que deseja excluir este post?',
+      'Tem certeza de que deseja excluir esta matéria?',
       [
         { text: 'Não', style: 'cancel' },
         { 
@@ -64,10 +86,11 @@ export default function PostsAdminScreen() {
           style: 'destructive',
           onPress: async () => {
             try {
-              await postsService.professor.delete(postId);
-              fetchPosts();
+              // TODO: Replace with actual API call
+              // await api.delete(`/professor/subjects/${subjectId}`);
+              setSubjects(prev => prev.filter(s => s.id !== subjectId));
             } catch (error) {
-              Alert.alert('Erro', 'Não foi possível excluir o post.');
+              Alert.alert('Erro', 'Não foi possível excluir a matéria.');
             }
           }
         },
@@ -75,31 +98,25 @@ export default function PostsAdminScreen() {
     );
   };
 
-  const handleAddPost = () => {
-    router.push('/posts/form');
+  const handleAddSubject = () => {
+    router.push('/subjects/form');
   };
 
-  const renderPostItem = ({ item }: { item: Post }) => (
+  const renderSubjectItem = ({ item }: { item: Subject }) => (
     <TouchableOpacity 
-      style={[styles.postItem, { backgroundColor: colors.card, borderColor: colors.border }]}
-      onPress={() => handleEditPost(item.id)}
+      style={[styles.subjectItem, { backgroundColor: colors.card, borderColor: colors.border }]}
+      onPress={() => handleEditSubject(item.id)}
       activeOpacity={0.7}
     >
-      <Text style={[styles.postTitle, { color: colors.text }]} numberOfLines={1}>
-        {item.title}
+      <Text style={[styles.subjectName, { color: colors.text }]} numberOfLines={1}>
+        {item.name}
       </Text>
-      <RNView style={styles.postActions}>
+      <RNView style={styles.subjectActions}>
         <TouchableOpacity 
-          onPress={() => handleEditPost(item.id)}
+          onPress={() => handleEditSubject(item.id)}
           style={styles.actionButton}
         >
           <FontAwesome name="pencil" size={18} color={colors.textSecondary} />
-        </TouchableOpacity>
-        <TouchableOpacity 
-          onPress={() => handleDeletePost(item.id)}
-          style={styles.actionButton}
-        >
-          <FontAwesome name="trash" size={18} color={Colors.error} />
         </TouchableOpacity>
       </RNView>
     </TouchableOpacity>
@@ -120,16 +137,16 @@ export default function PostsAdminScreen() {
       
       {/* Title Section */}
       <RNView style={[styles.titleSection, { paddingTop: insets.top + 20 }]}>
-        <Text style={[styles.title, { color: colors.text }]}>Posts</Text>
+        <Text style={[styles.title, { color: colors.text }]}>Matérias</Text>
         <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-          Abaixo são mostrados os últimos posts criados
+          Esta página é exclusivamente dedicada a gerenciar as matérias
         </Text>
       </RNView>
 
-      {/* Posts List */}
+      {/* Subjects List */}
       <FlatList
-        data={posts}
-        renderItem={renderPostItem}
+        data={subjects}
+        renderItem={renderSubjectItem}
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
@@ -143,7 +160,7 @@ export default function PostsAdminScreen() {
         ListEmptyComponent={
           <RNView style={styles.emptyContainer}>
             <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
-              Nenhum post encontrado
+              Nenhuma matéria encontrada
             </Text>
           </RNView>
         }
@@ -152,7 +169,7 @@ export default function PostsAdminScreen() {
       {/* Add Button */}
       <TouchableOpacity 
         style={[styles.addButton, { backgroundColor: colors.text }]}
-        onPress={handleAddPost}
+        onPress={handleAddSubject}
       >
         <FontAwesome name="plus" size={24} color={colors.background} />
       </TouchableOpacity>
@@ -179,14 +196,14 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   subtitle: {
-    fontSize: 16,
-    lineHeight: 22,
+    fontSize: 14,
+    lineHeight: 20,
   },
   listContent: {
     paddingHorizontal: 20,
     paddingBottom: 100,
   },
-  postItem: {
+  subjectItem: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -196,13 +213,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: 12,
   },
-  postTitle: {
+  subjectName: {
     flex: 1,
     fontSize: 16,
     fontWeight: '500',
     marginRight: 12,
   },
-  postActions: {
+  subjectActions: {
     flexDirection: 'row',
     gap: 16,
   },
@@ -223,21 +240,6 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    alignItems: 'center',
-    justifyContent: 'center',
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-  },
-  backButton: {
-    position: 'absolute',
-    bottom: 100,
-    left: 20,
-    width: 48,
-    height: 48,
-    borderRadius: 24,
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 4,

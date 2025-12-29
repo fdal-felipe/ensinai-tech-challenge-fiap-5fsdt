@@ -64,6 +64,32 @@ export const postsService = {
                 return [];
             }
         },
+        create: async (data: { title: string; content: string; author_id: number }): Promise<Post | null> => {
+            try {
+                const response = await api.post('/professor/posts', data);
+                return response.data;
+            } catch (error) {
+                console.log('Error creating post:', error);
+                throw error;
+            }
+        },
+        update: async (id: number, data: { title: string; content: string; status: string }): Promise<Post | null> => {
+            try {
+                const response = await api.put(`/professor/posts/${id}`, data);
+                return response.data;
+            } catch (error) {
+                console.log('Error updating post:', error);
+                throw error;
+            }
+        },
+        delete: async (id: number): Promise<void> => {
+            try {
+                await api.delete(`/professor/posts/${id}`);
+            } catch (error) {
+                console.log('Error deleting post:', error);
+                throw error;
+            }
+        },
     },
 
     // Helper functions for easier usage
