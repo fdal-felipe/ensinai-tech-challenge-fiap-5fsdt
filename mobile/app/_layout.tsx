@@ -89,6 +89,7 @@ function RootLayoutNav() {
         <Stack.Screen name="profile/settings" options={{ headerShown: false }} />
         <Stack.Screen name="profile/notifications" options={{ headerShown: false }} />
         <Stack.Screen name="profile/integrations" options={{ headerShown: false }} />
+        <Stack.Screen name="profile/about" options={{ headerShown: false }} />
         <Stack.Screen name="posts/form" options={{ headerShown: false }} />
         <Stack.Screen name="subjects/form" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal' }} />

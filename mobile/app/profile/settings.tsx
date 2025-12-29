@@ -59,7 +59,7 @@ export default function SettingsScreen() {
     { icon: 'download', label: 'Modo offline', type: 'switch', value: offlineMode, onToggle: setOfflineMode },
     { icon: 'shield', label: 'Política de privacidade', type: 'link' },
     { icon: 'file-text-o', label: 'Termos de uso', type: 'link' },
-    { icon: 'info-circle', label: 'Sobre o app', type: 'link' },
+    { icon: 'info-circle', label: 'Sobre o app', type: 'link', onPress: () => router.push('/profile/about') },
   ];
 
   return (
@@ -82,6 +82,7 @@ export default function SettingsScreen() {
               style={[styles.settingItem, { borderColor: colors.border, backgroundColor: colors.card }]}
               activeOpacity={item.type === 'link' ? 0.7 : 1}
               disabled={item.type === 'switch'}
+              onPress={item.type === 'link' && item.onPress ? item.onPress : undefined}
             >
               <RNView style={styles.settingLeft}>
                 <FontAwesome name={item.icon as any} size={18} color={colors.textSecondary} />
