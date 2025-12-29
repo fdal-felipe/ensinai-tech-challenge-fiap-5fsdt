@@ -57,8 +57,8 @@ export default function SettingsScreen() {
     { icon: 'moon-o', label: 'Modo escuro', type: 'switch', value: isDark, onToggle: toggleTheme },
     { icon: 'play-circle', label: 'Reprodução automática', type: 'switch', value: autoPlay, onToggle: setAutoPlay },
     { icon: 'download', label: 'Modo offline', type: 'switch', value: offlineMode, onToggle: setOfflineMode },
-    { icon: 'shield', label: 'Política de privacidade', type: 'link' },
-    { icon: 'file-text-o', label: 'Termos de uso', type: 'link' },
+    { icon: 'shield', label: 'Política de privacidade', type: 'link', onPress: () => router.push('/profile/privacy-policy') },
+    { icon: 'file-text-o', label: 'Termos de uso', type: 'link', onPress: () => router.push('/profile/terms-of-use') },
     { icon: 'info-circle', label: 'Sobre o app', type: 'link', onPress: () => router.push('/profile/about') },
   ];
 

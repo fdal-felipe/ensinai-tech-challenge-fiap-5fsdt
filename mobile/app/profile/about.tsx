@@ -85,14 +85,14 @@ export default function AboutScreen() {
         {/* Logo / Banner Area */}
         <RNView style={styles.bannerContainer}>
             <FontAwesome name="graduation-cap" size={64} color={Colors.primary} />
-            <Text style={[styles.appName, { color: colors.text }]}>EnsinAI</Text>
+            <Text style={[styles.appName, { color: colors.text }]}>Ensinai</Text>
             <Text style={[styles.version, { color: colors.textSecondary }]}>Versão 1.0.0 (Fase 4)</Text>
         </RNView>
 
         {/* Description */}
         <RNView style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <Text style={[styles.description, { color: colors.text }]}>
-                O EnsinAI é uma plataforma completa de blogging educacional, desenvolvida como parte do Tech Challenge da Pós-Graduação em Full Stack Development da FIAP.
+                O Ensinai é uma plataforma completa de blogging educacional, desenvolvida como parte do Tech Challenge da Pós-Graduação em Full Stack Development da FIAP.
                 {'\n\n'}
                 Conecta professores e alunos através do compartilhamento de conhecimento, permitindo a gestão de postagens e matérias de forma simples e eficiente.
             </Text>
