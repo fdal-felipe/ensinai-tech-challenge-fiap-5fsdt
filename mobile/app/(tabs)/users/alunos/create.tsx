@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { View, TextInput, Button, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import { router } from 'expo-router';
 import { createUser } from '@/services/UserService';
-import { Text } from '@/components/Themed'; // Se quiser usar o texto com tema
+import { Text } from '@/components/Themed'; 
 
 export default function AlunoCreate() {
   const [name, setName] = useState('');

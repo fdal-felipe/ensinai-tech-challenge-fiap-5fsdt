@@ -36,7 +36,7 @@ export default function AlunosScreen() {
                             title="Editar"
                             onPress={() =>
                                 router.push({
-                                    pathname: '/users/alunos/edit', // ou /users/professores/edit
+                                    pathname: '/users/alunos/edit',
                                     params: { id: item.id, name: item.name, email: item.email },
                                 })
                             }
