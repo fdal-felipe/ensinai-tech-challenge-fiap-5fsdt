@@ -86,8 +86,8 @@ export default function PostFormScreen() {
         ]);
       } else {
         // Create requires: title, content, author_id
-        // Use user.id from context, or fallback to 16 (professor from DB) if id is 0
-        const authorId = user?.id && user.id > 0 ? user.id : 16;
+        // Use user.id from context, or fallback to 1 (first professor in local DB)
+        const authorId = user?.id && user.id > 0 ? user.id : 1;
         await postsService.professor.create({ title, content, author_id: authorId });
         Alert.alert('Sucesso', 'Post criado com sucesso!', [
           { text: 'OK', onPress: () => router.back() }
