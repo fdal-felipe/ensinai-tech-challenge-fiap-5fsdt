@@ -14,6 +14,7 @@ interface AuthContextData {
   loading: boolean;
   signIn(user: User, token: string): Promise<void>;
   signOut(): void;
+  updateUser(user: User): Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
@@ -26,6 +27,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Carrega os dados do usuário armazenados ao iniciar o app
   useEffect(() => {
     async function loadStorageData() {
       try {
@@ -36,27 +38,35 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setUser(JSON.parse(storageUser));
         }
       } catch (error) {
-        console.log('Error loading user data:', error);
+        console.log('Erro ao carregar dados do usuário:', error);
       }
       setLoading(false);
     }
     loadStorageData();
   }, []);
 
+  // Função de login
   async function signIn(userData: User, token: string) {
     setUser(userData);
     await SecureStore.setItemAsync('userToken', token);
     await SecureStore.setItemAsync('userData', JSON.stringify(userData));
   }
 
+  // Função de logout
   function signOut() {
     SecureStore.deleteItemAsync('userToken');
     SecureStore.deleteItemAsync('userData');
     setUser(null);
   }
 
+  // Função para atualizar dados do usuário (após edição de perfil)
+  async function updateUser(userData: User) {
+    setUser(userData);
+    await SecureStore.setItemAsync('userData', JSON.stringify(userData));
+  }
+
   return (
-    <AuthContext.Provider value={{ signed: !!user, user, loading, signIn, signOut }}>
+    <AuthContext.Provider value={{ signed: !!user, user, loading, signIn, signOut, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

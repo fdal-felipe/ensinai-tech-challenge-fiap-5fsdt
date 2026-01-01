@@ -6,12 +6,13 @@ import {
   TouchableOpacity,
   StatusBar,
   Alert,
-  KeyboardAvoidingView,
-  Platform,
   ScrollView,
   Dimensions,
+  Keyboard,
+  TouchableWithoutFeedback,
+  ActivityIndicator,
 } from 'react-native';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Text, View } from '@/components/Themed';
@@ -19,31 +20,40 @@ import Colors from '@/constants/Colors';
 import { useTheme } from '../../src/contexts/ThemeContext';
 
 const { width } = Dimensions.get('window');
-const PADDING = 20;
-const GAP = 16;
-// Calculate square size: (screen width - padding on both sides - 3 gaps) / 4
-const SQUARE_SIZE = (width - (PADDING * 2) - (GAP * 3)) / 4;
+const PADDING = 24;
+const GAP = 12;
+// Calculate square size for 6 digits
+const SQUARE_SIZE = (width - (PADDING * 2) - (GAP * 5)) / 6;
 
 export default function OTPScreen() {
   const { isDark } = useTheme();
   const colors = Colors[isDark ? 'dark' : 'light'];
   const insets = useSafeAreaInsets();
+  const { email } = useLocalSearchParams<{ email: string }>();
   
-  const [otp, setOtp] = useState(['', '', '', '']);
+  const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   
   const inputRefs = useRef<(TextInput | null)[]>([]);
 
   const handleOtpChange = (value: string, index: number) => {
-    if (value.length > 1) return;
+    if (value.length > 1) {
+      // Handle paste or quick typing
+      const char = value.slice(-1);
+      const newOtp = [...otp];
+      newOtp[index] = char;
+      setOtp(newOtp);
+      if (index < 5) inputRefs.current[index + 1]?.focus();
+      return;
+    }
     
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
     setError(false);
 
-    if (value && index < 3) {
+    if (value && index < 5) {
       inputRefs.current[index + 1]?.focus();
     }
   };
@@ -54,104 +64,123 @@ export default function OTPScreen() {
     }
   };
 
-  const handleVerify = () => {
+  const handleVerify = async () => {
     const code = otp.join('');
     
-    if (code.length !== 4) {
-      Alert.alert('Erro', 'Por favor, insira o código completo.');
+    if (code.length !== 6) {
+      Alert.alert('Erro', 'Por favor, insira o código de 6 dígitos.');
       return;
     }
 
     setLoading(true);
     
+    // MOCK: Simulate API calls
     setTimeout(() => {
       setLoading(false);
-      router.push('/forgot-password/new-password');
-    }, 1000);
+      // Simulate validation (Just accept any code for mock)
+      router.push({
+        pathname: '/forgot-password/new-password',
+        params: { email, otp: code }
+      });
+      // Or if you want to force error for testing:
+      // setError(true);
+    }, 1500);
   };
 
-  const handleResend = () => {
-    Alert.alert('Código reenviado', 'Um novo código foi enviado para seu email.');
+  const handleResend = async () => {
+    Alert.alert('Código reenviado', 'Um novo código foi enviado para seu email (Simulado).');
   };
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
       
-      <KeyboardAvoidingView 
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.keyboardView}
-      >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <ScrollView 
-          contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 60 }]}
+          contentContainerStyle={[
+            styles.scrollContent, 
+            { 
+              paddingTop: insets.top + 60,
+              paddingBottom: insets.bottom + 20,
+            }
+          ]}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
+          bounces={false}
         >
-          {/* Title */}
+          {/* Title - Centered */}
           <RNView style={styles.titleContainer}>
             <Text style={[styles.title, { color: colors.text }]}>Código OTP</Text>
             <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-              Insira o código OTP enviado no seu email para recuperar a sua conta.
+              Insira o código enviado para{'\n'}<Text style={{ fontWeight: 'bold' }}>{email || 'seu email'}</Text>
             </Text>
           </RNView>
 
-          {/* OTP Inputs - Perfect squares */}
-          <RNView style={styles.otpContainer}>
-            {otp.map((digit, index) => (
-              <TextInput
-                key={index}
-                ref={(ref) => (inputRefs.current[index] = ref)}
-                style={[
-                  styles.otpInput, 
-                  { 
-                    width: SQUARE_SIZE,
-                    height: SQUARE_SIZE,
-                    borderColor: error ? Colors.error : colors.border, 
-                    color: colors.text,
-                    backgroundColor: colors.card,
-                  }
-                ]}
-                value={digit}
-                onChangeText={(value) => handleOtpChange(value, index)}
-                onKeyPress={({ nativeEvent }) => handleKeyPress(nativeEvent.key, index)}
-                keyboardType="number-pad"
-                maxLength={1}
-                textAlign="center"
-              />
-            ))}
-          </RNView>
+          {/* Form Wrapper - Centered */}
+          <RNView style={styles.formWrapper}>
+            {/* OTP Inputs */}
+            <RNView style={styles.otpContainer}>
+              {otp.map((digit, index) => (
+                <TextInput
+                  key={index}
+                  ref={(ref) => (inputRefs.current[index] = ref)}
+                  style={[
+                    styles.otpInput, 
+                    { 
+                      width: SQUARE_SIZE,
+                      height: SQUARE_SIZE,
+                      borderColor: error ? Colors.error : colors.border, 
+                      color: colors.text,
+                      backgroundColor: colors.card,
+                    }
+                  ]}
+                  value={digit}
+                  onChangeText={(value) => handleOtpChange(value, index)}
+                  onKeyPress={({ nativeEvent }) => handleKeyPress(nativeEvent.key, index)}
+                  keyboardType="number-pad"
+                  maxLength={1}
+                  textAlign="center"
+                  selectTextOnFocus
+                />
+              ))}
+            </RNView>
 
-          {/* Error Message */}
-          {error && (
-            <Text style={[styles.errorText, { color: Colors.error }]}>
-              código errado, tente novamente por favor
-            </Text>
-          )}
-
-          {/* Verify Button */}
-          <TouchableOpacity 
-            style={[styles.verifyButton, { backgroundColor: colors.text }]}
-            onPress={handleVerify}
-            disabled={loading}
-          >
-            <Text style={[styles.verifyButtonText, { color: colors.background }]}>
-              {loading ? 'Verificando...' : 'Verificar'}
-            </Text>
-          </TouchableOpacity>
-
-          {/* Resend */}
-          <RNView style={styles.resendContainer}>
-            <Text style={[styles.resendText, { color: colors.textSecondary }]}>
-              Não recebeu o código?{' '}
-            </Text>
-            <TouchableOpacity onPress={handleResend}>
-              <Text style={[styles.resendLink, { color: colors.text }]}>
-                Reenviar
+            {/* Error Message */}
+            {error && (
+              <Text style={[styles.errorText, { color: Colors.error }]}>
+                código errado, tente novamente por favor
               </Text>
+            )}
+
+            {/* Verify Button */}
+            <TouchableOpacity 
+              style={[styles.verifyButton, { backgroundColor: colors.text }]}
+              onPress={handleVerify}
+              disabled={loading}
+            >
+              {loading ? (
+                <ActivityIndicator color={colors.background} />
+              ) : (
+                <Text style={[styles.verifyButtonText, { color: colors.background }]}>
+                  Verificar
+                </Text>
+              )}
             </TouchableOpacity>
+
+            {/* Resend Link */}
+            <RNView style={styles.resendContainer}>
+              <Text style={[styles.resendText, { color: colors.textSecondary }]}>
+                Não recebeu o código?{' '}
+              </Text>
+              <TouchableOpacity onPress={handleResend}>
+                <Text style={[styles.resendLink, { color: colors.text }]}>
+                  Reenviar
+                </Text>
+              </TouchableOpacity>
+            </RNView>
           </RNView>
         </ScrollView>
-      </KeyboardAvoidingView>
+      </TouchableWithoutFeedback>
     </View>
   );
 }
@@ -160,24 +189,28 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  keyboardView: {
-    flex: 1,
-  },
   scrollContent: {
     flexGrow: 1,
     paddingHorizontal: PADDING,
   },
   titleContainer: {
+    alignItems: 'center',
     marginBottom: 48,
   },
   title: {
-    fontSize: 36,
+    fontSize: 32,
     fontWeight: 'bold',
     marginBottom: 16,
+    textAlign: 'center',
   },
   subtitle: {
-    fontSize: 15,
-    lineHeight: 22,
+    fontSize: 16,
+    lineHeight: 24,
+    textAlign: 'center',
+  },
+  formWrapper: {
+    flex: 1,
+    justifyContent: 'center',
   },
   otpContainer: {
     flexDirection: 'row',
@@ -185,9 +218,9 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   otpInput: {
-    borderRadius: 12,
+    borderRadius: 8,
     borderWidth: 1,
-    fontSize: 32,
+    fontSize: 24,
     fontWeight: 'bold',
   },
   errorText: {
@@ -200,6 +233,8 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     alignItems: 'center',
     marginBottom: 24,
+    height: 56,
+    justifyContent: 'center',
   },
   verifyButtonText: {
     fontSize: 17,
@@ -209,8 +244,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 'auto',
-    paddingBottom: 80,
+    paddingVertical: 20,
   },
   resendText: {
     fontSize: 15,

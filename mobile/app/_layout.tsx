@@ -93,7 +93,8 @@ function RootLayoutNav() {
         <Stack.Screen name="profile/privacy-policy" options={{ headerShown: false }} />
         <Stack.Screen name="profile/terms-of-use" options={{ headerShown: false }} />
         <Stack.Screen name="posts/form" options={{ headerShown: false }} />
-        <Stack.Screen name="subjects/form" options={{ headerShown: false }} />
+        <Stack.Screen name="users" options={{ headerShown: false }} />
+        {/* SUBJECTS DISABLED: <Stack.Screen name="subjects/form" options={{ headerShown: false }} /> */}
         <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
       </Stack>
     </NavThemeProvider>

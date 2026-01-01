@@ -94,21 +94,22 @@ export default function LoginScreen() {
 
       console.log('RESPOSTA DO BACKEND:', JSON.stringify(response.data, null, 2));
 
-      const { token, role } = response.data;
+      const { token, user: userData } = response.data;
 
       if (!token || typeof token !== 'string') {
         Alert.alert('Erro Técnico', 'O servidor não retornou um token válido.');
         return;
       }
 
+      // Usa os dados do usuário retornados pelo backend
       const user = {
-        id: 0,
-        name: email.split('@')[0],
-        email: email,
-        role: role
+        id: userData?.id || 0,
+        name: userData?.name || email.split('@')[0],
+        email: userData?.email || email,
+        role: userData?.role || 'aluno'
       };
 
-      // Save credentials if "Remember Me" is checked
+      // Salva credenciais se "Lembrar-me" estiver marcado
       await saveCredentials();
 
       await signIn(user, token);

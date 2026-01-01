@@ -73,17 +73,7 @@ export default function TabLayout() {
         }}
       />
 
-      {/* ABA 3: Matérias (Só Professor vê) */}
-      <Tabs.Screen
-        name="subjects"
-        options={{
-          title: 'Matérias',
-          href: user?.role === 'professor' ? '/subjects' : null,
-          tabBarIcon: ({ color }) => <TabBarIcon name="book" color={color} />,
-        }}
-      />
-
-      {/* ABA 4: Usuários (Só Professor vê) */}
+      {/* ABA 3: Usuários (Só Professor vê) */}
       <Tabs.Screen
         name="users"
         options={{

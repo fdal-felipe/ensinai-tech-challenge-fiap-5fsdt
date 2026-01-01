@@ -40,7 +40,7 @@ export default function PostsAdminScreen() {
     }
   }, []);
 
-  // Auto-refresh when screen gains focus (after create/edit/delete)
+  // Atualiza automaticamente ao ganhar foco (após criar/editar/excluir)
   useFocusEffect(
     useCallback(() => {
       fetchPosts();
@@ -122,7 +122,7 @@ export default function PostsAdminScreen() {
       <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
       
       {/* Title Section */}
-      <RNView style={[styles.titleSection, { paddingTop: insets.top + 20 }]}>
+      <RNView style={[styles.titleSection, { paddingTop: insets.top + 60 }]}>
         <Text style={[styles.title, { color: colors.text }]}>Posts</Text>
         <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
           Abaixo são mostrados os últimos posts criados
@@ -175,15 +175,18 @@ const styles = StyleSheet.create({
   titleSection: {
     paddingHorizontal: 20,
     paddingBottom: 16,
+    alignItems: 'center',
   },
   title: {
     fontSize: 32,
     fontWeight: 'bold',
     marginBottom: 8,
+    textAlign: 'center',
   },
   subtitle: {
     fontSize: 16,
     lineHeight: 22,
+    textAlign: 'center',
   },
   listContent: {
     paddingHorizontal: 20,

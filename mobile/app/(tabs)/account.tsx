@@ -33,7 +33,7 @@ export default function AccountScreen() {
       <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
       
       <ScrollView 
-        contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 20 }]}
+        contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 60 }]}
         showsVerticalScrollIndicator={false}
       >
         {/* Avatar Section */}
@@ -98,10 +98,12 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: 26,
     fontWeight: 'bold',
+    textAlign: 'center',
   },
   userEmail: {
     fontSize: 14,
     marginTop: 4,
+    textAlign: 'center',
   },
   menuSection: {
     gap: 12,

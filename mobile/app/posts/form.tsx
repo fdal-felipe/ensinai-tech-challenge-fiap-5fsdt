@@ -102,8 +102,37 @@ export default function PostFormScreen() {
     }
   };
 
+  // Função para excluir o post com confirmação
+  const handleDelete = async () => {
+    Alert.alert(
+      'Tem certeza?',
+      'Esta ação não pode ser desfeita e excluirá permanentemente este post.',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        { 
+          text: 'Sim, Excluir', 
+          style: 'destructive',
+          onPress: async () => {
+            if (!id) return;
+            setLoading(true);
+            try {
+              await postsService.professor.delete(parseInt(id));
+              Alert.alert('Sucesso', 'Post excluído com sucesso!', [
+                { text: 'OK', onPress: () => router.back() }
+              ]);
+            } catch (error) {
+              Alert.alert('Erro', 'Não foi possível excluir o post.');
+            } finally {
+              setLoading(false);
+            }
+          }
+        },
+      ]
+    );
+  };
+
   const handleCancel = () => {
-    // Check if there are unsaved changes
+    // Verifica se há alterações não salvas
     const hasChanges = isEditing 
       ? (title !== originalTitle || content !== originalContent)
       : (title.trim() !== '' || content.trim() !== '');
@@ -140,7 +169,7 @@ export default function PostFormScreen() {
           contentContainerStyle={[
             styles.scrollContent, 
             { 
-              paddingTop: insets.top + 20,
+              paddingTop: insets.top + 60,
               paddingBottom: insets.bottom + 120,
             }
           ]}
@@ -150,7 +179,10 @@ export default function PostFormScreen() {
           {/* Title */}
           <RNView style={styles.titleContainer}>
             <Text style={[styles.title, { color: colors.text }]}>
-              {isEditing ? 'Editar Post' : 'Adicionar Matéria'}
+              {isEditing ? 'Editar Post' : 'Novo Post'}
+            </Text>
+            <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+              {isEditing ? 'Atualize o conteúdo abaixo' : 'Escreva um novo post para os alunos'}
             </Text>
           </RNView>
 
@@ -158,12 +190,12 @@ export default function PostFormScreen() {
           <RNView style={styles.form}>
             {/* Post Title */}
             <RNView style={styles.fieldContainer}>
-              <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>NOME DA MATÉRIA *</Text>
+              <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>TÍTULO DO POST *</Text>
               <TextInput
                 style={[styles.textInput, { borderColor: colors.border, color: colors.text, backgroundColor: colors.card }]}
                 value={title}
                 onChangeText={setTitle}
-                placeholder="Física III"
+                placeholder="Ex: Como funciona o sistema solar"
                 placeholderTextColor={colors.textSecondary}
                 autoCapitalize="sentences"
               />
@@ -176,7 +208,7 @@ export default function PostFormScreen() {
                 style={[styles.textArea, { borderColor: colors.border, color: colors.text, backgroundColor: colors.card }]}
                 value={content}
                 onChangeText={setContent}
-                placeholder="Este curso é destinado ao estudo do eletromagnetismo..."
+                placeholder="Descreva o conteúdo do post..."
                 placeholderTextColor={colors.textSecondary}
                 multiline
                 numberOfLines={6}
@@ -185,7 +217,7 @@ export default function PostFormScreen() {
             </RNView>
           </RNView>
 
-          {/* Action Buttons */}
+          {/* Botões de Ação */}
           <RNView style={styles.buttonContainer}>
             <TouchableOpacity 
               style={[styles.cancelButton, { borderColor: Colors.error }]}
@@ -206,6 +238,20 @@ export default function PostFormScreen() {
               </Text>
             </TouchableOpacity>
           </RNView>
+
+          {/* Botão de Excluir (Somente ao editar) */}
+          {isEditing && (
+            <TouchableOpacity 
+              style={[styles.deleteButton]}
+              onPress={handleDelete}
+              disabled={loading}
+            >
+              <FontAwesome name="trash" size={16} color={Colors.error} />
+              <Text style={[styles.deleteButtonText, { color: Colors.error }]}>
+                Excluir Post
+              </Text>
+            </TouchableOpacity>
+          )}
         </ScrollView>
       </TouchableWithoutFeedback>
 
@@ -227,11 +273,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   titleContainer: {
-    marginBottom: 32,
+    marginBottom: 40,
+    alignItems: 'center',
   },
   title: {
     fontSize: 32,
     fontWeight: 'bold',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  subtitle: {
+    fontSize: 16,
+    textAlign: 'center',
   },
   form: {
     flex: 1,
@@ -284,6 +337,18 @@ const styles = StyleSheet.create({
   saveButtonText: {
     color: '#FFFFFF',
     fontSize: 16,
+    fontWeight: '600',
+  },
+  deleteButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    marginTop: 32,
+    paddingVertical: 12,
+  },
+  deleteButtonText: {
+    fontSize: 15,
     fontWeight: '600',
   },
   backButton: {

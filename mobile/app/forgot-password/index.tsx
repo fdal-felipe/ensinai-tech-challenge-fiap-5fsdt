@@ -6,9 +6,10 @@ import {
   TouchableOpacity,
   StatusBar,
   Alert,
-  KeyboardAvoidingView,
-  Platform,
   ScrollView,
+  Keyboard,
+  TouchableWithoutFeedback,
+  ActivityIndicator,
 } from 'react-native';
 import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -25,85 +26,103 @@ export default function ForgotPasswordScreen() {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSendCode = () => {
+  const handleSendCode = async () => {
+    Keyboard.dismiss();
+    
     if (!email.trim()) {
       Alert.alert('Erro', 'Por favor, insira seu e-mail.');
       return;
     }
 
     setLoading(true);
-    // Simulate sending code
+    
+    // MOCK: Simulate API call
     setTimeout(() => {
       setLoading(false);
-      router.push('/forgot-password/otp');
-    }, 1000);
+      // Simulate success
+      Alert.alert('Sucesso', 'Código enviado para seu email! (Simulado: 123456)');
+      router.push({
+        pathname: '/forgot-password/otp',
+        params: { email }
+      });
+    }, 1500);
   };
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
       
-      <KeyboardAvoidingView 
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.keyboardView}
-      >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <ScrollView 
-          contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 60 }]}
+          contentContainerStyle={[
+            styles.scrollContent, 
+            { 
+              paddingTop: insets.top + 60,
+              paddingBottom: insets.bottom + 20,
+            }
+          ]}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
+          bounces={false}
         >
-          {/* Title */}
+          {/* Title - Centered & Single Line */}
           <RNView style={styles.titleContainer}>
             <Text style={[styles.title, { color: colors.text }]}>
-              Esqueceu a sua{'\n'}senha?
+              Esqueceu a sua senha?
             </Text>
             <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
               Não se preocupe! Por favor insira seu email abaixo para enviarmos um código de recuperação!
             </Text>
           </RNView>
 
-          {/* Form */}
-          <RNView style={styles.form}>
-            {/* Email */}
-            <RNView style={styles.fieldContainer}>
-              <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>EMAIL</Text>
-              <TextInput
-                style={[styles.textInput, { borderColor: colors.border, color: colors.text, backgroundColor: colors.card }]}
-                value={email}
-                onChangeText={setEmail}
-                placeholder="john@gmail.com"
-                placeholderTextColor={colors.textSecondary}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
+          {/* Form Wrapper - Centered */}
+          <RNView style={styles.formWrapper}>
+            <RNView style={styles.form}>
+              {/* Email */}
+              <RNView style={styles.fieldContainer}>
+                <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>EMAIL</Text>
+                <TextInput
+                  style={[styles.textInput, { borderColor: colors.border, color: colors.text, backgroundColor: colors.card }]}
+                  value={email}
+                  onChangeText={setEmail}
+                  placeholder="john@gmail.com"
+                  placeholderTextColor={colors.textSecondary}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                />
+              </RNView>
+
+              {/* Send Button */}
+              <TouchableOpacity 
+                style={[styles.sendButton, { backgroundColor: colors.text }]}
+                onPress={handleSendCode}
+                disabled={loading}
+              >
+                {loading ? (
+                  <ActivityIndicator color={colors.background} />
+                ) : (
+                  <Text style={[styles.sendButtonText, { color: colors.background }]}>
+                    Enviar
+                  </Text>
+                )}
+              </TouchableOpacity>
             </RNView>
 
-            {/* Send Button */}
-            <TouchableOpacity 
-              style={[styles.sendButton, { backgroundColor: colors.text }]}
-              onPress={handleSendCode}
-              disabled={loading}
-            >
-              <Text style={[styles.sendButtonText, { color: colors.background }]}>
-                {loading ? 'Enviando...' : 'Enviar'}
+            {/* Back to Login Link */}
+            <RNView style={styles.backContainer}>
+              <Text style={[styles.backText, { color: colors.textSecondary }]}>
+                Lembrou da sua Senha?{' '}
               </Text>
-            </TouchableOpacity>
-          </RNView>
-
-          {/* Back to Login */}
-          <RNView style={styles.backContainer}>
-            <Text style={[styles.backText, { color: colors.textSecondary }]}>
-              Lembrou da sua Senha?{' '}
-            </Text>
-            <TouchableOpacity onPress={() => router.replace('/login')}>
-              <Text style={[styles.backLink, { color: colors.text }]}>
-                Entrar
-              </Text>
-            </TouchableOpacity>
+              <TouchableOpacity onPress={() => router.replace('/login')}>
+                <Text style={[styles.backLink, { color: colors.text }]}>
+                  Entrar
+                </Text>
+              </TouchableOpacity>
+            </RNView>
           </RNView>
         </ScrollView>
-      </KeyboardAvoidingView>
+      </TouchableWithoutFeedback>
     </View>
   );
 }
@@ -112,28 +131,31 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  keyboardView: {
-    flex: 1,
-  },
   scrollContent: {
     flexGrow: 1,
-    padding: 20,
+    paddingHorizontal: 24,
   },
   titleContainer: {
-    marginBottom: 40,
+    alignItems: 'center',
+    marginBottom: 48,
   },
   title: {
-    fontSize: 36,
+    fontSize: 28, // Small enough to fit in one line
     fontWeight: 'bold',
     marginBottom: 16,
-    lineHeight: 44,
+    textAlign: 'center',
   },
   subtitle: {
-    fontSize: 15,
-    lineHeight: 22,
+    fontSize: 16,
+    lineHeight: 24,
+    textAlign: 'center',
+  },
+  formWrapper: {
+    flex: 1,
+    justifyContent: 'center',
   },
   form: {
-    flex: 1,
+    width: '100%',
   },
   fieldContainer: {
     marginBottom: 32,
@@ -155,6 +177,9 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderRadius: 50,
     alignItems: 'center',
+    marginBottom: 24,
+    height: 56,
+    justifyContent: 'center',
   },
   sendButtonText: {
     fontSize: 17,
@@ -164,8 +189,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 'auto',
-    paddingBottom: 40,
+    paddingVertical: 40,
   },
   backText: {
     fontSize: 15,
