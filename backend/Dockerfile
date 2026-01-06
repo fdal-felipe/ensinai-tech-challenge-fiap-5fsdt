@@ -11,4 +11,4 @@ COPY postgres-init/ ./postgres-init/
 COPY --from=builder /usr/src/app/node_modules ./node_modules
 COPY ./src ./src
 EXPOSE 3000
-CMD [ "npm", "run", "dev" ]
+CMD ["node", "src/server.js"]

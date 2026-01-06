@@ -52,28 +52,21 @@ export default function LoginScreen() {
 
       console.log('RESPOSTA DO BACKEND:', JSON.stringify(response.data, null, 2));
 
-      // 1. Pegamos o token e a role que o backend confirmou que envia
       const { token, role } = response.data;
 
-      // 2. Trava de segurança apenas para o token
       if (!token || typeof token !== 'string') {
         Alert.alert('Erro Técnico', 'O servidor não retornou um token válido.');
         return;
       }
 
-      // 3. CONSTRUÇÃO MANUAL DO USUÁRIO (A CORREÇÃO ESTÁ AQUI)
-      // Como o backend não mandou o objeto 'user', nós criamos um objeto temporário
-      // usando o e-mail do formulário e a role da resposta.
       const user = {
-        id: 0, // Usamos 0 temporariamente pois o ID real está encriptado dentro do token
-        name: email.split('@')[0], // Pega a parte antes do @ como "nome" provisório
+        id: 0,
+        name: email.split('@')[0],
         email: email,
-        role: role // 'aluno' ou 'professor' (veio do backend)
+        role: role
       };
 
-      // 4. Agora chamamos o signIn com o objeto que acabamos de montar
       await signIn(user, token);
-
       router.replace('/(tabs)');
 
     } catch (error: any) {

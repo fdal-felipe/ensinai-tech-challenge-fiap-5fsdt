@@ -6,7 +6,7 @@ import { TouchableOpacity, ActivityIndicator, View } from 'react-native';
 
 import Colors from '@/constants/Colors';
 import { useTheme } from '../../src/contexts/ThemeContext';
-import { useAuth } from '../../src/contexts/AuthContext'; // Importe o Contexto
+import { useAuth } from '../../src/contexts/AuthContext';
 
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>['name'];
@@ -19,11 +19,8 @@ export default function TabLayout() {
   const { isDark } = useTheme();
   const colors = Colors[isDark ? 'dark' : 'light'];
   const insets = useSafeAreaInsets();
-  
-  // 1. Pegamos os dados do usuário do contexto
   const { signed, loading, user, signOut } = useAuth();
 
-  // 2. Se estiver carregando, mostra loading
   if (loading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -32,7 +29,6 @@ export default function TabLayout() {
     );
   }
 
-  // 3. Se não estiver logado, chuta para o login
   if (!signed) {
     return <Redirect href="/login" />;
   }
@@ -53,7 +49,6 @@ export default function TabLayout() {
           fontSize: 13,
           fontWeight: '600',
         },
-        // Adiciona botão de Logout no topo
         headerRight: () => (
           <TouchableOpacity onPress={signOut} style={{ marginRight: 20 }}>
             <FontAwesome name="sign-out" size={24} color={Colors.error} />
@@ -96,7 +91,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="two"
         options={{
-          href: null, // Esconde totalmente
+          href: null,
         }}
       />
     </Tabs>
