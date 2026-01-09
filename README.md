@@ -1,18 +1,52 @@
-# API de Blog Educacional (Ensinai) - Tech Challenge Fase 3 🎓
+# Plataforma Educacional Ensinai - Tech Challenge Fase 4 🎓📱
 
-> Projeto desenvolvido como parte do **Tech Challenge** do curso de Pós-Graduação em Full Stack Development da FIAP, com foco na criação de uma aplicação completa de blogging educacional.
+> Projeto desenvolvido como parte do **Tech Challenge** do curso de Pós-Graduação em Full Stack Development da FIAP. Aplicação completa de blogging educacional com **Backend API**, **Frontend Web** e **Aplicativo Mobile** nativo.
 
 [![CI/CD Pipeline](https://github.com/fdal-felipe/ensinai-tech-challenge-fiap-5fsdt/actions/workflows/ci.yml/badge.svg)](https://github.com/fdal-felipe/ensinai-tech-challenge-fiap-5fsdt/actions/workflows/ci.yml)
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen)](https://nodejs.org/)
+[![React Native](https://img.shields.io/badge/React%20Native-Expo%2054-blue?logo=expo)](https://expo.dev/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+---
+
+## ⭐ Novidades da Fase 4
+
+Esta fase marca a **conclusão da plataforma multiplataforma**, adicionando:
+
+🎯 **Aplicativo Mobile Nativo**
+- 📱 Compatível com iOS e Android
+- ⚡ Performance nativa com React Native
+- 🎨 UI/UX otimizada para dispositivos móveis
+
+🔒 **Segurança Aprimorada**
+- 🔐 Armazenamento seguro de credenciais (Expo SecureStore)
+- 🎫 Autenticação JWT persistente
+- 🔄 Refresh automático de sessão
+
+🌓 **Experiência do Usuário**
+- 🌙 Dark Mode e Light Mode
+- 🔍 Busca em tempo real com debounce
+- ⬇️ Pull-to-refresh nativo
+- 📊 Gerenciamento completo pelo mobile
+
+🚀 **Arquitetura Escalável**
+- 📦 Expo Router para navegação moderna
+- 🎯 TypeScript em todo o mobile
+- 🔄 Context API para estado global
+- 🧩 Componentes reutilizáveis
 
 ---
 
 ## 🌐 Aplicação em Produção
 
--   **Frontend**: [https://ensinai-tech-challenge-fiap-5fsdt.vercel.app/](https://ensinai-tech-challenge-fiap-5fsdt.vercel.app/) (Vercel)
--   **Backend API**: [https://blog-api-prod-mcw6.onrender.com](https://blog-api-prod-mcw6.onrender.com) (Render)
--   **Documentação da API**: [https://blog-api-prod-mcw6.onrender.com/api-docs](https://blog-api-prod-mcw6.onrender.com/api-docs) (Swagger)
+### 🖥️ Plataformas Disponíveis
+
+| Plataforma | Tecnologia | Status | Link |
+|------------|-----------|--------|------|
+| 🌐 **Web** | Next.js 15 | ✅ Online | [Vercel](https://ensinai-tech-challenge-fiap-5fsdt.vercel.app/) |
+| 📱 **Mobile** | React Native + Expo | ✅ Funcional | iOS/Android (via Expo) |
+| 🔧 **API** | Node.js + Express | ✅ Online | [Render](https://blog-api-prod-mcw6.onrender.com) |
+| 📖 **Docs** | Swagger/OpenAPI | ✅ Online | [API Docs](https://blog-api-prod-mcw6.onrender.com/api-docs) |
 
 ---
 
@@ -24,6 +58,7 @@
 -   [✨ Funcionalidades](#-funcionalidades)
 -   [📂 Estrutura do Projeto](#-estrutura-do-projeto)
 -   [🚀 Instalação e Execução](#-instalação-e-execução)
+-   [📱 Aplicativo Mobile](#-aplicativo-mobile)
 -   [🔒 Autenticação e Autorização](#-autenticação-e-autorização)
 -   [📄 Documentação da API](#-documentação-da-api)
 -   [🧪 Testes](#-testes)
@@ -36,9 +71,37 @@
 
 ---
 
+## 🎓 Evolução do Projeto por Fases
+
+### Fase 1 & 2: Fundamentos e API REST
+-   ✅ Criação da API RESTful com Node.js e Express
+-   ✅ Banco de dados PostgreSQL
+-   ✅ CRUD completo de posts e usuários
+-   ✅ Documentação Swagger/OpenAPI
+
+### Fase 3: Autenticação e Deploy
+-   ✅ Sistema de autenticação JWT
+-   ✅ Controle de acesso por roles (professor/aluno)
+-   ✅ Pipeline CI/CD com GitHub Actions
+-   ✅ Deploy automático (Backend no Render)
+-   ✅ Busca avançada com PostgreSQL
+
+### Fase 4: Frontend Web e Mobile ⭐ **(Atual)**
+-   ✅ Frontend web com Next.js 15 e React 19
+-   ✅ Deploy do frontend na Vercel
+-   ✅ **Aplicativo mobile nativo com React Native**
+-   ✅ **Expo Router para navegação fluida**
+-   ✅ **Dark Mode e Light Mode**
+-   ✅ **Autenticação segura com SecureStore**
+-   ✅ **Experiência otimizada para iOS e Android**
+-   ✅ **Pull-to-refresh e busca em tempo real**
+-   ✅ **Gestão completa de posts e usuários no mobile**
+
+---
+
 ## 🎯 Objetivo
 
-Criar uma aplicação **full-stack** robusta, escalável e bem documentada para blogging educacional, que permite:
+Criar uma **plataforma educacional completa e multiplataforma**, robusta, escalável e bem documentada, que permite:
 
 ### Para Professores 👨‍🏫
 
@@ -47,26 +110,37 @@ Criar uma aplicação **full-stack** robusta, escalável e bem documentada para 
 -   ✅ Controlar status das postagens (ativo/inativo)
 -   ✅ Buscar conteúdo avançado em todo o sistema
 -   ✅ Dashboard administrativo completo
+-   ✅ Acesso via web e mobile
 
 ### Para Alunos 👨‍🎓
 
 -   ✅ Visualizar postagens ativas
 -   ✅ Buscar conteúdo por palavra-chave
 -   ✅ Acessar conteúdo educacional de qualidade
--   ✅ Interface moderna e responsiva
+-   ✅ Interface moderna e responsiva (web e mobile)
+-   ✅ Experiência nativa em dispositivos móveis
 
 ---
 
 ## 🏗️ Arquitetura
 
-A aplicação segue uma arquitetura moderna e escalável:
+A aplicação segue uma arquitetura moderna, escalável e **multiplataforma**:
 
 ```
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
 │   Frontend      │    │   Backend API   │    │   Database      │
-│   (Next.js)     │◄──►│   (Express.js)  │◄──►│  (PostgreSQL)   │
+│   Web (Next.js) │◄──►│   (Express.js)  │◄──►│  (PostgreSQL)   │
 │   Vercel        │    │   Render        │    │   Supabase      │
 └─────────────────┘    └─────────────────┘    └─────────────────┘
+         ▲                      ▲
+         │                      │
+         └──────────────────────┘
+                  │
+         ┌────────▼─────────┐
+         │   Mobile App     │
+         │  (React Native)  │
+         │   Expo + TypeScript
+         └──────────────────┘
 ```
 
 ### Separação por Papéis
@@ -91,11 +165,22 @@ A aplicação segue uma arquitetura moderna e escalável:
 
 ### Frontend 🎨
 
--   **Framework:** [Next.js 15](https://nextjs.org/)
+-   **Framework Web:** [Next.js 15](https://nextjs.org/)
 -   **UI Library:** [React 19](https://react.dev/)
 -   **Linguagem:** [TypeScript](https://www.typescriptlang.org/)
 -   **Estilização:** [TailwindCSS 4](https://tailwindcss.com/)
 -   **Componentes:** [Styled Components](https://styled-components.com/)
+
+### Mobile 📱
+
+-   **Framework:** [React Native](https://reactnative.dev/)
+-   **Plataforma:** [Expo SDK 54](https://expo.dev/)
+-   **Navegação:** [Expo Router](https://docs.expo.dev/router/introduction/)
+-   **Linguagem:** [TypeScript](https://www.typescriptlang.org/)
+-   **Gerenciamento de Estado:** React Context API
+-   **Segurança:** [Expo SecureStore](https://docs.expo.dev/versions/latest/sdk/securestore/)
+-   **Temas:** Dark Mode + Light Mode
+-   **Compatibilidade:** iOS e Android
 
 ### DevOps & Infraestrutura 🚀
 
@@ -162,6 +247,20 @@ A aplicação segue uma arquitetura moderna e escalável:
 │   │   └── 📁 lib/                 # Utilitários
 │   ├── 🐳 Dockerfile               # Container do frontend
 │   └── 📄 package.json
+├── 📁 mobile/                      # 📱 Aplicativo React Native
+│   ├── 📁 app/                     # Screens (Expo Router)
+│   │   ├── 📁 (tabs)/              # Navegação por tabs
+│   │   ├── 📁 login/               # Tela de login
+│   │   ├── 📁 register/            # Cadastro
+│   │   ├── 📁 posts/               # Listagem e detalhes
+│   │   └── 📁 profile/             # Perfil do usuário
+│   ├── 📁 components/              # Componentes reutilizáveis
+│   ├── 📁 src/
+│   │   ├── 📁 api/                 # Serviços de API
+│   │   ├── 📁 contexts/            # Context API (Auth, Theme)
+│   │   └── 📁 types/               # Definições TypeScript
+│   ├── 📁 constants/               # Constantes (cores, etc.)
+│   └── 📄 package.json
 ├── 📁 docs/                        # 📚 Documentação do projeto
 │   ├── 📁 diagramas/               # Diagramas de arquitetura
 │   ├── 📄 guia-de-uso.md          # Manual do usuário
@@ -179,9 +278,10 @@ A aplicação segue uma arquitetura moderna e escalável:
 ### Pré-requisitos
 
 -   **Node.js** v18+
--   **Docker & Docker Compose**
+-   **Docker & Docker Compose** (para backend e banco)
 -   **PostgreSQL** (ou usar via Docker)
 -   **Git**
+-   **Expo CLI** (opcional, para mobile): `npm install -g expo-cli`
 
 ### 1️⃣ Clone o Repositório
 
@@ -239,6 +339,131 @@ npm run dev
 -   **Frontend**: http://localhost (Docker) ou http://localhost:3001 (manual)
 -   **Backend API**: http://localhost:3000
 -   **Documentação Swagger**: http://localhost:3000/api-docs
+
+---
+
+## 📱 Aplicativo Mobile
+
+### Pré-requisitos Mobile
+
+-   **Node.js** v18+
+-   **Expo CLI**: `npm install -g expo-cli`
+-   **Expo Go** (app no iOS/Android) ou emulador
+
+### Instalação e Execução
+
+```bash
+# Entre na pasta mobile
+cd mobile
+
+# Instale as dependências
+npm install
+
+# Inicie o servidor de desenvolvimento
+npm start
+```
+
+### Executar no Dispositivo
+
+1. **Instale o Expo Go**:
+   - [iOS App Store](https://apps.apple.com/app/expo-go/id982107779)
+   - [Android Play Store](https://play.google.com/store/apps/details?id=host.exp.exponent)
+
+2. **Escaneie o QR Code** que aparece no terminal
+
+3. **Ou use um emulador**:
+   ```bash
+   # Android
+   npm run android
+   
+   # iOS (apenas macOS)
+   npm run ios
+   ```
+
+### Funcionalidades Mobile
+
+#### 🔐 Autenticação
+-   Login com email e senha
+-   Registro de novos usuários
+-   Recuperação de senha (fluxo completo)
+-   Armazenamento seguro de tokens (SecureStore)
+-   Lembrar credenciais
+
+#### 🏠 Tela Principal (Home)
+-   Listagem de posts educacionais
+-   Busca em tempo real com debounce
+-   Pull-to-refresh
+-   Filtros por status (professores)
+-   Navegação fluida entre telas
+
+#### 👤 Perfil e Configurações
+-   Visualização e edição de perfil
+-   Configurações de notificações
+-   Temas: Dark Mode e Light Mode
+-   Gerenciamento de conta
+-   Sobre o aplicativo
+
+#### 📝 Gerenciamento de Posts (Professores)
+-   Criar novos posts
+-   Editar posts existentes
+-   Excluir posts
+-   Alterar status (ativo/inativo)
+-   Upload de conteúdo
+
+#### 👥 Gerenciamento de Usuários (Professores)
+-   Listar todos os usuários
+-   Criar novos usuários
+-   Editar informações
+-   Excluir usuários
+-   Filtros e busca
+
+### Configuração da API
+
+O aplicativo se conecta ao backend via arquivo `mobile/src/api/api.ts`:
+
+```typescript
+const api = axios.create({
+  // Produção
+  baseURL: 'https://blog-api-prod-mcw6.onrender.com',
+  
+  // Ou Local (desenvolvimento)
+  // baseURL: 'http://SEU_IP_LOCAL:3000',
+});
+```
+
+**Importante**: Para desenvolvimento local, use o IP da sua máquina na rede local, não `localhost`.
+
+### Estrutura do App Mobile
+
+```
+mobile/
+├── app/                    # Screens (Expo Router)
+│   ├── (tabs)/            # Navegação principal
+│   │   ├── index.tsx      # Home - Lista de posts
+│   │   ├── posts-admin.tsx # Admin de posts
+│   │   ├── users.tsx      # Gestão de usuários
+│   │   └── account.tsx    # Conta do usuário
+│   ├── login.tsx          # Tela de login
+│   ├── register.tsx       # Cadastro
+│   ├── forgot-password/   # Fluxo de recuperação
+│   ├── post/              # Detalhes do post
+│   └── profile/           # Perfil e configurações
+├── components/            # Componentes reutilizáveis
+│   ├── PostCard.tsx      # Card de post
+│   ├── Themed.tsx        # Componentes temáticos
+│   └── ...
+├── src/
+│   ├── api/              # Serviços de API
+│   │   ├── api.ts        # Configuração Axios
+│   │   ├── postsService.ts
+│   │   └── usersService.ts
+│   ├── contexts/         # Contextos React
+│   │   ├── AuthContext.tsx
+│   │   └── ThemeContext.tsx
+│   └── types/            # TypeScript types
+└── constants/
+    └── Colors.ts         # Paleta de cores
+```
 
 ---
 
@@ -505,7 +730,9 @@ O projeto conta com documentação completa na pasta `docs/`:
 
 ### Links do Projeto
 
--   🌐 **Aplicação**: [https://ensinai-tech-challenge-fiap-5fsdt.vercel.app/](https://ensinai-tech-challenge-fiap-5fsdt.vercel.app/)
+-   🌐 **Frontend Web**: [https://ensinai-tech-challenge-fiap-5fsdt.vercel.app/](https://ensinai-tech-challenge-fiap-5fsdt.vercel.app/)
+-   📱 **Mobile App**: React Native + Expo (iOS/Android)
+-   🔧 **API Backend**: [https://blog-api-prod-mcw6.onrender.com](https://blog-api-prod-mcw6.onrender.com)
 -   📚 **Repositório**: [https://github.com/fdal-felipe/ensinai-tech-challenge-fiap-5fsdt](https://github.com/fdal-felipe/ensinai-tech-challenge-fiap-5fsdt)
 -   📖 **API Docs**: [https://blog-api-prod-mcw6.onrender.com/api-docs](https://blog-api-prod-mcw6.onrender.com/api-docs)
 
@@ -519,11 +746,13 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 
 <div align="center">
 
-**Desenvolvido para o Tech Challenge FIAP**
+**Desenvolvido para o Tech Challenge FIAP - Fase 4**
 
-[![FIAP](https://img.shields.io/badge/FIAP-Tech%20Challenge-red?style=for-the-badge)](https://www.fiap.com.br/)
+[![FIAP](https://img.shields.io/badge/FIAP-Tech%20Challenge%20Fase%204-red?style=for-the-badge)](https://www.fiap.com.br/)
 [![Next.js](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+[![React Native](https://img.shields.io/badge/React%20Native-Expo%2054-blue?style=for-the-badge&logo=expo)](https://expo.dev/)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green?style=for-the-badge&logo=node.js)](https://nodejs.org/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue?style=for-the-badge&logo=postgresql)](https://www.postgresql.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
 
 </div>
