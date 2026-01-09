@@ -25,7 +25,7 @@ SplashScreen.preventAutoHideAsync();
 function LoadingScreen() {
   return (
     <View style={[styles.splashContainer, { backgroundColor: '#FFFFFF' }]}>
-      <Text style={[styles.splashTitle, { color: '#000000' }]}>EnsinAI</Text>
+      <Text style={[styles.splashTitle, { color: '#000000' }]}>Ensinai</Text>
       <Text style={[styles.splashSubtitle, { color: '#4F4F4F' }]}>
         Plataforma de Ensino
       </Text>
@@ -89,6 +89,12 @@ function RootLayoutNav() {
         <Stack.Screen name="profile/settings" options={{ headerShown: false }} />
         <Stack.Screen name="profile/notifications" options={{ headerShown: false }} />
         <Stack.Screen name="profile/integrations" options={{ headerShown: false }} />
+        <Stack.Screen name="profile/about" options={{ headerShown: false }} />
+        <Stack.Screen name="profile/privacy-policy" options={{ headerShown: false }} />
+        <Stack.Screen name="profile/terms-of-use" options={{ headerShown: false }} />
+        <Stack.Screen name="posts/form" options={{ headerShown: false }} />
+        <Stack.Screen name="users" options={{ headerShown: false }} />
+        {/* SUBJECTS DISABLED: <Stack.Screen name="subjects/form" options={{ headerShown: false }} /> */}
         <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
       </Stack>
     </NavThemeProvider>

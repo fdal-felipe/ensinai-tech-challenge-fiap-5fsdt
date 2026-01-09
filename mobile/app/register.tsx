@@ -80,7 +80,7 @@ export default function RegisterScreen() {
           showsVerticalScrollIndicator={false}
           bounces={false}
         >
-          {/* Title - Centered */}
+          {/* Title */}
           <RNView style={styles.titleContainer}>
             <Text style={[styles.title, { color: colors.text }]}>Cadastro</Text>
             <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
@@ -88,81 +88,84 @@ export default function RegisterScreen() {
             </Text>
           </RNView>
 
-          {/* Form */}
-          <RNView style={styles.form}>
-            {/* Name */}
-            <RNView style={styles.fieldContainer}>
-              <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>NOME COMPLETO</Text>
-              <TextInput
-                style={[styles.textInput, { borderColor: colors.border, color: colors.text, backgroundColor: colors.card }]}
-                value={name}
-                onChangeText={setName}
-                placeholder="John Doe"
-                placeholderTextColor={colors.textSecondary}
-                autoCapitalize="words"
-              />
-            </RNView>
-
-            {/* Email */}
-            <RNView style={styles.fieldContainer}>
-              <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>EMAIL</Text>
-              <TextInput
-                style={[styles.textInput, { borderColor: colors.border, color: colors.text, backgroundColor: colors.card }]}
-                value={email}
-                onChangeText={setEmail}
-                placeholder="john@gmail.com"
-                placeholderTextColor={colors.textSecondary}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
-            </RNView>
-
-            {/* Password */}
-            <RNView style={styles.fieldContainer}>
-              <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>SENHA</Text>
-              <RNView style={[styles.passwordContainer, { borderColor: colors.border, backgroundColor: colors.card }]}>
+          {/* Form Wrapper - Centered */}
+          <RNView style={styles.formWrapper}>
+            {/* Form */}
+            <RNView style={styles.form}>
+              {/* Name */}
+              <RNView style={styles.fieldContainer}>
+                <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>NOME COMPLETO</Text>
                 <TextInput
-                  style={[styles.passwordInput, { color: colors.text }]}
-                  value={password}
-                  onChangeText={setPassword}
-                  placeholder="••••••••••"
+                  style={[styles.textInput, { borderColor: colors.border, color: colors.text, backgroundColor: colors.card }]}
+                  value={name}
+                  onChangeText={setName}
+                  placeholder="John Doe"
                   placeholderTextColor={colors.textSecondary}
-                  secureTextEntry={!showPassword}
-                  autoCapitalize="none"
+                  autoCapitalize="words"
                 />
-                <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                  <FontAwesome 
-                    name={showPassword ? 'eye' : 'eye-slash'} 
-                    size={18} 
-                    color={colors.textSecondary} 
-                  />
-                </TouchableOpacity>
               </RNView>
+
+              {/* Email */}
+              <RNView style={styles.fieldContainer}>
+                <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>EMAIL</Text>
+                <TextInput
+                  style={[styles.textInput, { borderColor: colors.border, color: colors.text, backgroundColor: colors.card }]}
+                  value={email}
+                  onChangeText={setEmail}
+                  placeholder="john@gmail.com"
+                  placeholderTextColor={colors.textSecondary}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                />
+              </RNView>
+
+              {/* Password */}
+              <RNView style={styles.fieldContainer}>
+                <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>SENHA</Text>
+                <RNView style={[styles.passwordContainer, { borderColor: colors.border, backgroundColor: colors.card }]}>
+                  <TextInput
+                    style={[styles.passwordInput, { color: colors.text }]}
+                    value={password}
+                    onChangeText={setPassword}
+                    placeholder="••••••••••"
+                    placeholderTextColor={colors.textSecondary}
+                    secureTextEntry={!showPassword}
+                    autoCapitalize="none"
+                  />
+                  <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                    <FontAwesome 
+                      name={showPassword ? 'eye' : 'eye-slash'} 
+                      size={18} 
+                      color={colors.textSecondary} 
+                    />
+                  </TouchableOpacity>
+                </RNView>
+              </RNView>
+
+              {/* Register Button */}
+              <TouchableOpacity 
+                style={[styles.registerButton, { backgroundColor: colors.text }]}
+                onPress={handleRegister}
+                disabled={loading}
+              >
+                <Text style={[styles.registerButtonText, { color: colors.background }]}>
+                  {loading ? 'Criando...' : 'Criar'}
+                </Text>
+              </TouchableOpacity>
             </RNView>
 
-            {/* Register Button */}
-            <TouchableOpacity 
-              style={[styles.registerButton, { backgroundColor: colors.text }]}
-              onPress={handleRegister}
-              disabled={loading}
-            >
-              <Text style={[styles.registerButtonText, { color: colors.background }]}>
-                {loading ? 'Criando...' : 'Criar'}
+            {/* Login Link */}
+            <RNView style={styles.loginContainer}>
+              <Text style={[styles.loginText, { color: colors.textSecondary }]}>
+                Já tem uma conta?{' '}
               </Text>
-            </TouchableOpacity>
-          </RNView>
-
-          {/* Login Link */}
-          <RNView style={styles.loginContainer}>
-            <Text style={[styles.loginText, { color: colors.textSecondary }]}>
-              Já tem uma conta?{' '}
-            </Text>
-            <TouchableOpacity onPress={() => router.replace('/login')}>
-              <Text style={[styles.loginLink, { color: colors.text }]}>
-                Faça login
-              </Text>
-            </TouchableOpacity>
+              <TouchableOpacity onPress={() => router.replace('/login')}>
+                <Text style={[styles.loginLink, { color: colors.text }]}>
+                  Faça login
+                </Text>
+              </TouchableOpacity>
+            </RNView>
           </RNView>
         </ScrollView>
       </TouchableWithoutFeedback>
@@ -176,22 +179,26 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: 20,
+    paddingHorizontal: 24,
   },
   titleContainer: {
     alignItems: 'center',
     marginBottom: 48,
   },
   title: {
-    fontSize: 44,
+    fontSize: 40,
     fontWeight: 'bold',
-    marginBottom: 12,
+    marginBottom: 8,
   },
   subtitle: {
-    fontSize: 20,
+    fontSize: 18,
+  },
+  formWrapper: {
+    flex: 1,
+    justifyContent: 'center',
   },
   form: {
-    flex: 1,
+    width: '100%',
   },
   fieldContainer: {
     marginBottom: 20,

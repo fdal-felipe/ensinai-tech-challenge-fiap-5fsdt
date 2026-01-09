@@ -57,9 +57,9 @@ export default function SettingsScreen() {
     { icon: 'moon-o', label: 'Modo escuro', type: 'switch', value: isDark, onToggle: toggleTheme },
     { icon: 'play-circle', label: 'Reprodução automática', type: 'switch', value: autoPlay, onToggle: setAutoPlay },
     { icon: 'download', label: 'Modo offline', type: 'switch', value: offlineMode, onToggle: setOfflineMode },
-    { icon: 'shield', label: 'Política de privacidade', type: 'link' },
-    { icon: 'file-text-o', label: 'Termos de uso', type: 'link' },
-    { icon: 'info-circle', label: 'Sobre o app', type: 'link' },
+    { icon: 'shield', label: 'Política de privacidade', type: 'link', onPress: () => router.push('/profile/privacy-policy') },
+    { icon: 'file-text-o', label: 'Termos de uso', type: 'link', onPress: () => router.push('/profile/terms-of-use') },
+    { icon: 'info-circle', label: 'Sobre o app', type: 'link', onPress: () => router.push('/profile/about') },
   ];
 
   return (
@@ -68,11 +68,14 @@ export default function SettingsScreen() {
 
       <ScrollView 
         style={styles.scrollView}
-        contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 20 }]}
+        contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 60 }]}
         showsVerticalScrollIndicator={false}
       >
         {/* Title */}
-        <Text style={[styles.title, { color: colors.text }]}>Configurações</Text>
+        <RNView style={styles.titleContainer}>
+          <Text style={[styles.title, { color: colors.text }]}>Configurações</Text>
+          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>Personalize sua experiência</Text>
+        </RNView>
 
         {/* All Settings with uniform style */}
         <RNView style={styles.section}>
@@ -82,6 +85,7 @@ export default function SettingsScreen() {
               style={[styles.settingItem, { borderColor: colors.border, backgroundColor: colors.card }]}
               activeOpacity={item.type === 'link' ? 0.7 : 1}
               disabled={item.type === 'switch'}
+              onPress={item.type === 'link' && item.onPress ? item.onPress : undefined}
             >
               <RNView style={styles.settingLeft}>
                 <FontAwesome name={item.icon as any} size={18} color={colors.textSecondary} />
@@ -126,10 +130,19 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingBottom: 40,
   },
+  titleContainer: {
+    alignItems: 'center',
+    marginBottom: 32,
+  },
   title: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: 'bold',
-    marginBottom: 24,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  subtitle: {
+    fontSize: 16,
+    textAlign: 'center',
   },
   section: {
     gap: 12,

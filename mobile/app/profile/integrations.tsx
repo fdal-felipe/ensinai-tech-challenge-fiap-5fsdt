@@ -49,11 +49,14 @@ export default function IntegrationsScreen() {
 
       <ScrollView 
         style={styles.scrollView}
-        contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 20 }]}
+        contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 60 }]}
         showsVerticalScrollIndicator={false}
       >
         {/* Title */}
-        <Text style={[styles.title, { color: colors.text }]}>Integrações</Text>
+        <RNView style={styles.titleContainer}>
+          <Text style={[styles.title, { color: colors.text }]}>Integrações</Text>
+          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>Conecte seus serviços</Text>
+        </RNView>
 
         {/* Integrations List */}
         <RNView style={styles.section}>
@@ -111,10 +114,19 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingBottom: 40,
   },
+  titleContainer: {
+    alignItems: 'center',
+    marginBottom: 32,
+  },
   title: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: 'bold',
-    marginBottom: 24,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  subtitle: {
+    fontSize: 16,
+    textAlign: 'center',
   },
   section: {
     gap: 12,

@@ -1,4 +1,4 @@
-// EnsinAI - Paleta de Cores (Conforme Figma)
+// Ensinai - Paleta de Cores (Conforme Figma)
 // Tema minimalista preto e branco com suporte a dark mode
 
 const Colors = {

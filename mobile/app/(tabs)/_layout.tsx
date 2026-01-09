@@ -2,7 +2,7 @@ import React from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Tabs, Redirect } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { TouchableOpacity, ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator, View } from 'react-native';
 
 import Colors from '@/constants/Colors';
 import { useTheme } from '../../src/contexts/ThemeContext';
@@ -19,11 +19,16 @@ export default function TabLayout() {
   const { isDark } = useTheme();
   const colors = Colors[isDark ? 'dark' : 'light'];
   const insets = useSafeAreaInsets();
+<<<<<<< HEAD
+  
+  const { signed, loading, user } = useAuth();
+=======
   const { signed, loading, user, signOut } = useAuth();
+>>>>>>> e89679740bb56af64c132b44b8e98e644a407aa0
 
   if (loading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.background }}>
         <ActivityIndicator size="large" color={colors.text} />
       </View>
     );
@@ -49,11 +54,16 @@ export default function TabLayout() {
           fontSize: 13,
           fontWeight: '600',
         },
+<<<<<<< HEAD
+        // Esconde o header de todas as telas
+        headerShown: false,
+=======
         headerRight: () => (
           <TouchableOpacity onPress={signOut} style={{ marginRight: 20 }}>
             <FontAwesome name="sign-out" size={24} color={Colors.error} />
           </TouchableOpacity>
         ),
+>>>>>>> e89679740bb56af64c132b44b8e98e644a407aa0
       }}>
       
       {/* ABA 1: Posts (Todos veem) */}
@@ -69,10 +79,9 @@ export default function TabLayout() {
       <Tabs.Screen
         name="posts-admin"
         options={{
-          title: 'Gerenciar',
-          // A MÁGICA É AQUI: Se não for professor, href é null (esconde a aba)
+          title: 'Posts',
           href: user?.role === 'professor' ? '/posts-admin' : null,
-          tabBarIcon: ({ color }) => <TabBarIcon name="edit" color={color} />,
+          tabBarIcon: ({ color }) => <TabBarIcon name="file-text" color={color} />,
         }}
       />
 
@@ -81,17 +90,21 @@ export default function TabLayout() {
         name="users"
         options={{
           title: 'Usuários',
-          // A MÁGICA É AQUI: Se não for professor, href é null
           href: user?.role === 'professor' ? '/users' : null,
           tabBarIcon: ({ color }) => <TabBarIcon name="users" color={color} />,
         }}
       />
 
-      {/* Esconda a rota 'two' se ela ainda existir ou tiver sido renomeada */}
+      {/* ABA 5: Conta (Todos veem) */}
       <Tabs.Screen
-        name="two"
+        name="account"
         options={{
+<<<<<<< HEAD
+          title: 'Conta',
+          tabBarIcon: ({ color }) => <TabBarIcon name="user-circle" color={color} />,
+=======
           href: null,
+>>>>>>> e89679740bb56af64c132b44b8e98e644a407aa0
         }}
       />
     </Tabs>

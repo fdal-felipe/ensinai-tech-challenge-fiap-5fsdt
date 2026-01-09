@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   StyleSheet, 
   View as RNView, 
@@ -21,6 +21,10 @@ import { useTheme } from '../src/contexts/ThemeContext';
 import { useAuth } from '../src/contexts/AuthContext';
 import api from '@/src/api/api';
 
+const REMEMBER_EMAIL_KEY = 'rememberedEmail';
+const REMEMBER_PASSWORD_KEY = 'rememberedPassword';
+const REMEMBER_ME_KEY = 'rememberMe';
+
 export default function LoginScreen() {
   const { isDark } = useTheme();
   const colors = Colors[isDark ? 'dark' : 'light'];
@@ -31,6 +35,44 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
+
+  // Load saved credentials on mount
+  useEffect(() => {
+    loadSavedCredentials();
+  }, []);
+
+  const loadSavedCredentials = async () => {
+    try {
+      const savedRememberMe = await SecureStore.getItemAsync(REMEMBER_ME_KEY);
+      if (savedRememberMe === 'true') {
+        const savedEmail = await SecureStore.getItemAsync(REMEMBER_EMAIL_KEY);
+        const savedPassword = await SecureStore.getItemAsync(REMEMBER_PASSWORD_KEY);
+        
+        if (savedEmail) setEmail(savedEmail);
+        if (savedPassword) setPassword(savedPassword);
+        setRememberMe(true);
+      }
+    } catch (error) {
+      console.log('Error loading saved credentials:', error);
+    }
+  };
+
+  const saveCredentials = async () => {
+    try {
+      if (rememberMe) {
+        await SecureStore.setItemAsync(REMEMBER_EMAIL_KEY, email);
+        await SecureStore.setItemAsync(REMEMBER_PASSWORD_KEY, password);
+        await SecureStore.setItemAsync(REMEMBER_ME_KEY, 'true');
+      } else {
+        await SecureStore.deleteItemAsync(REMEMBER_EMAIL_KEY);
+        await SecureStore.deleteItemAsync(REMEMBER_PASSWORD_KEY);
+        await SecureStore.deleteItemAsync(REMEMBER_ME_KEY);
+      }
+    } catch (error) {
+      console.log('Error saving credentials:', error);
+    }
+  };
 
   const handleLogin = async () => {
     Keyboard.dismiss();
@@ -52,19 +94,23 @@ export default function LoginScreen() {
 
       console.log('RESPOSTA DO BACKEND:', JSON.stringify(response.data, null, 2));
 
-      const { token, role } = response.data;
+      const { token, user: userData } = response.data;
 
       if (!token || typeof token !== 'string') {
         Alert.alert('Erro Técnico', 'O servidor não retornou um token válido.');
         return;
       }
 
+      // Usa os dados do usuário retornados pelo backend
       const user = {
-        id: 0,
-        name: email.split('@')[0],
-        email: email,
-        role: role
+        id: userData?.id || 0,
+        name: userData?.name || email.split('@')[0],
+        email: userData?.email || email,
+        role: userData?.role || 'aluno'
       };
+
+      // Salva credenciais se "Lembrar-me" estiver marcado
+      await saveCredentials();
 
       await signIn(user, token);
       router.replace('/(tabs)');
@@ -95,7 +141,7 @@ export default function LoginScreen() {
           showsVerticalScrollIndicator={false}
           bounces={false}
         >
-          {/* Title - Centered */}
+          {/* Title */}
           <RNView style={styles.titleContainer}>
             <Text style={[styles.title, { color: colors.text }]}>Entrar</Text>
             <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
@@ -103,78 +149,103 @@ export default function LoginScreen() {
             </Text>
           </RNView>
 
-          {/* Form */}
-          <RNView style={styles.form}>
-            {/* Email */}
-            <RNView style={styles.fieldContainer}>
-              <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>EMAIL</Text>
-              <TextInput
-                style={[styles.textInput, { borderColor: colors.border, color: colors.text, backgroundColor: colors.card }]}
-                value={email}
-                onChangeText={setEmail}
-                placeholder="john@gmail.com"
-                placeholderTextColor={colors.textSecondary}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
-            </RNView>
-
-            {/* Password */}
-            <RNView style={styles.fieldContainer}>
-              <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>SENHA</Text>
-              <RNView style={[styles.passwordContainer, { borderColor: colors.border, backgroundColor: colors.card }]}>
+          {/* Form Wrapper - Centered */}
+          <RNView style={styles.formWrapper}>
+            {/* Form */}
+            <RNView style={styles.form}>
+              {/* Email */}
+              <RNView style={styles.fieldContainer}>
+                <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>EMAIL</Text>
                 <TextInput
-                  style={[styles.passwordInput, { color: colors.text }]}
-                  value={password}
-                  onChangeText={setPassword}
-                  placeholder="••••••••••"
+                  style={[styles.textInput, { borderColor: colors.border, color: colors.text, backgroundColor: colors.card }]}
+                  value={email}
+                  onChangeText={setEmail}
+                  placeholder="john@gmail.com"
                   placeholderTextColor={colors.textSecondary}
-                  secureTextEntry={!showPassword}
+                  keyboardType="email-address"
                   autoCapitalize="none"
+                  autoCorrect={false}
                 />
-                <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                  <FontAwesome 
-                    name={showPassword ? 'eye' : 'eye-slash'} 
-                    size={18} 
-                    color={colors.textSecondary} 
+              </RNView>
+
+              {/* Password */}
+              <RNView style={styles.fieldContainer}>
+                <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>SENHA</Text>
+                <RNView style={[styles.passwordContainer, { borderColor: colors.border, backgroundColor: colors.card }]}>
+                  <TextInput
+                    style={[styles.passwordInput, { color: colors.text }]}
+                    value={password}
+                    onChangeText={setPassword}
+                    placeholder="••••••••••"
+                    placeholderTextColor={colors.textSecondary}
+                    secureTextEntry={!showPassword}
+                    autoCapitalize="none"
                   />
+                  <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                    <FontAwesome 
+                      name={showPassword ? 'eye' : 'eye-slash'} 
+                      size={18} 
+                      color={colors.textSecondary} 
+                    />
+                  </TouchableOpacity>
+                </RNView>
+              </RNView>
+
+              {/* Remember Me & Forgot Password Row */}
+              <RNView style={styles.optionsRow}>
+                {/* Remember Me */}
+                <TouchableOpacity 
+                  style={styles.rememberMeContainer}
+                  onPress={() => setRememberMe(!rememberMe)}
+                  activeOpacity={0.7}
+                >
+                  <RNView style={[
+                    styles.checkbox,
+                    { borderColor: colors.border, backgroundColor: colors.card },
+                    rememberMe && { backgroundColor: colors.text, borderColor: colors.text }
+                  ]}>
+                    {rememberMe && (
+                      <FontAwesome name="check" size={12} color={colors.background} />
+                    )}
+                  </RNView>
+                  <Text style={[styles.rememberMeText, { color: colors.textSecondary }]}>
+                    Lembrar senha
+                  </Text>
+                </TouchableOpacity>
+
+                {/* Forgot Password */}
+                <TouchableOpacity 
+                  onPress={() => router.push('/forgot-password')}
+                >
+                  <Text style={[styles.forgotPasswordText, { color: colors.textSecondary }]}>
+                    Esqueci minha senha
+                  </Text>
                 </TouchableOpacity>
               </RNView>
+
+              {/* Login Button */}
+              <TouchableOpacity 
+                style={[styles.loginButton, { backgroundColor: colors.text }]}
+                onPress={handleLogin}
+                disabled={loading}
+              >
+                <Text style={[styles.loginButtonText, { color: colors.background }]}>
+                  {loading ? 'Entrando...' : 'Entrar'}
+                </Text>
+              </TouchableOpacity>
             </RNView>
 
-            {/* Forgot Password */}
-            <TouchableOpacity 
-              style={styles.forgotPassword}
-              onPress={() => router.push('/forgot-password')}
-            >
-              <Text style={[styles.forgotPasswordText, { color: colors.textSecondary }]}>
-                Esqueci minha senha
+            {/* Register Link */}
+            <RNView style={styles.registerContainer}>
+              <Text style={[styles.registerText, { color: colors.textSecondary }]}>
+                Não tem uma conta?{' '}
               </Text>
-            </TouchableOpacity>
-
-            {/* Login Button */}
-            <TouchableOpacity 
-              style={[styles.loginButton, { backgroundColor: colors.text }]}
-              onPress={handleLogin}
-              disabled={loading}
-            >
-              <Text style={[styles.loginButtonText, { color: colors.background }]}>
-                {loading ? 'Entrando...' : 'Entrar'}
-              </Text>
-            </TouchableOpacity>
-          </RNView>
-
-          {/* Register Link */}
-          <RNView style={styles.registerContainer}>
-            <Text style={[styles.registerText, { color: colors.textSecondary }]}>
-              Não tem uma conta?{' '}
-            </Text>
-            <TouchableOpacity onPress={() => router.replace('/register')}>
-              <Text style={[styles.registerLink, { color: colors.text }]}>
-                Cadastre agora
-              </Text>
-            </TouchableOpacity>
+              <TouchableOpacity onPress={() => router.replace('/register')}>
+                <Text style={[styles.registerLink, { color: colors.text }]}>
+                  Cadastre agora
+                </Text>
+              </TouchableOpacity>
+            </RNView>
           </RNView>
         </ScrollView>
       </TouchableWithoutFeedback>
@@ -188,22 +259,26 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: 20,
+    paddingHorizontal: 24,
   },
   titleContainer: {
     alignItems: 'center',
     marginBottom: 48,
   },
   title: {
-    fontSize: 44,
+    fontSize: 40,
     fontWeight: 'bold',
-    marginBottom: 12,
+    marginBottom: 8,
   },
   subtitle: {
-    fontSize: 20,
+    fontSize: 18,
+  },
+  formWrapper: {
+    flex: 1,
+    justifyContent: 'center',
   },
   form: {
-    flex: 1,
+    width: '100%',
   },
   fieldContainer: {
     marginBottom: 20,
@@ -234,9 +309,27 @@ const styles = StyleSheet.create({
     fontSize: 16,
     padding: 0,
   },
-  forgotPassword: {
-    alignSelf: 'flex-end',
+  optionsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 32,
+  },
+  rememberMeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderRadius: 4,
+    borderWidth: 1.5,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  rememberMeText: {
+    fontSize: 14,
   },
   forgotPasswordText: {
     fontSize: 14,
