@@ -113,7 +113,6 @@ export default function LoginScreen() {
       await saveCredentials();
 
       await signIn(user, token);
-
       router.replace('/(tabs)');
 
     } catch (error: any) {

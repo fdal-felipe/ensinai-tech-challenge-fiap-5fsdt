@@ -36,10 +36,9 @@ export default function PostsScreen() {
   const [searching, setSearching] = useState(false);
   const { user } = useAuth();
   
-  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isProfessor = user?.role === 'professor';
 
-  // Handle back button press - show exit confirmation
   useFocusEffect(
     useCallback(() => {
       const onBackPress = () => {
@@ -51,7 +50,7 @@ export default function PostsScreen() {
             { text: 'Sair', style: 'destructive', onPress: () => BackHandler.exitApp() },
           ]
         );
-        return true; // Prevent default back behavior
+        return true;
       };
 
       const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
