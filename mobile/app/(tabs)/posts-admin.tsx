@@ -19,8 +19,12 @@ import { useTheme } from '../../src/contexts/ThemeContext';
 import { postsService } from '../../src/api/postsService';
 import { Post } from '../../src/types';
 
+import { useAuth } from '@/src/contexts/AuthContext';
+
 export default function PostsAdminScreen() {
   const { isDark } = useTheme();
+  const { user } = useAuth();
+  console.log('PostsAdmin: Current user:', user);
   const colors = Colors[isDark ? 'dark' : 'light'];
   const insets = useSafeAreaInsets();
   
@@ -28,13 +32,19 @@ export default function PostsAdminScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
+  console.log('PostsAdmin: Render. Loading:', loading, 'Posts:', posts.length, 'Refreshing:', refreshing);
+
   const fetchPosts = useCallback(async () => {
+    console.log('PostsAdmin: fetchPosts called');
     try {
+      console.log('PostsAdmin: calling postsService.professor.getAll()');
       const data = await postsService.professor.getAll();
+      console.log('PostsAdmin: posts fetched', data?.length);
       setPosts(data);
     } catch (error) {
       console.error('Error fetching posts:', error);
     } finally {
+      console.log('PostsAdmin: setting loading false');
       setLoading(false);
       setRefreshing(false);
     }
@@ -43,9 +53,16 @@ export default function PostsAdminScreen() {
   // Atualiza automaticamente ao ganhar foco (após criar/editar/excluir)
   useFocusEffect(
     useCallback(() => {
+      console.log('PostsAdmin: useFocusEffect triggered');
       fetchPosts();
     }, [fetchPosts])
   );
+
+  // Fallback para carregamento inicial
+  useEffect(() => {
+    console.log('PostsAdmin: useEffect mounted');
+    fetchPosts();
+  }, []);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
