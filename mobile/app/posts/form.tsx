@@ -68,13 +68,15 @@ export default function PostFormScreen() {
   }, [id]);
 
   const loadPost = async () => {
-    setLoading(true);
+    setLoadingPost(true);
     try {
       const post = await postsService.professor.getById(parseInt(id as string));
       if (!post) return;
       
       setTitle(post.title);
       setContent(post.content);
+      setOriginalTitle(post.title);
+      setOriginalContent(post.content);
       setStatus(post.status);
       if (post.image_url) {
         setImage(post.image_url);
@@ -83,7 +85,7 @@ export default function PostFormScreen() {
       Alert.alert('Erro', 'Não foi possível carregar o post.');
       router.back();
     } finally {
-      setLoading(false);
+      setLoadingPost(false);
     }
   };
 
