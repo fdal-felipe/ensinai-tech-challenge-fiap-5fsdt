@@ -78,11 +78,15 @@ const TextArea = styled.textarea`
 const Actions = styled.div`
   margin-top: 2rem;
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
 `;
+
+//FSEIJI  - criando tipo de modal diferentes para cada um dos casos
+type ModalType = 'confirm-post' | 'ai-create' | 'success' | 'error';
 
 type ModalState = {
   isOpen: boolean;
+  type?: ModalType;
   title: string;
   message: string;
   onConfirm: () => void;
@@ -122,6 +126,9 @@ export default function NewPostPage() {
   const [author_id, setAuthorId] = useState('');
   const [professores, setProfessores] = useState<User[]>([]);
 
+  //FSEIJI armazenar o prompt que será enviado ao API do Agente
+const [aiPrompt, setAiPrompt] = useState('');
+
 
   const [modalState, setModalState] = useState<ModalState>({
     isOpen: false,
@@ -146,6 +153,7 @@ export default function NewPostPage() {
     setModalState({
       isOpen: true,
       title: 'Confirmar Publicação',
+      type: 'confirm-post',
       message: 'Deseja realmente criar este novo post?',
       onConfirm: handleConfirmCreate,
       confirmText: 'Sim, Publicar',
@@ -235,20 +243,63 @@ export default function NewPostPage() {
           <Button type='submit' variant='success'>
             Publicar
           </Button>
+            {/* FSEIJI - chamando novo modal para abertura do novo prompt */}
+          <Button
+            type='button'
+            variant='create'
+            onClick={() =>
+              setModalState({
+                isOpen: true,
+                type: 'ai-create',
+                title: 'Criar post com IA 🤖',
+                message: '',
+                onConfirm: () => {
+                  if (!aiPrompt.trim()) return;
+
+                  router.push(
+                    `/posts/create-with-ai?prompt=${encodeURIComponent(aiPrompt)}`
+                  );
+                },
+                confirmText: 'Gerar com IA',
+                cancelText: 'Cancelar',
+                confirmVariant: 'primary',
+              })
+            }
+          >
+            Criar com IA 🤖
+          </Button>
         </Actions>
       </Form>
+        <Modal
+          isOpen={modalState.isOpen}
+          onClose={() => {
+            setModalState({ ...modalState, isOpen: false });
+            setAiPrompt('');
+          }}
+          onConfirm={modalState.onConfirm}
+          title={modalState.title}
+          confirmText={modalState.confirmText}
+          cancelText={modalState.cancelText}
+          confirmVariant={modalState.confirmVariant}
+        >
+          {modalState.type === 'ai-create' && (
+            <>
+              <p style={{ marginBottom: '0.75rem' }}>
+                Descreva o que a IA deve gerar:
+              </p>
 
-      <Modal
-        isOpen={modalState.isOpen}
-        onClose={() => setModalState({ ...modalState, isOpen: false })}
-        onConfirm={modalState.onConfirm}
-        title={modalState.title}
-        confirmText={modalState.confirmText}
-        cancelText={modalState.cancelText}
-        confirmVariant={modalState.confirmVariant}
-      >
-        {modalState.message}
-      </Modal>
+              <TextArea
+                value={aiPrompt}
+                onChange={e => setAiPrompt(e.target.value)}
+                placeholder='Ex: Crie um post introdutório sobre equações do 1º grau'
+              />
+            </>
+          )}
+
+          {modalState.type !== 'ai-create' && modalState.message}
+        </Modal>
+
+
     </>
   );
 }
