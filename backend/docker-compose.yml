@@ -1,0 +1,49 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: ensinai_postgres
+    environment:
+      POSTGRES_USER: ${DB_USER:-ensinai_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-ensinai_password}
+      POSTGRES_DB: ${DB_DATABASE:-ensinai_db}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres-init:/docker-entrypoint-initdb.d
+    networks:
+      - ensinai_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-ensinai_user}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ensinai_app
+    ports:
+      - "${PORT:-3000}:3000"
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: ${DB_USER:-ensinai_user}
+      DB_PASSWORD: ${DB_PASSWORD:-ensinai_password}
+      DB_DATABASE: ${DB_DATABASE:-ensinai_db}
+      JWT_SECRET: ${JWT_SECRET:-sua_chave_secreta_super_segura}
+      NODE_ENV: ${NODE_ENV:-development}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - ensinai_network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  ensinai_network:
+    driver: bridge

@@ -1,0 +1,401 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2026-01-22T00:46:00.000Z",
+  "__export_source": "insomnia.desktop.app:v8.4.1",
+  "resources": [
+    {
+      "_id": "wrk_ensinai",
+      "_type": "workspace",
+      "name": "Ensinai Tech Challenge API",
+      "description": "API para Blog Educacional com autenticação e comentários",
+      "scope": "workspace"
+    },
+    {
+      "_id": "env_ensinai",
+      "_type": "environment",
+      "parentId": "wrk_ensinai",
+      "name": "Development",
+      "data": {
+        "base_url": "http://localhost:3000",
+        "token": "",
+        "user_id": "1",
+        "post_id": "1",
+        "comentario_id": "1"
+      },
+      "dataPropertyOrder": {
+        "&": [
+          "base_url",
+          "token",
+          "user_id",
+          "post_id",
+          "comentario_id"
+        ]
+      },
+      "color": null,
+      "isPrivate": false,
+      "metaSortKey": -1704823200000
+    },
+    {
+      "_id": "fld_auth",
+      "_type": "request_group",
+      "parentId": "wrk_ensinai",
+      "name": "🔐 Autenticação",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1704823100000
+    },
+    {
+      "_id": "req_register",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "POST - Registrar Usuário",
+      "url": "{{ base_url }}/auth/register",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Prof. Maria Silva\",\n  \"email\": \"maria@example.com\",\n  \"password\": \"senha123\",\n  \"role\": \"professor\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1704823000000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "req_login",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "POST - Login",
+      "url": "{{ base_url }}/auth/login",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"maria@example.com\",\n  \"password\": \"senha123\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1704822900000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "fld_posts",
+      "_type": "request_group",
+      "parentId": "wrk_ensinai",
+      "name": "📝 Posts (Professor)",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1704822800000
+    },
+    {
+      "_id": "req_create_post",
+      "_type": "request",
+      "parentId": "fld_posts",
+      "name": "POST - Criar Post",
+      "url": "{{ base_url }}/professor/posts",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"title\": \"Introdução ao Node.js\",\n  \"content\": \"Aprenda os fundamentos do Node.js e como criar aplicações escaláveis.\",\n  \"author_id\": 1\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1704822700000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "req_get_all_posts",
+      "_type": "request",
+      "parentId": "fld_posts",
+      "name": "GET - Listar Todos os Posts",
+      "url": "{{ base_url }}/professor/posts",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1704822600000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "req_get_post_by_id",
+      "_type": "request",
+      "parentId": "fld_posts",
+      "name": "GET - Obter Post por ID",
+      "url": "{{ base_url }}/professor/posts/{{ post_id }}",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1704822500000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "req_update_post",
+      "_type": "request",
+      "parentId": "fld_posts",
+      "name": "PUT - Atualizar Post",
+      "url": "{{ base_url }}/professor/posts/{{ post_id }}",
+      "method": "PUT",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"title\": \"Introdução ao Node.js - Atualizado\",\n  \"content\": \"Conteúdo atualizado sobre Node.js\",\n  \"status\": \"ativo\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1704822400000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "fld_comentarios",
+      "_type": "request_group",
+      "parentId": "wrk_ensinai",
+      "name": "💬 Comentários (NOVO)",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1704822300000
+    },
+    {
+      "_id": "req_create_comentario",
+      "_type": "request",
+      "parentId": "fld_comentarios",
+      "name": "POST - Criar Comentário",
+      "url": "{{ base_url }}/comentarios",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"post_id\": {{ post_id }},\n  \"user_id\": {{ user_id }},\n  \"texto\": \"Excelente aula! Muito bem explicado os conceitos de Node.js.\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1704822200000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "req_get_all_comentarios",
+      "_type": "request",
+      "parentId": "fld_comentarios",
+      "name": "GET - Listar Todos os Comentários",
+      "url": "{{ base_url }}/comentarios",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1704822100000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "req_get_comentario_by_id",
+      "_type": "request",
+      "parentId": "fld_comentarios",
+      "name": "GET - Obter Comentário por ID",
+      "url": "{{ base_url }}/comentarios/{{ comentario_id }}",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1704822000000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "req_get_comentarios_by_post",
+      "_type": "request",
+      "parentId": "fld_comentarios",
+      "name": "GET - Comentários de um Post",
+      "url": "{{ base_url }}/comentarios/post/{{ post_id }}",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1704821900000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "req_update_comentario",
+      "_type": "request",
+      "parentId": "fld_comentarios",
+      "name": "PUT - Atualizar Comentário",
+      "url": "{{ base_url }}/comentarios/{{ comentario_id }}",
+      "method": "PUT",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"texto\": \"Excelente aula! Realmente aprofundou meus conhecimentos sobre Node.js e arquitetura de aplicações.\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1704821800000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "req_delete_comentario",
+      "_type": "request",
+      "parentId": "fld_comentarios",
+      "name": "DELETE - Deletar Comentário",
+      "url": "{{ base_url }}/comentarios/{{ comentario_id }}",
+      "method": "DELETE",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1704821700000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    }
+  ]
+}

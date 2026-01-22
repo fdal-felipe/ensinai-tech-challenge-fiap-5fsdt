@@ -5,7 +5,7 @@ CREATE EXTENSION IF NOT EXISTS pg_trgm;
 -- 2. Cria uma função "wrapper" imutável para a unaccent
 CREATE OR REPLACE FUNCTION public.f_unaccent(text)
 RETURNS text AS $$
-SELECT extensions.unaccent($1)
+SELECT unaccent($1)
 $$ LANGUAGE sql IMMUTABLE;
 
 -- 3. Cria o tipo ENUM
@@ -41,8 +41,27 @@ CREATE TABLE IF NOT EXISTS public.posts (
         ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS public.comentarios (
+    id SERIAL PRIMARY KEY,
+    post_id INTEGER NOT NULL,
+    user_id INTEGER NOT NULL,
+    texto TEXT NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CONSTRAINT fk_post
+        FOREIGN KEY(post_id)
+        REFERENCES public.posts(id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_user
+        FOREIGN KEY(user_id)
+        REFERENCES public.users(id)
+        ON DELETE CASCADE
+);
+
 -- 5. Cria os índices
 CREATE INDEX IF NOT EXISTS idx_posts_author_id ON public.posts(author_id);
+CREATE INDEX IF NOT EXISTS idx_comentarios_post_id ON public.comentarios(post_id);
+CREATE INDEX IF NOT EXISTS idx_comentarios_user_id ON public.comentarios(user_id);
 
 DROP INDEX IF EXISTS idx_posts_search;
 CREATE INDEX idx_posts_search ON public.posts USING gin (public.f_unaccent(title || ' ' || content) gin_trgm_ops);
