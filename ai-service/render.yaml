@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: ensinai-ai-service
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: ID_PROJETO
+        sync: false
+      - key: INTERNAL_API_KEY
+        sync: false
+      - key: NOME_ARQUIVO_CHAVE
+        value: google_credentials.json
