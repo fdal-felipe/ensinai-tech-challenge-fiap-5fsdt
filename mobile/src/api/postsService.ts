@@ -38,7 +38,9 @@ export const postsService = {
     professor: {
         getAll: async (): Promise<Post[]> => {
             try {
+                console.log('postsService: calling GET /professor/posts');
                 const response = await api.get('/professor/posts');
+                console.log('postsService: response received', response.status);
                 return response.data;
             } catch (error) {
                 console.log('Error fetching professor posts:', error);
@@ -113,5 +115,54 @@ export const postsService = {
             return postsService.professor.search(query);
         }
         return postsService.aluno.search(query);
+    },
+
+    getComments: async (postId: number): Promise<any[]> => {
+        try {
+            const response = await api.get(`/posts/${postId}/comments`);
+            return response.data;
+        } catch (error) {
+            console.log('Error fetching comments:', error);
+            return [];
+        }
+    },
+
+    createComment: async (postId: number, content: string, authorId: number): Promise<any> => {
+        try {
+            const response = await api.post(`/posts/${postId}/comments`, { content, author_id: authorId });
+            return response.data;
+        } catch (error) {
+            console.log('Error creating comment:', error);
+            throw error;
+        }
+    },
+
+    deleteComment: async (commentId: number): Promise<void> => {
+        try {
+            await api.delete(`/comments/${commentId}`);
+        } catch (error) {
+            console.log('Error deleting comment:', error);
+            throw error;
+        }
+    },
+
+    updateComment: async (commentId: number, content: string): Promise<any> => {
+        try {
+            const response = await api.put(`/comments/${commentId}`, { content });
+            return response.data;
+        } catch (error) {
+            console.log('Error updating comment:', error);
+            throw error;
+        }
+    },
+
+    generateContent: async (title: string): Promise<string> => {
+        try {
+            const response = await api.post('/ai/generate', { title });
+            return response.data.content;
+        } catch (error) {
+            console.log('Error generating content:', error);
+            throw error;
+        }
     },
 };

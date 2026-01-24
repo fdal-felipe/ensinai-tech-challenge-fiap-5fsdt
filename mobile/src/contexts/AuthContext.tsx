@@ -6,6 +6,7 @@ interface User {
   name: string;
   email: string;
   role: 'aluno' | 'professor';
+  avatar_url?: string;
 }
 
 interface AuthContextData {

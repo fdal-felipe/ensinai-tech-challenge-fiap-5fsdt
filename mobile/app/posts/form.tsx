@@ -12,6 +12,8 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
+import * as ImagePicker from 'expo-image-picker';
+import { Image } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -35,30 +37,72 @@ export default function PostFormScreen() {
   const [originalTitle, setOriginalTitle] = useState('');
   const [originalContent, setOriginalContent] = useState('');
   const [status, setStatus] = useState('ativo');
+  const [image, setImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [loadingPost, setLoadingPost] = useState(isEditing);
+  const [generating, setGenerating] = useState(false);
+
+  const pickImage = async () => {
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0.5,
+      base64: true,
+    });
+
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      if (result.assets[0].base64) {
+        setImage(`data:image/jpeg;base64,${result.assets[0].base64}`);
+      } else {
+        setImage(result.assets[0].uri);
+      }
+    }
+  };
 
   useEffect(() => {
-    if (isEditing && id) {
-      loadPost(parseInt(id));
+    if (id) {
+      loadPost();
     }
-  }, [id, isEditing]);
+  }, [id]);
 
-  const loadPost = async (postId: number) => {
+  const loadPost = async () => {
+    setLoadingPost(true);
     try {
-      const post = await postsService.professor.getById(postId);
-      if (post) {
-        setTitle(post.title);
-        setContent(post.content);
-        setOriginalTitle(post.title);
-        setOriginalContent(post.content);
-        setStatus(post.status || 'ativo');
+      const post = await postsService.professor.getById(parseInt(id as string));
+      if (!post) return;
+      
+      setTitle(post.title);
+      setContent(post.content);
+      setOriginalTitle(post.title);
+      setOriginalContent(post.content);
+      setStatus(post.status);
+      if (post.image_url) {
+        setImage(post.image_url);
       }
     } catch (error) {
       Alert.alert('Erro', 'Não foi possível carregar o post.');
       router.back();
     } finally {
       setLoadingPost(false);
+    }
+  };
+
+  const handleAiGenerate = async () => {
+    if (!title.trim()) {
+      Alert.alert('Erro', 'Preencha o título para gerar sugestões.');
+      return;
+    }
+    
+    setGenerating(true);
+    try {
+      const suggestion = await postsService.generateContent(title);
+      setContent(suggestion);
+    } catch (error) {
+      Alert.alert('Erro', 'Não foi possível gerar conteúdo.');
+    } finally {
+      setGenerating(false);
     }
   };
 
@@ -78,9 +122,16 @@ export default function PostFormScreen() {
     setLoading(true);
 
     try {
+      const postData = {
+        title,
+        content,
+        image_url: image, // Send base64 or url
+        status
+      };
+
       if (isEditing && id) {
         // Update requires: title, content, status
-        await postsService.professor.update(parseInt(id), { title, content, status });
+        await postsService.professor.update(parseInt(id), postData);
         Alert.alert('Sucesso', 'Post atualizado com sucesso!', [
           { text: 'OK', onPress: () => router.back() }
         ]);
@@ -88,7 +139,7 @@ export default function PostFormScreen() {
         // Create requires: title, content, author_id
         // Use user.id from context, or fallback to 1 (first professor in local DB)
         const authorId = user?.id && user.id > 0 ? user.id : 1;
-        await postsService.professor.create({ title, content, author_id: authorId });
+        await postsService.professor.create({ ...postData, author_id: authorId });
         Alert.alert('Sucesso', 'Post criado com sucesso!', [
           { text: 'OK', onPress: () => router.back() }
         ]);
@@ -201,6 +252,27 @@ export default function PostFormScreen() {
               />
             </RNView>
 
+            {/* Image Selection */}
+            <RNView style={styles.imageSection}>
+               <TouchableOpacity onPress={pickImage} style={[styles.imageContainer, { borderColor: colors.border, backgroundColor: colors.card }]}>
+                  {image ? (
+                    <Image source={{ uri: image }} style={styles.imagePreview} />
+                  ) : (
+                    <RNView style={styles.imagePlaceholder}>
+                      <FontAwesome name="image" size={40} color={colors.textSecondary} />
+                      <Text style={[styles.imagePlaceholderText, { color: colors.textSecondary }]}>
+                        Selecionar Imagem de Capa
+                      </Text>
+                    </RNView>
+                  )}
+               </TouchableOpacity>
+               {image && (
+                 <TouchableOpacity onPress={() => setImage(null)} style={styles.removeImageButton}>
+                    <Text style={{ color: Colors.error, fontSize: 14 }}>Remover imagem</Text>
+                 </TouchableOpacity>
+               )}
+            </RNView>
+
             {/* Post Content */}
             <RNView style={styles.fieldContainer}>
               <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>DESCRIÇÃO *</Text>
@@ -215,6 +287,22 @@ export default function PostFormScreen() {
                 textAlignVertical="top"
               />
             </RNView>
+
+            {/* AI Generate Button (Now below content) */}
+            <TouchableOpacity 
+              style={[styles.aiButton, { backgroundColor: Colors.primary }]}
+              onPress={handleAiGenerate}
+              disabled={generating}
+            >
+              {generating ? (
+                <ActivityIndicator size="small" color="#FFF" />
+              ) : (
+                <>
+                  <FontAwesome name="magic" size={16} color="#FFF" style={{ marginRight: 8 }} />
+                  <Text style={styles.aiButtonText}>Gerar conteúdo com IA</Text>
+                </>
+              )}
+            </TouchableOpacity>
           </RNView>
 
           {/* Botões de Ação */}
@@ -365,5 +453,51 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
+  },
+  imageSection: {
+    marginBottom: 24,
+    alignItems: 'center',
+  },
+  imageContainer: {
+    width: '100%',
+    height: 200,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderStyle: 'dashed',
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  imagePreview: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
+  imagePlaceholder: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  imagePlaceholderText: {
+    marginTop: 12,
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  removeImageButton: {
+    marginTop: 12,
+    padding: 8,
+  },
+  aiButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 20,
+    alignSelf: 'center',
+  },
+  aiButtonText: {
+    color: '#FFF',
+    fontWeight: '600',
+    fontSize: 14,
   },
 });
