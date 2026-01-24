@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View, Image } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { router } from 'expo-router';
 
@@ -27,10 +27,18 @@ export function PostCard({ post, isProfessor = false }: PostCardProps) {
       onPress={handlePress}
       activeOpacity={0.7}
     >
+      {post.image_url && (
+        <Image source={{ uri: post.image_url }} style={styles.image} />
+      )}
       <View style={styles.content}>
         <Text style={[styles.title, { color: colors.text }]} numberOfLines={1}>
           {post.title}
         </Text>
+        {post.author_name && (
+          <Text style={[styles.author, { color: colors.textSecondary }]} numberOfLines={1}>
+            Por: {post.author_name}
+          </Text>
+        )}
       </View>
       
       <FontAwesome name="chevron-right" size={16} color={colors.textSecondary} />
@@ -56,5 +64,16 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 17,
     fontWeight: '500',
+  },
+  author: {
+    fontSize: 13,
+    marginTop: 4,
+  },
+  image: {
+    width: 60,
+    height: 60,
+    borderRadius: 8,
+    marginRight: 16,
+    backgroundColor: '#e1e1e1',
   },
 });

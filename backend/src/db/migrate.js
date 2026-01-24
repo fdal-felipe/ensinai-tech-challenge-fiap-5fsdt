@@ -38,10 +38,13 @@ async function runMigrations() {
         (SELECT 1 FROM information_schema.columns WHERE table_name = 'posts' AND column_name = 'status' AND table_schema = 'public' LIMIT 1) as posts_status_col,
         (SELECT 1 FROM information_schema.columns WHERE table_name = 'posts' AND column_name = 'created_at' AND table_schema = 'public' LIMIT 1) as posts_created_at_col,
         (SELECT 1 FROM information_schema.columns WHERE table_name = 'posts' AND column_name = 'updated_at' AND table_schema = 'public' LIMIT 1) as posts_updated_at_col,
+        (SELECT 1 FROM information_schema.columns WHERE table_name = 'posts' AND column_name = 'image_url' AND table_schema = 'public' LIMIT 1) as posts_image_url_col,
+        (SELECT 1 FROM information_schema.columns WHERE table_name = 'users' AND column_name = 'avatar_url' AND table_schema = 'public' LIMIT 1) as users_avatar_url_col,
 
         -- Índices
         (SELECT 1 FROM pg_class c JOIN pg_namespace n ON c.relnamespace = n.oid WHERE c.relname = 'idx_posts_author_id' AND n.nspname = 'public' LIMIT 1) as author_index_exists,
-        (SELECT 1 FROM pg_class c JOIN pg_namespace n ON c.relnamespace = n.oid WHERE c.relname = 'idx_posts_search' AND n.nspname = 'public' LIMIT 1) as search_index_exists
+        (SELECT 1 FROM pg_class c JOIN pg_namespace n ON c.relnamespace = n.oid WHERE c.relname = 'idx_posts_search' AND n.nspname = 'public' LIMIT 1) as search_index_exists,
+        (SELECT 1 FROM pg_class c JOIN pg_namespace n ON c.relnamespace = n.oid WHERE c.relname = 'comments' AND n.nspname = 'public' LIMIT 1) as comments_table_exists
     `;
 
         const { rows } = await db.query(checkQuery);
@@ -72,6 +75,9 @@ async function runMigrations() {
             "posts_updated_at_col",
             "author_index_exists",
             "search_index_exists",
+            "users_avatar_url_col",
+            "posts_image_url_col",
+            "comments_table_exists"
         ];
 
         const missing = requiredChecks.filter((key) => !checks[key]);
