@@ -12,6 +12,7 @@ import {
 import { router } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import api from '../../src/api/api';
+import { uploadImage } from '../../src/services/supabase';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -34,15 +35,20 @@ export default function AccountScreen() {
         allowsEditing: true,
         aspect: [1, 1],
         quality: 0.5,
-        base64: true,
       });
 
       if (!result.canceled && result.assets && result.assets.length > 0) {
         setLoadingAvatar(true);
         const asset = result.assets[0];
-        const imageUri = asset.base64 
-          ? `data:image/jpeg;base64,${asset.base64}` 
-          : asset.uri;
+        console.log('[Account] Asset selected:', asset);
+        console.log('[Account] Calling uploadImage...');
+        const imageUri = await uploadImage(asset.uri, 'profile-images');
+        console.log('[Account] uploadImage returned:', imageUri);
+
+        if (!imageUri) {
+            console.error('[Account] Upload failed (imageUri is null)');
+            throw new Error('Falha no upload da imagem');
+        }
 
         // Update in backend
         await api.put(`/users/${user?.id}`, {

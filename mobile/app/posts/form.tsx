@@ -22,6 +22,7 @@ import Colors from '@/constants/Colors';
 import { useTheme } from '../../src/contexts/ThemeContext';
 import { useAuth } from '../../src/contexts/AuthContext';
 import { postsService } from '../../src/api/postsService';
+import { uploadImage } from '../../src/services/supabase';
 
 export default function PostFormScreen() {
   const { isDark } = useTheme();
@@ -48,16 +49,11 @@ export default function PostFormScreen() {
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [4, 3],
-      quality: 0.5,
-      base64: true,
+      quality: 0.7,
     });
 
     if (!result.canceled && result.assets && result.assets.length > 0) {
-      if (result.assets[0].base64) {
-        setImage(`data:image/jpeg;base64,${result.assets[0].base64}`);
-      } else {
-        setImage(result.assets[0].uri);
-      }
+      setImage(result.assets[0].uri);
     }
   };
 
@@ -122,10 +118,28 @@ export default function PostFormScreen() {
     setLoading(true);
 
     try {
+      let finalImageUrl = image;
+      
+      // Upload image if it's a local URI (not starting with http)
+      if (image && !image.startsWith('http')) {
+        console.log('[PostForm] Image selected for upload:', image);
+        console.log('[PostForm] Calling uploadImage...');
+        const publicUrl = await uploadImage(image, 'posts-images');
+        console.log('[PostForm] uploadImage returned:', publicUrl);
+        
+        if (!publicUrl) {
+          console.error('[PostForm] Upload failed (publicUrl is null)');
+          Alert.alert('Erro', 'Falha ao fazer upload da imagem. Verifique os logs.');
+          setLoading(false);
+          return;
+        }
+        finalImageUrl = publicUrl;
+      }
+
       const postData = {
         title,
         content,
-        image_url: image, // Send base64 or url
+        image_url: finalImageUrl,
         status
       };
 

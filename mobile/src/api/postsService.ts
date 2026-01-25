@@ -1,4 +1,5 @@
 import api from './api';
+import axios from 'axios';
 import { Post } from '../types';
 
 export const postsService = {
@@ -156,10 +157,40 @@ export const postsService = {
         }
     },
 
-    generateContent: async (title: string): Promise<string> => {
+    generateContent: async (topic: string): Promise<string> => {
         try {
-            const response = await api.post('/ai/generate', { title });
-            return response.data.content;
+            // Using external AI service directly
+            const response = await axios.post('https://ensinai-ai-service.onrender.com/generate', {
+                topic
+            }, {
+                headers: {
+                    'x-api-key': 'Ens1n412026',
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            // Assuming the AI service returns: { "content": "Generated text..." }
+            // or if it returns directly the text, we might need to adjust.
+            // Based on typical behavior if not specified, it's likely a JSON object.
+            // Let's assume response.data is the object and it has a field with the text.
+            // If the user says "Body (exemplo): { "topic": ... }", often response mimics structure or has 'result'/'content'.
+            // I'll return response.data.content if exists, else response.data if string, else JSON.stringify(response.data)
+
+            // Helper to strip HTML tags
+            const stripHtml = (html: string): string => {
+                return html.replace(/<[^>]*>/g, '').trim();
+            };
+
+            let rawContent = '';
+            if (response.data && typeof response.data.content === 'string') {
+                rawContent = response.data.content;
+            } else if (typeof response.data === 'string') {
+                rawContent = response.data;
+            } else {
+                rawContent = response.data.result || JSON.stringify(response.data);
+            }
+
+            return stripHtml(rawContent);
         } catch (error) {
             console.log('Error generating content:', error);
             throw error;
