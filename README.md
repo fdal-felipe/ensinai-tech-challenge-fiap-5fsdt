@@ -63,6 +63,7 @@ Esta fase marca a **conclusão da plataforma multiplataforma**, adicionando:
 -   [📄 Documentação da API](#-documentação-da-api)
 -   [🧪 Testes](#-testes)
 -   [🐳 Docker](#-docker)
+-   [📱 Fase 4 - Mobile](#-fase-4---mobile)
 -   [☁️ CI/CD e Produção](#️-cicd-e-produção)
 -   [🔍 Busca Inteligente](#-busca-inteligente)
 -   [🗄️ Banco de Dados](#️-banco-de-dados)
@@ -328,10 +329,15 @@ cd backend
 npm install
 npm run dev
 
-# Frontend (em outro terminal)
+# Frontend Web (em outro terminal)
 cd frontend
 npm install
 npm run dev
+
+# Mobile (em outro terminal)
+cd mobile
+npm install
+npx expo start
 ```
 
 ### 5️⃣ Acesso às Aplicações
@@ -540,6 +546,29 @@ npm test
 ### Pipeline de CI/CD
 
 Os testes são executados automaticamente no GitHub Actions a cada push/PR.
+
+---
+
+## 📱 Fase 4 - Mobile
+
+A quarta fase do projeto consiste na migração da experiência do usuário para dispositivos móveis utilizando **React Native** e **Expo**.
+
+### 🛠️ Tecnologias Mobile
+- **React Native** (expo-router)
+- **TypeScript**
+- **Axios** para consumo de API
+- **Expo Secure Store** para autenticação persistente
+
+### 👥 Divisão do Time (Fase 4)
+- **Felipe:** Core, Autenticação e Configuração Base.
+- **Nicholas:** Módulo de Conteúdo (Listagem de Posts, Busca e Filtros).
+- **Seiji:** Módulo Administrativo (CRUD de Posts).
+- **Tiago:** Gestão de Usuários (Professores e Alunos).
+
+### 🚀 Como executar o Mobile
+1. Instale o aplicativo **Expo Go** em seu celular.
+2. No terminal: `cd mobile && npm install && npx expo start`.
+3. Escaneie o QR Code gerado.
 
 ---
 

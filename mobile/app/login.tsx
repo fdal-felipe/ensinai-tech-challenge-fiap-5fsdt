@@ -106,7 +106,8 @@ export default function LoginScreen() {
         id: userData?.id || 0,
         name: userData?.name || email.split('@')[0],
         email: userData?.email || email,
-        role: userData?.role || 'aluno'
+        role: userData?.role || 'aluno',
+        avatar_url: userData?.avatar_url || undefined,
       };
 
       // Salva credenciais se "Lembrar-me" estiver marcado

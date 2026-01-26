@@ -10,6 +10,7 @@ import 'react-native-reanimated';
 import { AuthProvider } from '../src/contexts/AuthContext';
 import { ThemeProvider, useTheme } from '../src/contexts/ThemeContext';
 import Colors from '@/constants/Colors';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 export {
   ErrorBoundary,
@@ -65,7 +66,9 @@ export default function RootLayout() {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <RootLayoutNav />
+        <SafeAreaProvider>
+          <RootLayoutNav />
+        </SafeAreaProvider>
       </AuthProvider>
     </ThemeProvider>
   );

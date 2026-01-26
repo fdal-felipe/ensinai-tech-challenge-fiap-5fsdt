@@ -5,6 +5,7 @@ export interface User {
   name: string;
   email: string;
   role: UserRole;
+  avatar_url?: string;
 }
 
 export interface Post {
@@ -13,7 +14,8 @@ export interface Post {
   content: string;
   author_id: number;
   author_name?: string;
+  image_url?: string;
   status: 'ativo' | 'inativo';
-  created_at: string;
-  updated_at: string;
+  created_at?: string;
+  updated_at?: string;
 }

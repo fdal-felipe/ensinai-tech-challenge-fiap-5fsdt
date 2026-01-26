@@ -19,12 +19,8 @@ export default function TabLayout() {
   const { isDark } = useTheme();
   const colors = Colors[isDark ? 'dark' : 'light'];
   const insets = useSafeAreaInsets();
-<<<<<<< HEAD
   
   const { signed, loading, user } = useAuth();
-=======
-  const { signed, loading, user, signOut } = useAuth();
->>>>>>> e89679740bb56af64c132b44b8e98e644a407aa0
 
   if (loading) {
     return (
@@ -54,16 +50,8 @@ export default function TabLayout() {
           fontSize: 13,
           fontWeight: '600',
         },
-<<<<<<< HEAD
         // Esconde o header de todas as telas
         headerShown: false,
-=======
-        headerRight: () => (
-          <TouchableOpacity onPress={signOut} style={{ marginRight: 20 }}>
-            <FontAwesome name="sign-out" size={24} color={Colors.error} />
-          </TouchableOpacity>
-        ),
->>>>>>> e89679740bb56af64c132b44b8e98e644a407aa0
       }}>
       
       {/* ABA 1: Posts (Todos veem) */}
@@ -80,7 +68,7 @@ export default function TabLayout() {
         name="posts-admin"
         options={{
           title: 'Posts',
-          href: user?.role === 'professor' ? '/posts-admin' : null,
+          href: user?.role === 'professor' ? undefined : null,
           tabBarIcon: ({ color }) => <TabBarIcon name="file-text" color={color} />,
         }}
       />
@@ -90,7 +78,7 @@ export default function TabLayout() {
         name="users"
         options={{
           title: 'Usuários',
-          href: user?.role === 'professor' ? '/users' : null,
+          href: user?.role === 'professor' ? undefined : null,
           tabBarIcon: ({ color }) => <TabBarIcon name="users" color={color} />,
         }}
       />
@@ -99,12 +87,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="account"
         options={{
-<<<<<<< HEAD
           title: 'Conta',
           tabBarIcon: ({ color }) => <TabBarIcon name="user-circle" color={color} />,
-=======
-          href: null,
->>>>>>> e89679740bb56af64c132b44b8e98e644a407aa0
         }}
       />
     </Tabs>
