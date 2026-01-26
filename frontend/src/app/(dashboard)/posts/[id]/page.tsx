@@ -363,6 +363,9 @@ export default function EditPostPage() {
       >
         {modalState.message}
       </Modal>
+      <div>
+        <p>comemtários </p>
+      </div>
     </>
   )
 }
