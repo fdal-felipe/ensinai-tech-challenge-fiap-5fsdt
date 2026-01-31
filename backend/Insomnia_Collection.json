@@ -21,7 +21,7 @@
         "token": "",
         "user_id": "1",
         "post_id": "1",
-        "comentario_id": "1"
+        "comment_id": "1"
       },
       "dataPropertyOrder": {
         "&": [
@@ -29,7 +29,7 @@
           "token",
           "user_id",
           "post_id",
-          "comentario_id"
+          "comment_id"
         ]
       },
       "color": null,
@@ -225,20 +225,20 @@
       "settingFollowRedirects": "global"
     },
     {
-      "_id": "fld_comentarios",
+      "_id": "fld_comments",
       "_type": "request_group",
       "parentId": "wrk_ensinai",
-      "name": "💬 Comentários (NOVO)",
+      "name": "💬 Comments",
       "environment": {},
       "environmentPropertyOrder": null,
       "metaSortKey": -1704822300000
     },
     {
-      "_id": "req_create_comentario",
+      "_id": "req_create_comment",
       "_type": "request",
-      "parentId": "fld_comentarios",
-      "name": "POST - Criar Comentário",
-      "url": "{{ base_url }}/comentarios",
+      "parentId": "fld_comments",
+      "name": "POST - Create Comment",
+      "url": "{{ base_url }}/posts/{{ post_id }}/comments",
       "method": "POST",
       "body": {
         "mimeType": "application/json",
@@ -266,11 +266,11 @@
       "settingFollowRedirects": "global"
     },
     {
-      "_id": "req_get_all_comentarios",
+      "_id": "req_get_all_comments",
       "_type": "request",
-      "parentId": "fld_comentarios",
-      "name": "GET - Listar Todos os Comentários",
-      "url": "{{ base_url }}/comentarios",
+      "parentId": "fld_comments",
+      "name": "GET - List All Comments",
+      "url": "{{ base_url }}/posts/{{ post_id }}/comments",
       "method": "GET",
       "body": {},
       "parameters": [],
@@ -291,11 +291,11 @@
       "settingFollowRedirects": "global"
     },
     {
-      "_id": "req_get_comentario_by_id",
+      "_id": "req_get_comment_by_id",
       "_type": "request",
-      "parentId": "fld_comentarios",
-      "name": "GET - Obter Comentário por ID",
-      "url": "{{ base_url }}/comentarios/{{ comentario_id }}",
+      "parentId": "fld_comments",
+      "name": "GET - Get Comment by ID",
+      "url": "{{ base_url }}/posts/{{ post_id }}/comments/{{ comment_id }}",
       "method": "GET",
       "body": {},
       "parameters": [],
@@ -316,11 +316,11 @@
       "settingFollowRedirects": "global"
     },
     {
-      "_id": "req_get_comentarios_by_post",
+      "_id": "req_get_comments_by_post",
       "_type": "request",
-      "parentId": "fld_comentarios",
-      "name": "GET - Comentários de um Post",
-      "url": "{{ base_url }}/comentarios/post/{{ post_id }}",
+      "parentId": "fld_comments",
+      "name": "GET - Comments by Post",
+      "url": "{{ base_url }}/posts/{{ post_id }}/comments",
       "method": "GET",
       "body": {},
       "parameters": [],
@@ -341,11 +341,11 @@
       "settingFollowRedirects": "global"
     },
     {
-      "_id": "req_update_comentario",
+      "_id": "req_update_comment",
       "_type": "request",
-      "parentId": "fld_comentarios",
-      "name": "PUT - Atualizar Comentário",
-      "url": "{{ base_url }}/comentarios/{{ comentario_id }}",
+      "parentId": "fld_comments",
+      "name": "PUT - Update Comment",
+      "url": "{{ base_url }}/posts/{{ post_id }}/comments/{{ comment_id }}",
       "method": "PUT",
       "body": {
         "mimeType": "application/json",
@@ -373,11 +373,11 @@
       "settingFollowRedirects": "global"
     },
     {
-      "_id": "req_delete_comentario",
+      "_id": "req_delete_comment",
       "_type": "request",
-      "parentId": "fld_comentarios",
-      "name": "DELETE - Deletar Comentário",
-      "url": "{{ base_url }}/comentarios/{{ comentario_id }}",
+      "parentId": "fld_comments",
+      "name": "DELETE - Delete Comment",
+      "url": "{{ base_url }}/posts/{{ post_id }}/comments/{{ comment_id }}",
       "method": "DELETE",
       "body": {},
       "parameters": [],
