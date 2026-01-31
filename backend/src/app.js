@@ -11,7 +11,8 @@ const swaggerOptions = require('../swagger.config.js');
 const cors = require('cors');
 
 const app = express();
-app.use(express.json());
+app.use(express.json({ limit: '100mb' }));
+app.use(express.urlencoded({ limit: '100mb', extended: true }));
 app.use(cors());
 
 
@@ -23,6 +24,9 @@ app.use('/aluno/posts', alunoPostsRoutes);
 
 app.use('/professor/posts', authenticate, authorizeProfessor, professorPostsRoutes);
 app.use('/users', authenticate, usersRoutes);
-app.use('/comentarios', authenticate, comentariosRoutes);
+app.use(require('./routes/comments'));
+app.use('/ai', require('./routes/ai'));
+
+console.log('[DEBUG] Routes registered: /auth, /aluno/posts, /professor/posts, /users, /posts/:postId/comments, /ai');
 
 module.exports = app;
