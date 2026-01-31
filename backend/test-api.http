@@ -1,0 +1,250 @@
+### API Testing File for Ensinai Tech Challenge
+
+### Variables
+@baseUrl = http://localhost:3000
+@token = 
+@userId = 1
+@postId = 1
+@commentId = 1
+@professorId = 1
+@alunoId = 2
+
+### ===== AUTHENTICATION TESTS =====
+
+### Register User - Professor
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "Prof. João Silva",
+  "email": "joao@example.com",
+  "password": "senha123",
+  "role": "professor"
+}
+
+### Register User - Student
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "Maria Oliveira",
+  "email": "maria@example.com",
+  "password": "senha123",
+  "role": "aluno"
+}
+
+### Login - Professor
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "joao@example.com",
+  "password": "senha123"
+}
+
+### Login - Student
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "maria@example.com",
+  "password": "senha123"
+}
+
+### ===== USER MANAGEMENT TESTS =====
+
+### Get All Users
+GET {{baseUrl}}/users
+Authorization: Bearer {{token}}
+
+### Get User by ID
+GET {{baseUrl}}/users/{{userId}}
+Authorization: Bearer {{token}}
+
+### Create User (Admin Only)
+POST {{baseUrl}}/users
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Carlos Santos",
+  "email": "carlos@example.com",
+  "password": "senha123",
+  "role": "aluno"
+}
+
+### Update User
+PUT {{baseUrl}}/users/{{userId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "João Silva Atualizado",
+  "email": "joao.atualizado@example.com"
+}
+
+### Delete User
+DELETE {{baseUrl}}/users/{{userId}}
+Authorization: Bearer {{token}}
+
+### ===== PROFESSOR POSTS TESTS =====
+
+### Create Professor Post
+POST {{baseUrl}}/professor/posts
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Introdução a Node.js",
+  "content": "Nesta aula, aprenderemos os conceitos fundamentais do Node.js, incluindo módulos, eventos e callbacks.",
+  "status": "ativo"
+}
+
+### Get All Professor Posts
+GET {{baseUrl}}/professor/posts
+Authorization: Bearer {{token}}
+
+### Get Professor Post by ID
+GET {{baseUrl}}/professor/posts/{{postId}}
+Authorization: Bearer {{token}}
+
+### Update Professor Post
+PUT {{baseUrl}}/professor/posts/{{postId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Introdução a Node.js - Atualizado",
+  "content": "Conteúdo atualizado com novos exemplos e exercícios."
+}
+
+### Delete Professor Post
+DELETE {{baseUrl}}/professor/posts/{{postId}}
+Authorization: Bearer {{token}}
+
+### ===== STUDENT POSTS TESTS =====
+
+### Create Student Post
+POST {{baseUrl}}/aluno/posts
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Meu aprendizado em JavaScript",
+  "content": "Estou aprendendo JavaScript e achei muito interessante os conceitos de closures e async/await.",
+  "status": "ativo"
+}
+
+### Get All Student Posts
+GET {{baseUrl}}/aluno/posts
+Authorization: Bearer {{token}}
+
+### Get Student Post by ID
+GET {{baseUrl}}/aluno/posts/{{postId}}
+Authorization: Bearer {{token}}
+
+### Update Student Post
+PUT {{baseUrl}}/aluno/posts/{{postId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Meu aprendizado em JavaScript - Revisão",
+  "content": "Após mais estudos, posso dizer que dominei melhor os conceitos."
+}
+
+### Delete Student Post
+DELETE {{baseUrl}}/aluno/posts/{{postId}}
+Authorization: Bearer {{token}}
+
+### ===== COMMENTS TESTS =====
+
+### Create Comment
+POST {{baseUrl}}/posts/{{postId}}/comments
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "content": "Excelente post! Muito bem explicado.",
+  "author_id": {{userId}}
+}
+
+### Get All Comments for a Post
+GET {{baseUrl}}/posts/{{postId}}/comments
+Authorization: Bearer {{token}}
+
+### Get Comment by ID
+GET {{baseUrl}}/posts/{{postId}}/comments/{{commentId}}
+Authorization: Bearer {{token}}
+
+### Update Comment
+PUT {{baseUrl}}/posts/{{postId}}/comments/{{commentId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "content": "Atualizado: Excelente post! Muito bem explicado mesmo!"
+}
+
+### Delete Comment
+DELETE {{baseUrl}}/posts/{{postId}}/comments/{{commentId}}
+Authorization: Bearer {{token}}
+
+### ===== AI AGENT TESTS =====
+
+### AI - Generate Content Suggestion
+POST {{baseUrl}}/ai/generate
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Programação em Python para Iniciantes"
+}
+
+### AI - Analyze Post
+POST {{baseUrl}}/ai/analyze
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Entendendo REST APIs",
+  "content": "REST é um estilo arquitetural que define um conjunto de restrições a serem usadas na criação de web services. Uma API REST deve ser stateless, cacheable, uniform e client-server. Os verbos HTTP (GET, POST, PUT, DELETE) são usados para realizar operações CRUD. Esta é uma introdução fundamental para qualquer desenvolvedor web."
+}
+
+### AI - Moderate Content
+POST {{baseUrl}}/ai/moderate
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "content": "Este é um conteúdo apropriado e educacional.",
+  "type": "post"
+}
+
+### AI - Moderate Inappropriate Content
+POST {{baseUrl}}/ai/moderate
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "content": "Este conteúdo contém spam e violência inaceitável.",
+  "type": "comment"
+}
+
+### AI - Generate Auto Response
+POST {{baseUrl}}/ai/respond
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "commentText": "Adorei este post, muito informativo!",
+  "postId": {{postId}}
+}
+
+### ===== DOCUMENTATION =====
+
+### View API Documentation (Swagger)
+GET {{baseUrl}}/api-docs
+
+### View Swagger UI
+GET {{baseUrl}}/api-docs/
