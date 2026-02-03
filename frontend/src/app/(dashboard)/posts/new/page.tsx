@@ -222,72 +222,86 @@ const generateContent = async (topic: string): Promise<string> => {
     throw new Error('Falha ao gerar conteúdo.');
   }
 };
-  return (
-    <>
-      <Form onSubmit={handleSubmit}>
-        <PageHeader>
-          <BackButton type='button' onClick={() => router.back()}>
-            <BackIcon />
-          </BackButton>
-          <Title>Criar Novo Post</Title>
-        </PageHeader>
+ return (
+  <>
+    <Form onSubmit={handleSubmit}>
+      <PageHeader>
+        <BackButton type='button' onClick={() => router.back()}>
+          <BackIcon />
+        </BackButton>
+        <Title>Criar Novo Post</Title>
+      </PageHeader>
 
-        <InputGroup>
-          <Label htmlFor='title'>NOME DA MATÉRIA</Label>
-          <Input
-            type='text'
-            id='title'
-            value={title}
-            onChange={e => setTitle(e.target.value)}
-            placeholder='Ex: Matemática I - Podcast'
-          />
-        </InputGroup>
+      <InputGroup>
+        <Label htmlFor='title'>NOME DA MATÉRIA</Label>
+        <Input
+          type='text'
+          id='title'
+          value={title}
+          onChange={e => setTitle(e.target.value)}
+          placeholder='Ex: Matemática I - Podcast'
+        />
+      </InputGroup>
 
-<InputGroup style={{ marginTop: '1.5rem' }}>
-  <Label htmlFor='author'>AUTOR (Professor)</Label>
-  <ProfessorList 
-    users={professores} 
-    onProfessorSelect={handleProfessorSelect} />
-</InputGroup>
+      <InputGroup style={{ marginTop: '1.5rem' }}>
+        <Label htmlFor='author'>AUTOR (Professor)</Label>
+        <ProfessorList
+          users={professores}
+          onProfessorSelect={handleProfessorSelect}
+        />
+      </InputGroup>
 
+      <InputGroup style={{ marginTop: '1.5rem' }}>
+        <Label htmlFor='description'>DESCRIÇÃO</Label>
+        <TextArea
+          id='description'
+          value={content}
+          onChange={e => setContent(e.target.value)}
+          placeholder='Descreva a atividade ou o conteúdo do post...'
+        />
+      </InputGroup>
 
-        <InputGroup style={{ marginTop: '1.5rem' }}>
-          <Label htmlFor='description'>DESCRIÇÃO</Label>
-          <TextArea
-            id='description'
-            value={content}
-            onChange={e => setContent(e.target.value)}
-            placeholder='Descreva a atividade ou o conteúdo do post...'
-          />
-        </InputGroup>
+      <Actions>
+        <Button type='submit' variant='success'>
+          Publicar
+        </Button>
 
-        <Actions>
-          <Button type='submit' variant='success'>
-            Publicar
-          </Button>
-            {/* FSEIJI - chamando novo modal para abertura do novo prompt */}
-          <Button
-            type='button'
-            variant='create'
-            onClick={async () => {
-              if (!title.trim()) {
-                alert('Por favor, digite o nome da matéria primeiro.');
-                return;
-              }
-              try {
-                const result = await generateContent(title);
-                setContent(result);
-              } catch (error) {
-                console.error("Erro ao gerar conteúdo:", error);
-                alert('Erro ao gerar conteúdo com IA. Tente novamente.');
-              }
-            }}
-          >
-            Criar com IA 🤖
-          </Button>
-        </Actions>
-      </Form>
-       
-    </>
-  );
+        <Button
+          type='button'
+          variant='create'
+          onClick={async () => {
+            if (!title.trim()) {
+              alert('Por favor, digite o nome da matéria primeiro.');
+              return;
+            }
+            try {
+              const result = await generateContent(title);
+              setContent(result);
+            } catch (error) {
+              console.error('Erro ao gerar conteúdo:', error);
+              alert('Erro ao gerar conteúdo com IA. Tente novamente.');
+            }
+          }}
+        >
+          Criar com IA 🤖
+        </Button>
+      </Actions>
+    </Form>
+
+    {/* 🔥 MODAL FUNCIONANDO */}
+ <Modal
+        isOpen={modalState.isOpen}
+        title={modalState.title}
+        confirmText={modalState.confirmText}
+        cancelText={modalState.cancelText}
+        confirmVariant={modalState.confirmVariant}
+        onConfirm={modalState.onConfirm}
+        onClose={() =>
+          setModalState(prev => ({ ...prev, isOpen: false }))
+        }
+      >
+        {modalState.message}
+      </Modal>
+  </>
+);
 }
