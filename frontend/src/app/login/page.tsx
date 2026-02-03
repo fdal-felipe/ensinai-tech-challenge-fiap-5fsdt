@@ -14,7 +14,12 @@ interface ApiError {
 
 interface LoginResponse {
   token: string;
-  role: string;
+  user: {
+    id: number;
+    name: string;
+    email: string;
+    role: string;
+  };
 }
 
 export default function LoginPage() {
@@ -50,7 +55,7 @@ export default function LoginPage() {
 
       const data = await res.json() as LoginResponse;
       localStorage.setItem('token', data.token);
-      localStorage.setItem('role', data.role);
+      localStorage.setItem('role', data.user.role);
       router.push('/home');
     } catch {
       setError('Erro de conexão com o servidor');
