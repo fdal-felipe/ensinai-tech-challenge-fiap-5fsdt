@@ -199,7 +199,29 @@ const [aiPrompt, setAiPrompt] = useState('');
       });
     }
   };
+const generateContent = async (topic: string): Promise<string> => {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ai/generate`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
 
+         body: JSON.stringify({ topic })
+      
+    });
+    if (!response.ok) {
+      throw new Error('Erro na resposta da API');
+    }
+    const data = await response.json();
+    return data.content;
+  } catch (error) {
+    console.error('Erro ao gerar conteúdo com IA:', error);
+    throw new Error('Falha ao gerar conteúdo.');
+  }
+};
   return (
     <>
       <Form onSubmit={handleSubmit}>
@@ -247,59 +269,25 @@ const [aiPrompt, setAiPrompt] = useState('');
           <Button
             type='button'
             variant='create'
-            onClick={() =>
-              setModalState({
-                isOpen: true,
-                type: 'ai-create',
-                title: 'Criar post com IA 🤖',
-                message: '',
-                onConfirm: () => {
-                  if (!aiPrompt.trim()) return;
-
-                  router.push(
-                    `/posts/create-with-ai?prompt=${encodeURIComponent(aiPrompt)}`
-                  );
-                },
-                confirmText: 'Gerar com IA',
-                cancelText: 'Cancelar',
-                confirmVariant: 'primary',
-              })
-            }
+            onClick={async () => {
+              if (!title.trim()) {
+                alert('Por favor, digite o nome da matéria primeiro.');
+                return;
+              }
+              try {
+                const result = await generateContent(title);
+                setContent(result);
+              } catch (error) {
+                console.error("Erro ao gerar conteúdo:", error);
+                alert('Erro ao gerar conteúdo com IA. Tente novamente.');
+              }
+            }}
           >
             Criar com IA 🤖
           </Button>
         </Actions>
       </Form>
-        <Modal
-          isOpen={modalState.isOpen}
-          onClose={() => {
-            setModalState({ ...modalState, isOpen: false });
-            setAiPrompt('');
-          }}
-          onConfirm={modalState.onConfirm}
-          title={modalState.title}
-          confirmText={modalState.confirmText}
-          cancelText={modalState.cancelText}
-          confirmVariant={modalState.confirmVariant}
-        >
-          {modalState.type === 'ai-create' && (
-            <>
-              <p style={{ marginBottom: '0.75rem' }}>
-                Descreva o que a IA deve gerar:
-              </p>
-
-              <TextArea
-                value={aiPrompt}
-                onChange={e => setAiPrompt(e.target.value)}
-                placeholder='Ex: Crie um post introdutório sobre equações do 1º grau'
-              />
-            </>
-          )}
-
-          {modalState.type !== 'ai-create' && modalState.message}
-        </Modal>
-
-
+       
     </>
   );
 }

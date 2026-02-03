@@ -104,7 +104,7 @@ export default function EditPostPage() {
   const router = useRouter()
   const params = useParams()
   const id = params.id as string
-  const role = localStorage.getItem('role')
+  const [role, setRole] = useState<string | null>(null)  // Adicionado: useState para role
 
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
@@ -113,6 +113,12 @@ export default function EditPostPage() {
 
   const [isLoading, setIsLoading] = useState(false)
   const [fetchLoading, setFetchLoading] = useState(true)
+
+  // Adicionado: useEffect para acessar localStorage no cliente
+  useEffect(() => {
+    setRole(localStorage.getItem('role'))
+  }, [])
+
 
   // --- 🔹 Buscar post existente ---
   useEffect(() => {
