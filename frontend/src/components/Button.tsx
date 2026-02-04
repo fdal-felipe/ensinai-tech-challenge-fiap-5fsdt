@@ -7,9 +7,11 @@ interface ButtonProps {
   children: React.ReactNode;
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   type?: 'button' | 'submit' | 'reset';
-  variant?: 'primary' | 'danger' | 'success'| 'create'; // Adicionada a variante 'success'
+  variant?: 'primary' | 'danger' | 'success' | 'create';
   $fullWidth?: boolean;
+  disabled?: boolean; 
 }
+
 
 const StyledButton = styled.button<ButtonProps>`
   background-color: ${props => {
