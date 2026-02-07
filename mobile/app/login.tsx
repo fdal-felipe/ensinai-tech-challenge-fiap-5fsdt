@@ -108,6 +108,8 @@ export default function LoginScreen() {
         email: userData?.email || email,
         role: userData?.role || 'aluno',
         avatar_url: userData?.avatar_url || undefined,
+        phone: userData?.phone || undefined,
+        bio: userData?.bio || undefined,
       };
 
       // Salva credenciais se "Lembrar-me" estiver marcado

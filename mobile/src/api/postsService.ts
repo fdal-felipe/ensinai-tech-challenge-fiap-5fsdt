@@ -157,6 +157,36 @@ export const postsService = {
         }
     },
 
+    toggleReaction: async (postId: number, type: string = 'like'): Promise<{ liked: boolean; count: number; type: string | null } | null> => {
+        try {
+            const response = await api.post(`/posts/${postId}/reactions`, { type });
+            return response.data;
+        } catch (error) {
+            console.log('Error toggling reaction:', error);
+            return null;
+        }
+    },
+
+    getReactions: async (postId: number): Promise<{ liked: boolean; count: number; type: string | null; latest_reactions?: any[] } | null> => {
+        try {
+            const response = await api.get(`/posts/${postId}/reactions`);
+            return response.data;
+        } catch (error) {
+            console.log('Error fetching reactions:', error);
+            return null;
+        }
+    },
+
+    getAllReactions: async (postId: number): Promise<any[]> => {
+        try {
+            const response = await api.get(`/posts/${postId}/reactions/all`);
+            return response.data;
+        } catch (error) {
+            console.log('Error fetching all reactions:', error);
+            return [];
+        }
+    },
+
     generateContent: async (topic: string): Promise<string> => {
         try {
             // Using external AI service directly

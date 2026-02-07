@@ -23,6 +23,7 @@ import { Post } from '../../src/types';
 import { CommentList } from '@/components/CommentList';
 import { CommentInput } from '@/components/CommentInput';
 import { useAuth } from '@/src/contexts/AuthContext';
+import { ReactionButton } from '@/src/components/ReactionButton';
 
 export default function PostDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -203,6 +204,11 @@ export default function PostDetailsScreen() {
           </TouchableOpacity>
         )}
         
+        {/* Reactions */}
+        <RNView style={{ paddingHorizontal: 20, marginTop: 16 }}>
+             <ReactionButton postId={post.id} />
+        </RNView>
+
         {/* Comments Section */}
         <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
         <CommentList 

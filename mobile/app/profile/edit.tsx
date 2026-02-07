@@ -1,24 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  StyleSheet, 
-  ScrollView, 
   View as RNView, 
-  TextInput,
-  TouchableOpacity,
-  Alert,
-  StatusBar,
-  ActivityIndicator,
-  Keyboard,
+  Text, 
+  TextInput, 
+  TouchableOpacity, 
+  ScrollView, 
+  StyleSheet, 
+  Alert, 
+  ActivityIndicator, 
+  Keyboard, 
   TouchableWithoutFeedback,
+  StatusBar,
+  Image 
 } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 
-import { Text, View } from '@/components/Themed';
-import Colors from '@/constants/Colors';
-import { useTheme } from '../../src/contexts/ThemeContext';
+import { uploadImage } from '../../src/services/supabase';
 import { useAuth } from '../../src/contexts/AuthContext';
+import { useTheme } from '../../src/contexts/ThemeContext';
+import Colors from '../../constants/Colors';
 import { usersService } from '../../src/api/usersService';
 
 export default function EditProfileScreen() {
@@ -33,6 +36,7 @@ export default function EditProfileScreen() {
   const [phone, setPhone] = useState('');
   const [bio, setBio] = useState('');
   const [loading, setLoading] = useState(false);
+  const [loadingAvatar, setLoadingAvatar] = useState(false);
   const [loadingUser, setLoadingUser] = useState(true);
 
   // Carrega os dados do usuário logado ao montar o componente
@@ -40,28 +44,67 @@ export default function EditProfileScreen() {
     if (user) {
       setName(user.name || '');
       setEmail(user.email || '');
-      // Telefone e bio não existem no banco, então deixamos vazio
-      setPhone('');
-      setBio('');
+      setPhone(user.phone || '');
+      setBio(user.bio || '');
       setLoadingUser(false);
     }
   }, [user]);
 
-  // Função para exibir modal de funcionalidade não disponível
-  const showUnavailableModal = (feature: string) => {
-    Alert.alert(
-      'Funcionalidade Indisponível',
-      `A função "${feature}" ainda não está disponível nesta versão do aplicativo.`,
-      [{ text: 'Entendi', style: 'default' }]
-    );
+  // Função para salvar as alterações
+  const handleAvatarUpdate = async () => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.5,
+      });
+
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        setLoadingAvatar(true);
+        const asset = result.assets[0];
+        console.log('[EditProfile] Asset selected:', asset);
+        
+        const imageUri = await uploadImage(asset.uri, 'profile-images');
+        
+        if (!imageUri) {
+            Alert.alert('Erro', 'Falha no upload da imagem');
+            return;
+        }
+
+        // Update in backend
+        await usersService.update(user!.id, {
+          name: name || user!.name,
+          email: email || user!.email,
+          avatar_url: imageUri,
+          role: user!.role
+        });
+
+        // Update context
+        if (updateUser) {
+            updateUser({ ...user!, avatar_url: imageUri });
+        }
+        
+        Alert.alert('Sucesso', 'Foto de perfil atualizada!');
+      }
+    } catch (error) {
+      console.log('Error updating avatar:', error);
+      Alert.alert('Erro', 'Não foi possível atualizar a foto.');
+    } finally {
+      setLoadingAvatar(false);
+    }
   };
 
-  // Função para salvar as alterações
   const handleSave = async () => {
     Keyboard.dismiss();
     
     // Verifica se nada foi alterado
-    const hasChanges = name !== (user?.name || '') || email !== (user?.email || '');
+    const hasChanges = 
+        name !== (user?.name || '') || 
+        email !== (user?.email || '') ||
+        phone !== (user?.phone || '') ||
+        bio !== (user?.bio || '');
+
     if (!hasChanges) {
       Alert.alert('Nada alterado', 'Você não fez nenhuma alteração nos dados.');
       return;
@@ -85,10 +128,22 @@ export default function EditProfileScreen() {
     setLoading(true);
 
     try {
-      // Atualiza apenas nome e email (campos editáveis nesta tela)
+      console.log('[EditProfile] Sending update to service:', {
+        id: user.id,
+        name,
+        email,
+        phone,
+        bio,
+        role: user.role
+      });
+
+      // Atualiza nome, email, telefone e bio
       const updatedUser = await usersService.update(user.id, {
         name,
         email,
+        phone,
+        bio,
+        role: user.role,
       });
 
       // Atualiza o contexto local se a função existir
@@ -127,15 +182,15 @@ export default function EditProfileScreen() {
 
   if (loadingUser) {
     return (
-      <View style={[styles.loadingContainer, { backgroundColor: colors.background }]}>
+      <RNView style={[styles.loadingContainer, { backgroundColor: colors.background }]}>
         <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
         <ActivityIndicator size="large" color={colors.text} />
-      </View>
+      </RNView>
     );
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <RNView style={[styles.container, { backgroundColor: colors.background }]}>
       <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
 
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -153,12 +208,22 @@ export default function EditProfileScreen() {
 
           {/* Seção do Avatar */}
           <RNView style={styles.avatarSection}>
-            <RNView style={[styles.avatarContainer, { borderColor: colors.border }]}>
-              <FontAwesome name="user" size={40} color={colors.textSecondary} />
-            </RNView>
-            <TouchableOpacity onPress={() => showUnavailableModal('Alterar foto')}>
+            <TouchableOpacity 
+                onPress={handleAvatarUpdate} 
+                disabled={loadingAvatar}
+                style={[styles.avatarContainer, { borderColor: colors.border }]}
+            >
+               {loadingAvatar ? (
+                   <ActivityIndicator size="small" color={colors.text} />
+               ) : user?.avatar_url ? (
+                   <Image source={{ uri: user.avatar_url }} style={{ width: '100%', height: '100%' }} />
+               ) : (
+                   <FontAwesome name="user" size={40} color={colors.textSecondary} />
+               )}
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleAvatarUpdate} disabled={loadingAvatar}>
               <Text style={[styles.changePhotoText, { color: Colors.primary }]}>
-                Alterar foto
+                {loadingAvatar ? 'Enviando...' : 'Alterar foto'}
               </Text>
             </TouchableOpacity>
           </RNView>
@@ -188,24 +253,29 @@ export default function EditProfileScreen() {
             />
           </RNView>
 
-          <RNView style={styles.fieldContainer}>
+            <RNView style={styles.fieldContainer}>
             <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>TELEFONE</Text>
-            <TouchableOpacity 
-              style={[styles.textInput, styles.disabledInput, { borderColor: colors.border, backgroundColor: colors.card }]}
-              onPress={() => showUnavailableModal('Telefone')}
-            >
-              <Text style={{ color: colors.textSecondary }}>(00) 00000-0000</Text>
-            </TouchableOpacity>
+            <TextInput
+              style={[styles.textInput, { borderColor: colors.border, color: colors.text, backgroundColor: colors.card }]}
+              value={phone}
+              onChangeText={setPhone}
+              placeholder="(00) 00000-0000"
+              placeholderTextColor={colors.textSecondary}
+              keyboardType="phone-pad"
+            />
           </RNView>
 
           <RNView style={styles.fieldContainer}>
             <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>BIOGRAFIA</Text>
-            <TouchableOpacity 
-              style={[styles.textInput, styles.bioInput, styles.disabledInput, { borderColor: colors.border, backgroundColor: colors.card }]}
-              onPress={() => showUnavailableModal('Biografia')}
-            >
-              <Text style={{ color: colors.textSecondary }}>Fale sobre você...</Text>
-            </TouchableOpacity>
+            <TextInput
+              style={[styles.textInput, styles.bioInput, { borderColor: colors.border, color: colors.text, backgroundColor: colors.card, textAlignVertical: 'top' }]}
+              value={bio}
+              onChangeText={setBio}
+              placeholder="Fale sobre você..."
+              placeholderTextColor={colors.textSecondary}
+              multiline
+              numberOfLines={4}
+            />
           </RNView>
 
           {/* Botões de Ação */}
@@ -231,9 +301,11 @@ export default function EditProfileScreen() {
           </RNView>
         </ScrollView>
       </TouchableWithoutFeedback>
-    </View>
+    </RNView>
   );
 }
+
+
 
 const styles = StyleSheet.create({
   container: {
@@ -270,17 +342,20 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   avatarContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 120,
+    height: 120,
+    borderRadius: 60,
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 12,
+    overflow: 'hidden', // Ensures image stays within circle
+    backgroundColor: '#f0f0f0', // Optional background
   },
   changePhotoText: {
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: '500',
+    marginBottom: 8,
   },
   fieldContainer: {
     marginBottom: 20,
@@ -308,8 +383,9 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: 16,
-    marginTop: 24,
+    gap: 24,
+    marginTop: 40,
+    marginBottom: 40, 
   },
   cancelButton: {
     paddingVertical: 14,

@@ -32,9 +32,11 @@ export const usersService = {
         }
     },
 
-    update: async (id: number, data: { name: string; email: string; password?: string; role: UserRole }): Promise<User | null> => {
+    update: async (id: number, data: { name: string; email: string; password?: string; role: UserRole; phone?: string; bio?: string; avatar_url?: string }): Promise<User | null> => {
         try {
+            console.log('[usersService] update called with:', { id, data });
             const response = await api.put(`/users/${id}`, data);
+            console.log('[usersService] update response:', response.data);
             return response.data;
         } catch (error) {
             console.log('Error updating user:', error);

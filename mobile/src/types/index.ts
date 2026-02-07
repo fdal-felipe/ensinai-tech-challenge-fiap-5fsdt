@@ -6,6 +6,8 @@ export interface User {
   email: string;
   role: UserRole;
   avatar_url?: string;
+  phone?: string;
+  bio?: string;
 }
 
 export interface Post {
