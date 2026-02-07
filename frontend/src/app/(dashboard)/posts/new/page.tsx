@@ -78,11 +78,15 @@ const TextArea = styled.textarea`
 const Actions = styled.div`
   margin-top: 2rem;
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
 `;
+
+//FSEIJI  - criando tipo de modal diferentes para cada um dos casos
+type ModalType = 'confirm-post' | 'ai-create' | 'success' | 'error';
 
 type ModalState = {
   isOpen: boolean;
+  type?: ModalType;
   title: string;
   message: string;
   onConfirm: () => void;
@@ -122,6 +126,9 @@ export default function NewPostPage() {
   const [author_id, setAuthorId] = useState('');
   const [professores, setProfessores] = useState<User[]>([]);
 
+  //FSEIJI armazenar o prompt que será enviado ao API do Agente
+const [aiPrompt, setAiPrompt] = useState('');
+
 
   const [modalState, setModalState] = useState<ModalState>({
     isOpen: false,
@@ -146,6 +153,7 @@ export default function NewPostPage() {
     setModalState({
       isOpen: true,
       title: 'Confirmar Publicação',
+      type: 'confirm-post',
       message: 'Deseja realmente criar este novo post?',
       onConfirm: handleConfirmCreate,
       confirmText: 'Sim, Publicar',
@@ -191,64 +199,109 @@ export default function NewPostPage() {
       });
     }
   };
+const generateContent = async (topic: string): Promise<string> => {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ai/generate`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
 
-  return (
-    <>
-      <Form onSubmit={handleSubmit}>
-        <PageHeader>
-          <BackButton type='button' onClick={() => router.back()}>
-            <BackIcon />
-          </BackButton>
-          <Title>Criar Novo Post</Title>
-        </PageHeader>
+         body: JSON.stringify({ topic })
+      
+    });
+    if (!response.ok) {
+      throw new Error('Erro na resposta da API');
+    }
+    const data = await response.json();
+    return data.content;
+  } catch (error) {
+    console.error('Erro ao gerar conteúdo com IA:', error);
+    throw new Error('Falha ao gerar conteúdo.');
+  }
+};
+ return (
+  <>
+    <Form onSubmit={handleSubmit}>
+      <PageHeader>
+        <BackButton type='button' onClick={() => router.back()}>
+          <BackIcon />
+        </BackButton>
+        <Title>Criar Novo Post</Title>
+      </PageHeader>
 
-        <InputGroup>
-          <Label htmlFor='title'>NOME DA MATÉRIA</Label>
-          <Input
-            type='text'
-            id='title'
-            value={title}
-            onChange={e => setTitle(e.target.value)}
-            placeholder='Ex: Matemática I - Podcast'
-          />
-        </InputGroup>
+      <InputGroup>
+        <Label htmlFor='title'>NOME DA MATÉRIA</Label>
+        <Input
+          type='text'
+          id='title'
+          value={title}
+          onChange={e => setTitle(e.target.value)}
+          placeholder='Ex: Matemática I - Podcast'
+        />
+      </InputGroup>
 
-<InputGroup style={{ marginTop: '1.5rem' }}>
-  <Label htmlFor='author'>AUTOR (Professor)</Label>
-  <ProfessorList 
-    users={professores} 
-    onProfessorSelect={handleProfessorSelect} />
-</InputGroup>
+      <InputGroup style={{ marginTop: '1.5rem' }}>
+        <Label htmlFor='author'>AUTOR (Professor)</Label>
+        <ProfessorList
+          users={professores}
+          onProfessorSelect={handleProfessorSelect}
+        />
+      </InputGroup>
 
+      <InputGroup style={{ marginTop: '1.5rem' }}>
+        <Label htmlFor='description'>DESCRIÇÃO</Label>
+        <TextArea
+          id='description'
+          value={content}
+          onChange={e => setContent(e.target.value)}
+          placeholder='Descreva a atividade ou o conteúdo do post...'
+        />
+      </InputGroup>
 
-        <InputGroup style={{ marginTop: '1.5rem' }}>
-          <Label htmlFor='description'>DESCRIÇÃO</Label>
-          <TextArea
-            id='description'
-            value={content}
-            onChange={e => setContent(e.target.value)}
-            placeholder='Descreva a atividade ou o conteúdo do post...'
-          />
-        </InputGroup>
+      <Actions>
+        <Button type='submit' variant='success'>
+          Publicar
+        </Button>
 
-        <Actions>
-          <Button type='submit' variant='success'>
-            Publicar
-          </Button>
-        </Actions>
-      </Form>
+        <Button
+          type='button'
+          variant='create'
+          onClick={async () => {
+            if (!title.trim()) {
+              alert('Por favor, digite o nome da matéria primeiro.');
+              return;
+            }
+            try {
+              const result = await generateContent(title);
+              setContent(result);
+            } catch (error) {
+              console.error('Erro ao gerar conteúdo:', error);
+              alert('Erro ao gerar conteúdo com IA. Tente novamente.');
+            }
+          }}
+        >
+          Criar com IA 🤖
+        </Button>
+      </Actions>
+    </Form>
 
-      <Modal
+    {/* 🔥 MODAL FUNCIONANDO */}
+ <Modal
         isOpen={modalState.isOpen}
-        onClose={() => setModalState({ ...modalState, isOpen: false })}
-        onConfirm={modalState.onConfirm}
         title={modalState.title}
         confirmText={modalState.confirmText}
         cancelText={modalState.cancelText}
         confirmVariant={modalState.confirmVariant}
+        onConfirm={modalState.onConfirm}
+        onClose={() =>
+          setModalState(prev => ({ ...prev, isOpen: false }))
+        }
       >
         {modalState.message}
       </Modal>
-    </>
-  );
+  </>
+);
 }

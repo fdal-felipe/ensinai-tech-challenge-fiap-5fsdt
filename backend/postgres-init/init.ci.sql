@@ -43,6 +43,17 @@ CREATE TABLE IF NOT EXISTS public.posts (
         ON DELETE CASCADE
 );
 
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_name = 'posts'
+          AND column_name = 'image_url'
+    ) THEN
+        ALTER TABLE public.posts ADD COLUMN image_url TEXT;
+    END IF;
+END$$;
+
 -- 5. Cria os índices
 CREATE INDEX IF NOT EXISTS idx_posts_author_id ON public.posts(author_id);
 DROP INDEX IF EXISTS idx_posts_search;
