@@ -222,6 +222,12 @@ const generateContent = async (topic: string): Promise<string> => {
     throw new Error('Falha ao gerar conteúdo.');
   }
 };
+
+function stripHtml(html: string) {
+  return html.replace(/<[^>]*>/g, '');
+}
+
+
  return (
   <>
     <Form onSubmit={handleSubmit}>
@@ -276,7 +282,7 @@ const generateContent = async (topic: string): Promise<string> => {
             }
             try {
               const result = await generateContent(title);
-              setContent(result);
+              setContent(stripHtml(result));
             } catch (error) {
               console.error('Erro ao gerar conteúdo:', error);
               alert('Erro ao gerar conteúdo com IA. Tente novamente.');

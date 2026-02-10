@@ -106,7 +106,10 @@ const CommentContent = styled.p`
 const NewCommentBox = styled.div`
   margin-top: 1.5rem;
 `
-
+const CommentTextArea = styled(TextArea)`
+  min-height: 80px;
+  max-height: 120px;
+`;
 
 type ModalState = {
   isOpen: boolean
@@ -506,7 +509,7 @@ const handleCreateComment = async () => {
       )}
 
       <NewCommentBox>
-        <TextArea
+        <CommentTextArea
           placeholder='Escreva um comentário...'
           value={newComment}
           onChange={e => setNewComment(e.target.value)}
