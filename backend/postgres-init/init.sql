@@ -41,8 +41,27 @@ CREATE TABLE IF NOT EXISTS public.posts (
         ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS public.comments (
+    id SERIAL PRIMARY KEY,
+    post_id INTEGER NOT NULL,
+    author_id INTEGER NOT NULL,
+    content TEXT NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CONSTRAINT fk_post
+        FOREIGN KEY(post_id)
+        REFERENCES public.posts(id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_author
+        FOREIGN KEY(author_id)
+        REFERENCES public.users(id)
+        ON DELETE CASCADE
+);
+
 -- 5. Cria os índices
 CREATE INDEX IF NOT EXISTS idx_posts_author_id ON public.posts(author_id);
+CREATE INDEX IF NOT EXISTS idx_comments_post_id ON public.comments(post_id);
+CREATE INDEX IF NOT EXISTS idx_comments_author_id ON public.comments(author_id);
 
 -- 6. Tabela de recuperação de senha (OTP)
 CREATE TABLE IF NOT EXISTS public.password_resets (

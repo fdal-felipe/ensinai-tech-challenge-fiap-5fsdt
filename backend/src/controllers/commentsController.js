@@ -20,6 +20,30 @@ exports.index = async (req, res) => {
     }
 };
 
+// Buscar um comentário específico de um post
+exports.show = async (req, res) => {
+    const { postId, commentId } = req.params;
+    try {
+        const sql = `
+            SELECT c.*, u.name as author_name, u.avatar_url as author_avatar
+            FROM comments c
+            JOIN users u ON c.author_id = u.id
+            WHERE c.post_id = $1 AND c.id = $2
+            LIMIT 1
+        `;
+        const { rows } = await db.query(sql, [postId, commentId]);
+
+        if (rows.length === 0) {
+            return res.status(404).json({ error: 'Comentário não encontrado para este post.' });
+        }
+
+        res.status(200).json(rows[0]);
+    } catch (error) {
+        console.error('Erro ao buscar comentário:', error);
+        res.status(500).json({ error: 'Erro interno do servidor.' });
+    }
+};
+
 // Criar um comentário
 exports.store = async (req, res) => {
     const { postId } = req.params;

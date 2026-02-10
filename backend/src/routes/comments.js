@@ -17,6 +17,11 @@ router.get('/posts/:postId/comments', (req, res, next) => {
     next();
 }, commentsController.index);
 
+// Buscar um comentário específico de um post
+router.get('/posts/:postId/comments/:commentId', (req, res, next) => {
+    console.log('[COMMENTS] GET /posts/:postId/comments/:commentId hit with postId:', req.params.postId, 'commentId:', req.params.commentId);
+    next();
+}, commentsController.show);
 // Criar comentário em um post
 router.post('/posts/:postId/comments', commentsController.store);
 

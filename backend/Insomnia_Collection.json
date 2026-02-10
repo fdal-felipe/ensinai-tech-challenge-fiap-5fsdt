@@ -1,0 +1,539 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2026-01-22T00:46:00.000Z",
+  "__export_source": "insomnia.desktop.app:v8.4.1",
+  "resources": [
+    {
+      "_id": "wrk_ensinai",
+      "_type": "workspace",
+      "name": "Ensinai Tech Challenge API",
+      "description": "API para Blog Educacional com autenticação e comentários",
+      "scope": "workspace"
+    },
+    {
+      "_id": "env_ensinai",
+      "_type": "environment",
+      "parentId": "wrk_ensinai",
+      "name": "Development",
+      "data": {
+        "base_url": "http://localhost:3000",
+        "token": "PASTE_YOUR_TOKEN_HERE",
+        "user_id": "1",
+        "post_id": "1",
+        "comment_id": "1"
+      },
+      "dataPropertyOrder": {
+        "&": [
+          "base_url",
+          "token",
+          "user_id",
+          "post_id",
+          "comment_id"
+        ]
+      },
+      "color": null,
+      "isPrivate": false,
+      "metaSortKey": -1704823200000
+    },
+    {
+      "_id": "fld_auth",
+      "_type": "request_group",
+      "parentId": "wrk_ensinai",
+      "name": "🔐 Autenticação",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1704823100000
+    },
+    {
+      "_id": "req_register",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "POST - Registrar Usuário",
+      "url": "{{ base_url }}/auth/register",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Prof. Maria Silva\",\n  \"email\": \"maria@example.com\",\n  \"password\": \"senha123\",\n  \"role\": \"professor\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1704823000000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "req_login",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "POST - Login",
+      "url": "{{ base_url }}/auth/login",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"maria@example.com\",\n  \"password\": \"senha123\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1704822900000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "fld_posts",
+      "_type": "request_group",
+      "parentId": "wrk_ensinai",
+      "name": "📝 Posts (Professor)",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1704822800000
+    },
+    {
+      "_id": "req_create_post",
+      "_type": "request",
+      "parentId": "fld_posts",
+      "name": "POST - Criar Post",
+      "url": "{{ base_url }}/professor/posts",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"title\": \"Introdução ao Node.js\",\n  \"content\": \"Aprenda os fundamentos do Node.js e como criar aplicações escaláveis.\",\n  \"author_id\": 1\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1704822700000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "req_get_all_posts",
+      "_type": "request",
+      "parentId": "fld_posts",
+      "name": "GET - Listar Todos os Posts",
+      "url": "{{ base_url }}/professor/posts",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1704822600000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "req_get_post_by_id",
+      "_type": "request",
+      "parentId": "fld_posts",
+      "name": "GET - Obter Post por ID",
+      "url": "{{ base_url }}/professor/posts/{{ post_id }}",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1704822500000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "req_update_post",
+      "_type": "request",
+      "parentId": "fld_posts",
+      "name": "PUT - Atualizar Post",
+      "url": "{{ base_url }}/professor/posts/{{ post_id }}",
+      "method": "PUT",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"title\": \"Introdução ao Node.js - Atualizado\",\n  \"content\": \"Conteúdo atualizado sobre Node.js\",\n  \"status\": \"ativo\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1704822400000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "fld_comments",
+      "_type": "request_group",
+      "parentId": "wrk_ensinai",
+      "name": "💬 Comments",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1704822300000
+    },
+    {
+      "_id": "req_create_comment",
+      "_type": "request",
+      "parentId": "fld_comments",
+      "name": "POST - Create Comment",
+      "url": "{{ base_url }}/posts/{{ post_id }}/comments",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"content\": \"Excelente aula! Muito bem explicado os conceitos de Node.js.\",\n  \"author_id\": {{ user_id }}\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1704822200000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "req_get_all_comments",
+      "_type": "request",
+      "parentId": "fld_comments",
+      "name": "GET - List All Comments",
+      "url": "{{ base_url }}/posts/{{ post_id }}/comments",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1704822100000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "req_get_comment_by_id",
+      "_type": "request",
+      "parentId": "fld_comments",
+      "name": "GET - Get Comment by ID",
+      "url": "{{ base_url }}/posts/{{ post_id }}/comments/{{ comment_id }}",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1704822000000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "req_get_comments_by_post",
+      "_type": "request",
+      "parentId": "fld_comments",
+      "name": "GET - Comments by Post",
+      "url": "{{ base_url }}/posts/{{ post_id }}/comments",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1704821900000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "req_update_comment",
+      "_type": "request",
+      "parentId": "fld_comments",
+      "name": "PUT - Update Comment",
+      "url": "{{ base_url }}/posts/{{ post_id }}/comments/{{ comment_id }}",
+      "method": "PUT",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"content\": \"Excelente aula! Realmente aprofundou meus conhecimentos sobre Node.js e arquitetura de aplicações.\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1704821800000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "req_delete_comment",
+      "_type": "request",
+      "parentId": "fld_comments",
+      "name": "DELETE - Delete Comment",
+      "url": "{{ base_url }}/posts/{{ post_id }}/comments/{{ comment_id }}",
+      "method": "DELETE",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1704821700000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    }
+    ,
+    {
+      "_id": "fld_ai",
+      "_type": "request_group",
+      "parentId": "wrk_ensinai",
+      "name": "🤖 AI",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1704821600000
+    },
+    {
+      "_id": "req_ai_generate",
+      "_type": "request",
+      "parentId": "fld_ai",
+      "name": "POST - AI Generate",
+      "url": "{{ base_url }}/ai/generate",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"title\": \"Programação em Python para Iniciantes\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1704821500000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "req_ai_analyze",
+      "_type": "request",
+      "parentId": "fld_ai",
+      "name": "POST - AI Analyze",
+      "url": "{{ base_url }}/ai/analyze",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"title\": \"Entendendo REST APIs\",\n  \"content\": \"REST é um estilo arquitetural...\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1704821400000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "req_ai_moderate",
+      "_type": "request",
+      "parentId": "fld_ai",
+      "name": "POST - AI Moderate",
+      "url": "{{ base_url }}/ai/moderate",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"content\": \"Este conteúdo contém spam e violência inaceitável.\",\n  \"type\": \"comment\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1704821300000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "req_ai_respond",
+      "_type": "request",
+      "parentId": "fld_ai",
+      "name": "POST - AI Respond",
+      "url": "{{ base_url }}/ai/respond",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"commentText\": \"Adorei este post, muito informativo!\",\n  \"postId\": 1\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ token }}"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1704821200000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    }
+  ]
+}
