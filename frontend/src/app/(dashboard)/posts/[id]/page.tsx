@@ -75,6 +75,81 @@ const Actions = styled.div`
   justify-content: space-between;
 `
 
+const CommentsWrapper = styled.div`
+  margin-top: 3rem;
+`
+
+const CommentBox = styled.div`
+  padding: 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid #e5e7eb;
+  margin-bottom: 1rem;
+`
+
+const CommentAuthor = styled.div`
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 0.25rem;
+`
+
+const CommentDate = styled.div`
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-bottom: 0.5rem;
+`
+
+const CommentContent = styled.p`
+  color: #374151;
+  margin: 0;
+`
+
+const NewCommentBox = styled.div`
+  margin-top: 1.5rem;
+`
+const CommentTextArea = styled(TextArea)`
+  min-height: 80px;
+  max-height: 120px;
+`;
+
+const CommentHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+const DeleteCommentButton = styled.button`
+  background: transparent;
+  border: none;
+  color: #ef4444;
+  cursor: pointer;
+  padding: 0;
+
+  &:hover {
+    color: #b91c1c;
+  }
+`;
+
+
+const TrashIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <polyline points="3 6 5 6 21 6" />
+    <path d="M19 6l-1 14H6L5 6" />
+    <path d="M10 11v6" />
+    <path d="M14 11v6" />
+    <path d="M9 6V4h6v2" />
+  </svg>
+);
+
+
 type ModalState = {
   isOpen: boolean
   title: string
@@ -100,6 +175,18 @@ interface UserData {
   name: string;
 }
 
+interface Comment {
+  id: number
+  content: string
+  post_id: number
+  author_id: number
+  author_name: string
+  author_avatar: string | null
+  created_at: string
+  updated_at: string | null
+}
+
+
 export default function EditPostPage() {
   const router = useRouter()
   const params = useParams()
@@ -113,6 +200,11 @@ export default function EditPostPage() {
 
   const [isLoading, setIsLoading] = useState(false)
   const [fetchLoading, setFetchLoading] = useState(true)
+  const [comments, setComments] = useState<Comment[]>([])
+  const [commentsLoading, setCommentsLoading] = useState(true)
+  const [newComment, setNewComment] = useState('')
+  const [sendingComment, setSendingComment] = useState(false)
+
 
   // Adicionado: useEffect para acessar localStorage no cliente
   useEffect(() => {
@@ -294,6 +386,102 @@ export default function EditPostPage() {
     })
   }
 
+useEffect(() => {
+const fetchComments = async () => {
+  try {
+    setCommentsLoading(true)
+
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/posts/${id}/comments`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      }
+    )
+
+    if (!res.ok) throw new Error('Erro ao buscar comentários')
+
+    const data: Comment[] = await res.json()
+    setComments(data)
+  } catch (err) {
+    console.error('Erro ao carregar comentários:', err)
+  } finally {
+    setCommentsLoading(false)
+  }
+}
+
+if (id) fetchComments()
+}, [id])
+
+const handleCreateComment = async () => {
+  if (!newComment.trim()) return
+
+  try {
+    setSendingComment(true)
+
+    const res = await fetch(
+      `https://blog-api-prod-mcw6.onrender.com/posts/${id}/comments`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          content: newComment,
+          author_id: `${localStorage.getItem('user_id')}` // 👈 vem do login
+        })
+      }
+    )
+
+    if (!res.ok) {
+      throw new Error('Erro ao criar comentário')
+    }
+
+    const createdComment = await res.json()
+
+    setComments(prev => [...prev, createdComment])
+    setNewComment('')
+  } catch (error) {
+    console.error('Erro ao criar comentário:', error)
+  } finally {
+    setSendingComment(false)
+  }
+}
+const [userId, setUserId] = useState<number | null>(null)
+
+useEffect(() => {
+  const storedUserId = localStorage.getItem('user_id')
+  if (storedUserId) {
+    setUserId(Number(storedUserId))
+  }
+}, [])
+
+const handleDeleteComment = async (commentId: number) => {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/comments/${commentId}`,
+      {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      }
+    )
+    if (!res.ok) {
+      throw new Error('Erro ao excluir comentário')
+    }
+    // Remove comment from UI
+    setComments(prev => prev.filter(c => c.id !== commentId))
+  } catch (error) {
+    console.error('Erro ao excluir comentário:', error)
+  }
+}
+
+
+
+
   return (
     <>
       <Form onSubmit={handleSubmit}>
@@ -369,9 +557,63 @@ export default function EditPostPage() {
       >
         {modalState.message}
       </Modal>
-      <div>
-        <p>comemtários </p>
-      </div>
+    <CommentsWrapper>
+      <Title>Comentários</Title>
+
+{commentsLoading ? (
+  <p>Carregando comentários...</p>
+) : comments.length === 0 ? (
+  <p>Seja o primeiro a comentar.</p>
+) : (
+  comments.map(comment => {
+    const canDelete =
+      comment.author_id === userId || role === 'professor'
+
+    return (
+      <CommentBox key={comment.id}>
+        <CommentHeader>
+          <CommentAuthor>{comment.author_name}</CommentAuthor>
+
+          {canDelete && (
+            <DeleteCommentButton
+              onClick={() => handleDeleteComment(comment.id)}
+              title="Excluir comentário"
+            >
+              🗑️
+            </DeleteCommentButton>
+          )}
+        </CommentHeader>
+
+        <CommentDate>
+          {new Date(comment.created_at).toLocaleString('pt-BR')}
+        </CommentDate>
+
+        <CommentContent>{comment.content}</CommentContent>
+      </CommentBox>
+    )
+  })
+)}
+
+      <NewCommentBox>
+        <CommentTextArea
+          placeholder='Escreva um comentário...'
+          value={newComment}
+          onChange={e => setNewComment(e.target.value)}
+          disabled={sendingComment}
+        />
+
+        <Actions>
+          <Button
+            type='button'
+            variant='success'
+            onClick={handleCreateComment}
+            disabled={sendingComment || !newComment.trim()}
+          >
+            {sendingComment ? 'Enviando...' : 'Comentar'}
+          </Button>
+        </Actions>
+      </NewCommentBox>
+    </CommentsWrapper>
     </>
   )
 }

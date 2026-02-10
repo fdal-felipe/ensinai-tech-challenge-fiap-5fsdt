@@ -56,6 +56,7 @@ export default function LoginPage() {
       const data = await res.json() as LoginResponse;
       localStorage.setItem('token', data.token);
       localStorage.setItem('role', data.user.role);
+      localStorage.setItem('user_id',String(data.user.id));
       router.push('/home');
     } catch {
       setError('Erro de conexão com o servidor');

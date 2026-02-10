@@ -170,6 +170,12 @@ interface UserData {
   name: string;
 }
 
+function truncateText(text: string, maxLength = 120) {
+  if (!text) return '';
+  if (text.length <= maxLength) return text;
+  return text.slice(0, maxLength) + '...';
+}
+
 // --- Página Principal ---
 export default function PostsPage() {
   const router = useRouter();
@@ -311,7 +317,7 @@ export default function PostsPage() {
               key={post.id}
               title={post.title}
               author={post.authorName}
-              description={post.content}
+              description={truncateText(post.content,150)}
               onClick={() => handleNavigateToPost(post.id)}
               //onDelete={() => handleDeleteClick(post.id)}
             />
