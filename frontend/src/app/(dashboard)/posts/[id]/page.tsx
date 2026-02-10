@@ -111,6 +111,45 @@ const CommentTextArea = styled(TextArea)`
   max-height: 120px;
 `;
 
+const CommentHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+const DeleteCommentButton = styled.button`
+  background: transparent;
+  border: none;
+  color: #ef4444;
+  cursor: pointer;
+  padding: 0;
+
+  &:hover {
+    color: #b91c1c;
+  }
+`;
+
+
+const TrashIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <polyline points="3 6 5 6 21 6" />
+    <path d="M19 6l-1 14H6L5 6" />
+    <path d="M10 11v6" />
+    <path d="M14 11v6" />
+    <path d="M9 6V4h6v2" />
+  </svg>
+);
+
+
 type ModalState = {
   isOpen: boolean
   title: string
@@ -410,6 +449,35 @@ const handleCreateComment = async () => {
     setSendingComment(false)
   }
 }
+const [userId, setUserId] = useState<number | null>(null)
+
+useEffect(() => {
+  const storedUserId = localStorage.getItem('user_id')
+  if (storedUserId) {
+    setUserId(Number(storedUserId))
+  }
+}, [])
+
+const handleDeleteComment = async (commentId: number) => {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/comments/${commentId}`,
+      {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      }
+    )
+    if (!res.ok) {
+      throw new Error('Erro ao excluir comentário')
+    }
+    // Remove comment from UI
+    setComments(prev => prev.filter(c => c.id !== commentId))
+  } catch (error) {
+    console.error('Erro ao excluir comentário:', error)
+  }
+}
 
 
 
@@ -492,21 +560,39 @@ const handleCreateComment = async () => {
     <CommentsWrapper>
       <Title>Comentários</Title>
 
-      {commentsLoading ? (
-        <p>Carregando comentários...</p>
-      ) : comments.length === 0 ? (
-        <p>Seja o primeiro a comentar.</p>
-      ) : (
-        comments.map(comment => (
-          <CommentBox key={comment.id}>
-            <CommentAuthor>{comment.author_name}</CommentAuthor>
-            <CommentDate>
-              {new Date(comment.created_at).toLocaleString('pt-BR')}
-            </CommentDate>
-            <CommentContent>{comment.content}</CommentContent>
-          </CommentBox>
-        ))
-      )}
+{commentsLoading ? (
+  <p>Carregando comentários...</p>
+) : comments.length === 0 ? (
+  <p>Seja o primeiro a comentar.</p>
+) : (
+  comments.map(comment => {
+    const canDelete =
+      comment.author_id === userId || role === 'professor'
+
+    return (
+      <CommentBox key={comment.id}>
+        <CommentHeader>
+          <CommentAuthor>{comment.author_name}</CommentAuthor>
+
+          {canDelete && (
+            <DeleteCommentButton
+              onClick={() => handleDeleteComment(comment.id)}
+              title="Excluir comentário"
+            >
+              🗑️
+            </DeleteCommentButton>
+          )}
+        </CommentHeader>
+
+        <CommentDate>
+          {new Date(comment.created_at).toLocaleString('pt-BR')}
+        </CommentDate>
+
+        <CommentContent>{comment.content}</CommentContent>
+      </CommentBox>
+    )
+  })
+)}
 
       <NewCommentBox>
         <CommentTextArea
