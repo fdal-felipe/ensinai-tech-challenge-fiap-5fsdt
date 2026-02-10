@@ -77,24 +77,6 @@ class AIService {
     }
 }
 
-// Generate content suggestions
-exports.generate = async (req, res) => {
-    const { title } = req.body;
-
-    if (!title) {
-        return res.status(400).json({ error: 'Título é obrigatório para gerar sugestão.' });
-    }
-
-    try {
-        const content = AIService.generateContent(title);
-
-        setTimeout(() => {
-            res.status(200).json({ 
-                success: true,
-                content,
-                timestamp: new Date()
-            });
-        }, 1500);
 // Controller for AI features
 exports.generate = async (req, res) => {
     const { topic } = req.body;
@@ -110,7 +92,7 @@ exports.generate = async (req, res) => {
                 'x-api-key': 'Ens1n412026',
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({topic})  // Ajustado: usa "teste" em vez de "topic"
+            body: JSON.stringify({topic})
         });
 
         if (!response.ok) {
@@ -118,7 +100,7 @@ exports.generate = async (req, res) => {
         }
 
         const data = await response.json();
-        res.status(200).json({ content: data.content });  // Assumindo que a resposta externa tem { content: ... }
+        res.status(200).json({ content: data.content });
     } catch (error) {
         console.error('Erro na geração IA:', error);
         res.status(500).json({ error: 'Erro ao gerar sugestão.' });
