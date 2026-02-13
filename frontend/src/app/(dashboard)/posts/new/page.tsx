@@ -6,6 +6,8 @@ import Button from '../../../../components/Button';
 import Modal from '../../../../components/Modal';
 import ProfessorList from '../../../../components/ProfessorList';
 import { InputGroup, Label, Input } from '../../../../components/FormStyles';
+import { uploadImage } from '@/services/supabase';
+
 
 // --- Styled Components ---
 const Form = styled.form`
@@ -80,6 +82,48 @@ const Actions = styled.div`
   display: flex;
   justify-content: space-between;
 `;
+const ImageUploadContainer = styled.div`
+  margin-top: 1.5rem;
+`;
+
+const HiddenFileInput = styled.input`
+  display: none;
+`;
+
+const UploadButton = styled.button`
+  background: #111827;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-weight: 500;
+
+  &:hover {
+    background: #374151;
+  }
+`;
+
+const ImagePreview = styled.img`
+  margin-top: 1rem;
+  width: 300px;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+`;
+
+const RemoveImageButton = styled.button`
+  margin-top: 0.5rem;
+  background: transparent;
+  color: #ef4444;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
 
 //FSEIJI  - criando tipo de modal diferentes para cada um dos casos
 type ModalType = 'confirm-post' | 'ai-create' | 'success' | 'error';
@@ -128,6 +172,9 @@ export default function NewPostPage() {
 
   //FSEIJI armazenar o prompt que será enviado ao API do Agente
 const [aiPrompt, setAiPrompt] = useState('');
+const [imageFile, setImageFile] = useState<File | null>(null);
+const [imagePreview, setImagePreview] = useState<string | null>(null);
+
 
 
   const [modalState, setModalState] = useState<ModalState>({
@@ -162,43 +209,64 @@ const [aiPrompt, setAiPrompt] = useState('');
     });
   };
 
-  const handleConfirmCreate = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/professor/posts`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({ title, content, author_id }),
-      });
+ const handleConfirmCreate = async () => {
+  try {
+    const token = localStorage.getItem('token');
 
-      if (!res.ok) throw new Error('Erro ao criar post');
+    let imageUrl = null;
 
-      setModalState({
-        isOpen: true,
-        title: 'Post Criado!',
-        message: 'Seu novo post foi criado e publicado com sucesso.',
-        onConfirm: () => {
-          setModalState({ ...modalState, isOpen: false });
-          router.push('/posts');
-        },
-        confirmText: 'Ok',
-        confirmVariant: 'success',
-      });
-    } catch (err) {
-      console.error(err);
-      setModalState({
-        isOpen: true,
-        title: 'Erro',
-        message: 'Não foi possível criar o post.',
-        onConfirm: () => setModalState({ ...modalState, isOpen: false }),
-        confirmText: 'Ok',
-        confirmVariant: 'danger',
-      });
+    // upload imagem se existir
+    if (imageFile) {
+      imageUrl = await uploadImage(imageFile);
+
+      if (!imageUrl) {
+        alert('Erro ao fazer upload da imagem');
+        return;
+      }
     }
-  };
+
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/professor/posts`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        title,
+        content,
+        author_id,
+        image_url: imageUrl,
+      }),
+    });
+
+    if (!res.ok) throw new Error('Erro ao criar post');
+
+    setModalState({
+      isOpen: true,
+      title: 'Post Criado!',
+      message: 'Seu novo post foi criado com sucesso.',
+      onConfirm: () => {
+        setModalState({ ...modalState, isOpen: false });
+        router.push('/posts');
+      },
+      confirmText: 'Ok',
+      confirmVariant: 'success',
+    });
+
+  } catch (err) {
+    console.error(err);
+
+    setModalState({
+      isOpen: true,
+      title: 'Erro',
+      message: 'Não foi possível criar o post.',
+      onConfirm: () => setModalState({ ...modalState, isOpen: false }),
+      confirmText: 'Ok',
+      confirmVariant: 'danger',
+    });
+  }
+};
+
 const generateContent = async (topic: string): Promise<string> => {
   try {
     const token = localStorage.getItem('token');
@@ -266,6 +334,49 @@ function stripHtml(html: string) {
           placeholder='Descreva a atividade ou o conteúdo do post...'
         />
       </InputGroup>
+      <ImageUploadContainer>
+  <Label>IMAGEM DE CAPA</Label>
+
+  <HiddenFileInput
+    id="imageUpload"
+    type="file"
+    accept="image/*"
+    onChange={(e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
+    }}
+  />
+
+  <UploadButton
+    type="button"
+    onClick={() => {
+      document.getElementById('imageUpload')?.click();
+    }}
+  >
+    Selecionar imagem
+  </UploadButton>
+
+  {imagePreview && (
+    <>
+      <ImagePreview src={imagePreview} />
+
+      <RemoveImageButton
+        type="button"
+        onClick={() => {
+          setImageFile(null);
+          setImagePreview(null);
+        }}
+      >
+        Remover imagem
+      </RemoveImageButton>
+    </>
+  )}
+</ImageUploadContainer>
+
+
 
       <Actions>
         <Button type='submit' variant='success'>
