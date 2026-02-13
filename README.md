@@ -231,7 +231,12 @@ A aplicação segue uma arquitetura moderna, escalável e **multiplataforma**:
 
 ```
 📦 ensinai-tech-challenge-fiap-5fsdt/
-├── 📁 backend/                     # API Node.js/Express
+├── 📁 ai-service/                  # 🤖 Serviço de IA (Python/FastAPI)
+│   ├── 📄 main.py                  # Aplicação FastAPI
+│   ├── 📄 requirements.txt         # Dependências Python
+│   ├── 📄 render.yaml              # Deploy no Render
+│   └── 📄 README.md                # Documentação do serviço
+├── 📁 backend/                     # 🔧 API Node.js/Express
 │   ├── 📁 src/
 │   │   ├── 📁 controllers/         # Lógica de negócio
 │   │   ├── 📁 routes/              # Definição das rotas
@@ -240,13 +245,15 @@ A aplicação segue uma arquitetura moderna, escalável e **multiplataforma**:
 │   ├── 📁 tests/                   # Testes automatizados
 │   ├── 📁 postgres-init/           # Scripts de inicialização do DB
 │   ├── 🐳 Dockerfile               # Container do backend
+│   ├── 📄 README.md                # Documentação da API
 │   └── 📄 package.json
-├── 📁 frontend/                    # Aplicação Next.js/React
+├── 📁 frontend/                    # 🎨 Aplicação Next.js/React
 │   ├── 📁 src/
 │   │   ├── 📁 app/                 # Pages (App Router)
 │   │   ├── 📁 components/          # Componentes reutilizáveis
 │   │   └── 📁 lib/                 # Utilitários
 │   ├── 🐳 Dockerfile               # Container do frontend
+│   ├── 📄 README.md                # Documentação do frontend
 │   └── 📄 package.json
 ├── 📁 mobile/                      # 📱 Aplicativo React Native
 │   ├── 📁 app/                     # Screens (Expo Router)
@@ -261,6 +268,7 @@ A aplicação segue uma arquitetura moderna, escalável e **multiplataforma**:
 │   │   ├── 📁 contexts/            # Context API (Auth, Theme)
 │   │   └── 📁 types/               # Definições TypeScript
 │   ├── 📁 constants/               # Constantes (cores, etc.)
+│   ├── 📄 README.md                # Documentação do mobile
 │   └── 📄 package.json
 ├── 📁 docs/                        # 📚 Documentação do projeto
 │   ├── 📁 diagramas/               # Diagramas de arquitetura
@@ -687,9 +695,20 @@ As migrações são executadas automaticamente na inicialização via `backend/s
 
 ## 📚 Documentação
 
-O projeto conta com documentação completa na pasta `docs/`:
+O projeto conta com documentação completa organizada por componente:
 
-### 📋 Documentos Disponíveis
+### 📁 Documentação por Componente
+
+Cada componente do monorepo possui sua própria documentação detalhada:
+
+| Componente | README | Descrição |
+|------------|--------|-----------|
+| 🤖 **AI Service** | [ai-service/README.md](ai-service/README.md) | Serviço de IA com Vertex AI e Gemini |
+| 🔧 **Backend** | [backend/README.md](backend/README.md) | API RESTful com Node.js e Express |
+| 🎨 **Frontend** | [frontend/README.md](frontend/README.md) | Aplicação web com Next.js 15 |
+| 📱 **Mobile** | [mobile/README.md](mobile/README.md) | App nativo com React Native e Expo |
+
+### 📋 Documentos Gerais
 
 -   **[Arquitetura do Sistema](docs/arquitetura.md)** - Documentação técnica completa
 -   **[Guia de Uso](docs/guia-de-uso.md)** - Manual do usuário final

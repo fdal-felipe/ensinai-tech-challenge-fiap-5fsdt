@@ -23,4 +23,7 @@ frontend/node_modules
 frontend/dist
 frontend/.env
 frontend/README.md
+ai-service/venv
+ai-service/google_credentials.json
+__pycache__
 venv
